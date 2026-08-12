@@ -8,11 +8,7 @@
 
 <style>
 *{box-sizing:border-box}
-
-html{
-scroll-behavior:smooth
-}
-
+html{scroll-behavior:smooth}
 body{
 margin:0;
 background:#fbf5f1;
@@ -116,7 +112,6 @@ gap:14px
 }
 
 .photo{
-position:relative;
 aspect-ratio:1;
 border-radius:20px;
 background:linear-gradient(135deg,#ead0d0,#f8e9e4);
@@ -136,17 +131,35 @@ object-fit:cover;
 border-radius:20px
 }
 
+.first-photo{
+padding:0;
+display:block;
+height:auto;
+aspect-ratio:auto
+}
+
+.first-photo a{
+display:block;
+width:100%
+}
+
+.first-photo img{
+display:block;
+width:100%;
+height:auto;
+aspect-ratio:1;
+object-fit:cover;
+border-radius:20px 20px 0 0
+}
+
 .photo-caption{
-position:absolute;
-bottom:0;
-left:0;
-right:0;
-background:#fffdf9ee;
-padding:10px;
+background:#fffdf9;
+padding:12px 8px;
 color:#6d3147;
 font-family:Georgia,serif;
 font-size:16px;
-text-align:center
+text-align:center;
+border-radius:0 0 20px 20px
 }
 
 .cards{
@@ -390,15 +403,23 @@ Little Moments, Big Memories 📸
 
 <div class="grid">
 
-<div class="photo">
+<div class="photo first-photo">
 
-<img src="our-first-pic-together.jpg" alt="Our first pic together">
+<a href="our-first-pic-together.jpg" target="_blank">
+
+<img
+src="our-first-pic-together.jpg"
+alt="Our first pic together"
+>
+
+</a>
 
 <div class="photo-caption">
 Our first pic together ❤️
 </div>
 
 </div>
+
 
 <div class="photo">
 A memory I'll always keep
