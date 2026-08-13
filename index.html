@@ -860,7 +860,8 @@ text-shadow:
 
 
 /* =====================================================
-   CANDLES
+   22 CANDLES
+   POSITIONED DIRECTLY ON CAKE TOP
 ===================================================== */
 
 .candles{
@@ -868,7 +869,7 @@ position:absolute;
 width:390px;
 height:240px;
 left:50%;
-bottom:190px;
+bottom:185px;
 transform:translateX(-50%);
 z-index:12;
 pointer-events:none;
@@ -1827,7 +1828,7 @@ your 22 candles ✨
 <div class="cake-stage">
 
 
-<!-- SUPERMAN -->
+<!-- SUPERMAN FIGURE -->
 
 <div class="superhero">
 
@@ -1863,13 +1864,7 @@ S
 </div>
 
 
-<!-- =================================================
-     BLANK BABY PHOTO SPACE
-
-     The actual photo will be added later.
-
-     There is NO baby-photo.jpg here.
-================================================= -->
+<!-- BLANK BABY PHOTO SPACE -->
 
 <div
 class="baby-head"
@@ -1877,9 +1872,13 @@ id="babyPhotoSpace"
 >
 
 <span>
-BABY<br>
-PHOTO<br>
+
+BABY
+<br>
+PHOTO
+<br>
 SPACE
+
 </span>
 
 </div>
@@ -1965,7 +1964,6 @@ id="tapButton"
 
 </button>
 
-
 </div>
 
 
@@ -1979,9 +1977,7 @@ Make a wish first… 🥺❤️
 </div>
 
 
-<!-- =================================================
-     CELEBRATION
-================================================= -->
+<!-- CELEBRATION -->
 
 <div
 class="birthday-celebration"
@@ -1993,7 +1989,6 @@ id="birthdayCelebration"
 
 HAPPY 22ND BIRTHDAY,
 <br>
-
 MY LOVE! 🎂❤️
 
 </h2>
@@ -2008,11 +2003,9 @@ And happy 7 months to us. 🥹💕
 Seven months of us.
 
 <br>
-
 Seven months of choosing each other.
 
 <br>
-
 Seven months of memories,
 laughter, love and growing together.
 
@@ -2096,10 +2089,10 @@ Made with all my heart, just for you.
 
 /* =====================================================
    PASSCODE
+   CODE: 220426
 ===================================================== */
 
-const correctCode =
-"220426";
+const correctCode = "220426";
 
 const inputs =
 document.querySelectorAll(
@@ -2135,16 +2128,13 @@ input.value.replace(
 ""
 );
 
-
 if(
 input.value &&
 index <
 inputs.length - 1
 ){
 
-inputs[
-index + 1
-].focus();
+inputs[index + 1].focus();
 
 }
 
@@ -2162,12 +2152,9 @@ event.key === "Backspace" &&
 index > 0
 ){
 
-inputs[
-index - 1
-].focus();
+inputs[index - 1].focus();
 
 }
-
 
 if(
 event.key === "Enter"
@@ -2186,7 +2173,6 @@ unlock();
 function unlock(){
 
 let entered = "";
-
 
 inputs.forEach(
 input=>{
@@ -2227,7 +2213,7 @@ lockError.textContent =
 
 inputs.forEach(
 input=>{
-input.value="";
+input.value = "";
 });
 
 
@@ -2306,17 +2292,19 @@ document.getElementById(
 );
 
 
-const totalCandles =
-22;
+const totalCandles = 22;
 
-let candlesOut =
-0;
+let candlesOut = 0;
 
-let completed =
-false;
+let completed = false;
 
 
-/* Create 22 candles */
+/*
+Create all 22 candles.
+
+They are positioned across the
+oval top of the Superman cake.
+*/
 
 for(
 let i = 0;
@@ -2334,11 +2322,6 @@ candle.className =
 "candle";
 
 
-/*
-Arrange candles around
-the cake.
-*/
-
 const angle =
 (
 Math.PI * 2 * i /
@@ -2346,21 +2329,24 @@ totalCandles
 );
 
 
-const radiusX =
-175;
+/*
+These values keep the candles
+on the cake's oval top.
+*/
 
-const radiusY =
-75;
+const radiusX = 125;
+
+const radiusY = 25;
 
 
 const x =
-190 +
+195 +
 Math.cos(angle) *
 radiusX;
 
 
 const y =
-135 +
+45 +
 Math.sin(angle) *
 radiusY;
 
@@ -2402,7 +2388,7 @@ candle
 
 
 /* =====================================================
-   EXTINGUISH
+   EXTINGUISH CANDLE
 ===================================================== */
 
 function extinguishCandle(
@@ -2446,7 +2432,7 @@ birthdayComplete();
 
 
 /* =====================================================
-   TAP
+   TAP CANDLE
 ===================================================== */
 
 function blowOneCandle(){
@@ -2474,20 +2460,15 @@ remaining[0]
    MICROPHONE BLOW
 ===================================================== */
 
-let audioContext =
-null;
+let audioContext = null;
 
-let analyser =
-null;
+let analyser = null;
 
-let microphone =
-null;
+let microphone = null;
 
-let blowListening =
-false;
+let blowListening = false;
 
-let lastBlow =
-0;
+let lastBlow = 0;
 
 
 async function startBlowing(){
@@ -2535,8 +2516,7 @@ window.webkitAudioContext
 
 
 analyser =
-audioContext
-.createAnalyser();
+audioContext.createAnalyser();
 
 
 analyser.fftSize =
@@ -2564,7 +2544,6 @@ blowStatus.textContent =
 
 
 listenForBlow();
-
 
 }
 
@@ -2605,13 +2584,12 @@ data
 );
 
 
-let total =
-0;
+let total = 0;
 
 
 for(
-let i=0;
-i<data.length;
+let i = 0;
+i < data.length;
 i++
 ){
 
@@ -2652,7 +2630,7 @@ listenForBlow
 
 
 /* =====================================================
-   COMPLETE
+   ALL 22 CANDLES OUT
 ===================================================== */
 
 function birthdayComplete(){
@@ -2703,7 +2681,6 @@ block:"center"
 
 launchConfetti();
 
-
 },
 900
 );
@@ -2729,8 +2706,8 @@ const colors = [
 
 
 for(
-let i=0;
-i<120;
+let i = 0;
+i < 120;
 i++
 ){
 
