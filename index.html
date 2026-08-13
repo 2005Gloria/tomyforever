@@ -19,9 +19,7 @@
 --line:#ead7d5
 }
 
-*{
-box-sizing:border-box
-}
+*{box-sizing:border-box}
 
 html{
 scroll-behavior:smooth
@@ -575,15 +573,15 @@ color:#604653
 }
 
 
-/* SURPRISE */
+/* CLICK ME SURPRISE */
 
-.surprise{
+.click-section{
 padding:110px 22px;
 background:
 radial-gradient(
 circle at 50% 45%,
-#6a3b51 0,
-#321d27 45%,
+#704056 0,
+#321d27 48%,
 #160c14 100%
 );
 color:white;
@@ -591,32 +589,101 @@ text-align:center;
 overflow:hidden
 }
 
-.surprise h2{
+.click-section .section-title{
 color:#f6dce2;
-font:
-400 clamp(38px,10vw,65px)
-Georgia,serif
+margin-bottom:22px
 }
 
-.surprise-text{
-max-width:700px;
-margin:30px auto;
-font:
-22px/1.9
-Georgia,serif
+.click-section .eyebrow{
+color:#f3ccd5
 }
 
-.surprise-heart{
-font-size:70px;
-display:inline-block;
-animation:heartbeat 1.6s infinite;
-filter:
-drop-shadow(
-0 0 25px #e89aaa
+.click-me{
+border:0;
+cursor:pointer;
+padding:16px 30px;
+border-radius:999px;
+background:
+linear-gradient(
+135deg,
+#d28c9d,
+#8a4b60
+);
+color:white;
+font:
+18px Georgia,serif;
+box-shadow:
+0 10px 30px #0005,
+0 0 25px #e89aaa55;
+transition:.35s
+}
+
+.click-me:hover{
+transform:
+translateY(-4px)
+scale(1.03);
+box-shadow:
+0 15px 40px #0006,
+0 0 35px #e89aaa77
+}
+
+.click-me:active{
+transform:scale(.96)
+}
+
+.click-me.open{
+background:
+linear-gradient(
+135deg,
+#8a4b60,
+#632f43
 )
 }
 
+.surprise-message{
+max-width:700px;
+margin:30px auto 0;
+font:
+22px/1.9
+Georgia,serif;
+color:#f9e9ed;
+opacity:0;
+max-height:0;
+overflow:hidden;
+transform:
+translateY(15px)
+scale(.98);
+transition:
+opacity .8s ease,
+transform .8s ease,
+max-height 1s ease
+}
+
+.surprise-message.show{
+opacity:1;
+max-height:900px;
+transform:
+translateY(0)
+scale(1)
+}
+
+.surprise-heart{
+display:block;
+margin:25px auto 0;
+font-size:62px;
+color:#f0a8b8;
+filter:
+drop-shadow(
+0 0 22px #e89aaa
+);
+animation:
+heartbeat 1.6s infinite
+}
+
 @keyframes heartbeat{
+0%,100%{
+transform:scale(1)
+}
 50%{
 transform:scale(1.18)
 }
@@ -749,14 +816,11 @@ For the person who makes my world feel a little softer, brighter, and happier.
 </div>
 
 <audio controls loop>
-
 <source
 src="Dandelions mp3.mp3"
 type="audio/mpeg"
 >
-
 Your browser does not support the audio player.
-
 </audio>
 
 </div>
@@ -1169,24 +1233,32 @@ But I can promise that my love for you is something I will always treasure.
 </section>
 
 
-<!-- SURPRISE -->
+<!-- CLICK ME SURPRISE -->
 
-<section class="surprise">
+<section class="click-section">
 
 <div class="reveal-on-scroll">
 
-<div
-class="eyebrow"
-style="color:#f3ccd5"
->
+<div class="eyebrow">
 One more thing…
 </div>
 
-<h2>
-If I had to choose my forever…
+<h2 class="section-title">
+I Have One More Thing To Tell You…
 </h2>
 
-<div class="surprise-text">
+<button
+class="click-me"
+id="clickMe"
+onclick="showSurprise()"
+>
+Click Me ❤️
+</button>
+
+<div
+class="surprise-message"
+id="surpriseMessage"
+>
 
 If I could choose one person to write a thousand love letters to, it would still be you.<br><br>
 
@@ -1202,10 +1274,10 @@ I'd choose you.
 
 Every single time. ❤️
 
-</div>
-
 <div class="surprise-heart">
 ♥
+</div>
+
 </div>
 
 </div>
@@ -1238,34 +1310,76 @@ Scan the heart when you want a little piece of my heart ❤️
 
 <script>
 
-/* Stars */
+/* CLICK ME */
 
-const stars=document.getElementById("stars");
+function showSurprise(){
 
-for(let i=0;i<75;i++){
+const message=
+document.getElementById("surpriseMessage");
 
-const s=document.createElement("span");
+const button=
+document.getElementById("clickMe");
+
+message.classList.toggle("show");
+
+button.classList.toggle("open");
+
+if(
+message.classList.contains("show")
+){
+
+button.textContent=
+"I Love You ❤️";
+
+}else{
+
+button.textContent=
+"Click Me ❤️";
+
+}
+
+}
+
+
+/* STARS */
+
+const stars=
+document.getElementById("stars");
+
+for(
+let i=0;
+i<75;
+i++
+){
+
+const s=
+document.createElement("span");
 
 s.className="star";
 
-s.style.left=Math.random()*100+"%";
+s.style.left=
+Math.random()*100+"%";
 
-s.style.top=Math.random()*100+"%";
+s.style.top=
+Math.random()*100+"%";
 
 s.style.animationDelay=
 Math.random()*3+"s";
 
 s.style.animationDuration=
-1.5+Math.random()*3+"s";
+1.5+
+Math.random()*3+
+"s";
 
 stars.appendChild(s);
 
 }
 
 
-/* Floating hearts */
+/* FLOATING HEARTS */
 
-const petals=document.getElementById("petals");
+const petals=
+document.getElementById("petals");
 
 const symbols=[
 "♡",
@@ -1273,9 +1387,14 @@ const symbols=[
 "✦"
 ];
 
-for(let i=0;i<18;i++){
+for(
+let i=0;
+i<18;
+i++
+){
 
-const p=document.createElement("span");
+const p=
+document.createElement("span");
 
 p.className="petal";
 
@@ -1290,28 +1409,36 @@ p.style.left=
 Math.random()*100+"%";
 
 p.style.fontSize=
-12+Math.random()*15+"px";
+12+
+Math.random()*15+
+"px";
 
 p.style.animationDuration=
-9+Math.random()*9+"s";
+9+
+Math.random()*9+
+"s";
 
 p.style.animationDelay=
--Math.random()*12+"s";
+-Math.random()*12+
+"s";
 
 petals.appendChild(p);
 
 }
 
 
-/* Scroll animations */
+/* SCROLL ANIMATIONS */
 
 const observer=
 new IntersectionObserver(
 (entries)=>{
 
-entries.forEach(entry=>{
+entries.forEach(
+entry=>{
 
-if(entry.isIntersecting){
+if(
+entry.isIntersecting
+){
 
 entry.target.classList.add(
 "visible"
@@ -1328,7 +1455,9 @@ threshold:.12
 );
 
 document
-.querySelectorAll(".reveal-on-scroll")
+.querySelectorAll(
+".reveal-on-scroll"
+)
 .forEach(
 el=>observer.observe(el)
 );
