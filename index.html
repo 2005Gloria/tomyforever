@@ -51,6 +51,166 @@ max-width:920px;
 margin:auto
 }
 
+
+/* =========================
+   SECRET LOCK SCREEN
+========================= */
+
+.lock-screen{
+position:fixed;
+inset:0;
+z-index:99999;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+padding:25px;
+background:
+radial-gradient(
+circle at 50% 35%,
+#fff 0,
+#fff7f8 30%,
+#f3dadd 65%,
+#d9a7ad 100%
+);
+transition:opacity .9s ease,visibility .9s ease;
+}
+
+.lock-screen.hidden{
+opacity:0;
+visibility:hidden;
+pointer-events:none;
+}
+
+.lock-box{
+width:min(430px,100%);
+padding:42px 28px;
+border-radius:32px;
+background:#ffffff70;
+border:1px solid #ffffffaa;
+backdrop-filter:blur(18px);
+-webkit-backdrop-filter:blur(18px);
+box-shadow:
+0 30px 80px #632f4325,
+inset 0 1px 0 #ffffff;
+}
+
+.lock-heart{
+font-size:58px;
+margin-bottom:12px;
+animation:lockPulse 1.8s infinite;
+filter:drop-shadow(0 8px 15px #632f4330);
+}
+
+.lock-box h2{
+font-family:Georgia,serif;
+font-weight:400;
+font-size:38px;
+text-align:center;
+color:var(--wine);
+margin:0 0 12px;
+}
+
+.lock-box h2:after{
+display:none;
+}
+
+.lock-message{
+font-family:Georgia,serif;
+font-style:italic;
+font-size:17px;
+line-height:1.7;
+color:#694b57;
+margin-bottom:25px;
+}
+
+.lock-input{
+width:100%;
+padding:16px;
+border-radius:18px;
+border:1px solid #d9a7ad;
+background:#fffdf9cc;
+text-align:center;
+font-size:22px;
+letter-spacing:8px;
+color:#632f43;
+outline:none;
+font-family:Arial,sans-serif;
+}
+
+.lock-input:focus{
+border-color:#632f43;
+box-shadow:0 0 0 4px #632f4312;
+}
+
+.unlock-btn{
+margin-top:17px;
+width:100%;
+padding:16px;
+border:0;
+border-radius:999px;
+background:linear-gradient(135deg,#632f43,#8a4b60);
+color:white;
+font-family:Georgia,serif;
+font-size:17px;
+cursor:pointer;
+box-shadow:0 12px 30px #632f4330;
+transition:.3s;
+}
+
+.unlock-btn:hover{
+transform:translateY(-3px);
+}
+
+.unlock-btn:active{
+transform:scale(.97);
+}
+
+.wrong-code{
+height:24px;
+margin-top:13px;
+font-family:Georgia,serif;
+font-size:14px;
+color:#9b4b5d;
+opacity:0;
+transition:.3s;
+}
+
+.wrong-code.show{
+opacity:1;
+animation:shake .35s ease;
+}
+
+.lock-hearts{
+margin-top:20px;
+font-size:14px;
+letter-spacing:7px;
+color:#b97884;
+}
+
+@keyframes lockPulse{
+50%{
+transform:scale(1.12);
+}
+}
+
+@keyframes shake{
+0%,100%{
+transform:translateX(0);
+}
+25%{
+transform:translateX(-7px);
+}
+75%{
+transform:translateX(7px);
+}
+}
+
+
+/* =========================
+   HERO
+========================= */
+
 .hero{
 min-height:100svh;
 display:flex;
@@ -60,7 +220,13 @@ text-align:center;
 position:relative;
 overflow:hidden;
 background:
-radial-gradient(circle at 50% 30%,#fff 0,#fffaf8 35%,#f6e7e4 72%,#ead0d2 100%)
+radial-gradient(
+circle at 50% 30%,
+#fff 0,
+#fffaf8 35%,
+#f6e7e4 72%,
+#ead0d2 100%
+)
 }
 
 .hero:after{
@@ -142,7 +308,9 @@ transform:scale(.97)
 }
 
 
-/* CUTE MUSIC PLAYER */
+/* =========================
+   CUTE MUSIC PLAYER
+========================= */
 
 .music-player{
 margin:28px auto 0;
@@ -289,7 +457,9 @@ inset 0 1px 0 #ffffffaa
 }
 
 
-/* HEADINGS */
+/* =========================
+   HEADINGS
+========================= */
 
 h2{
 font-family:Georgia,serif;
@@ -317,7 +487,9 @@ font-family:Georgia,serif
 }
 
 
-/* LETTER */
+/* =========================
+   LETTER
+========================= */
 
 .letter{
 position:relative;
@@ -343,7 +515,9 @@ color:#d9a7ad55
 }
 
 
-/* PHOTOS */
+/* =========================
+   PHOTOS
+========================= */
 
 .grid{
 display:grid;
@@ -410,7 +584,9 @@ border-radius:0 0 18px 18px
 }
 
 
-/* REASONS */
+/* =========================
+   REASONS
+========================= */
 
 .cards{
 display:grid;
@@ -440,7 +616,9 @@ box-shadow:0 18px 40px #632f4318
 }
 
 
-/* DARK SECTION */
+/* =========================
+   DARK SECTION
+========================= */
 
 .dark{
 max-width:none;
@@ -488,7 +666,9 @@ animation:fade .8s ease
 }
 
 
-/* FINAL */
+/* =========================
+   FINAL
+========================= */
 
 .final{
 text-align:center;
@@ -510,7 +690,9 @@ filter:drop-shadow(0 8px 15px #632f4330)
 }
 
 
-/* FLOATING HEARTS */
+/* =========================
+   FLOATING HEARTS
+========================= */
 
 .float{
 position:absolute;
@@ -592,15 +774,79 @@ grid-template-columns:repeat(4,1fr)
 <body>
 
 
-<!-- OPENING PAGE -->
+<!-- =========================
+     SECRET LOCK SCREEN
+========================= -->
+
+<div class="lock-screen" id="lockScreen">
+
+<div class="lock-box">
+
+<div class="lock-heart">
+🔐❤️
+</div>
+
+<h2>
+A Little Secret
+</h2>
+
+<div class="lock-message">
+
+This little piece of my heart<br>
+is just for you. 🥺❤️
+
+<br><br>
+
+Enter the secret code to continue…
+
+</div>
+
+<input
+type="password"
+id="passcode"
+class="lock-input"
+inputmode="numeric"
+maxlength="6"
+placeholder="••••••"
+autocomplete="off"
+>
+
+<button
+class="unlock-btn"
+onclick="unlockHeart()"
+>
+Unlock My Heart 💌
+</button>
+
+<div
+class="wrong-code"
+id="wrongCode"
+>
+Hmm… that's not it, my love 🥺❤️ Try again.
+</div>
+
+<div class="lock-hearts">
+♡ ♥ ♡ ♥ ♡
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     OPENING PAGE
+========================= -->
 
 <section class="hero">
 
 <div class="float">
+
 <span>♥</span>
 <span>♡</span>
 <span>♥</span>
 <span>♡</span>
+
 </div>
 
 <div class="hero-inner">
@@ -623,9 +869,12 @@ For the person who makes my world feel a little softer, brighter, and happier.
 </p>
 
 
-<!-- CUTE MUSIC PLAYER -->
+<!-- MUSIC PLAYER -->
 
-<div class="music-player" id="musicPlayer">
+<div
+class="music-player"
+id="musicPlayer"
+>
 
 <div class="music-top">
 
@@ -668,7 +917,10 @@ Your browser does not support the audio player.
 </div>
 
 
-<a class="btn" href="#letter">
+<a
+class="btn"
+href="#letter"
+>
 Open My Heart 💌
 </a>
 
@@ -677,7 +929,9 @@ Open My Heart 💌
 </section>
 
 
-<!-- LOVE LETTER -->
+<!-- =========================
+     LOVE LETTER
+========================= -->
 
 <section id="letter">
 
@@ -726,16 +980,21 @@ And again.
 You are my person, my love, and my forever.
 
 With all my heart,
-Your girl ❤️</div>
+Your woman ❤️</div>
 
 </section>
 
 
-<!-- MEMORIES -->
+<!-- =========================
+     MEMORIES
+========================= -->
 
 <section>
 
-<div class="eyebrow" style="text-align:center;margin-bottom:12px">
+<div
+class="eyebrow"
+style="text-align:center;margin-bottom:12px"
+>
 The little pieces of us
 </div>
 
@@ -794,11 +1053,16 @@ Just you being you
 </section>
 
 
-<!-- REASONS -->
+<!-- =========================
+     REASONS
+========================= -->
 
 <section>
 
-<div class="eyebrow" style="text-align:center;margin-bottom:12px">
+<div
+class="eyebrow"
+style="text-align:center;margin-bottom:12px"
+>
 If you ever forget
 </div>
 
@@ -845,7 +1109,9 @@ Simply because you are YOU ❤️
 </section>
 
 
-<!-- NEVER FORGET -->
+<!-- =========================
+     NEVER FORGET
+========================= -->
 
 <section>
 
@@ -872,7 +1138,9 @@ And no matter how difficult life gets, I hope you always remember that you have 
 </section>
 
 
-<!-- ANOTHER YEAR -->
+<!-- =========================
+     ANOTHER YEAR
+========================= -->
 
 <section>
 
@@ -900,7 +1168,9 @@ But I can promise that my love for you is something I will always treasure.
 </section>
 
 
-<!-- SECRET SURPRISE -->
+<!-- =========================
+     SECRET SURPRISE
+========================= -->
 
 <section class="dark">
 
@@ -914,9 +1184,7 @@ One More Thing…
 class="btn"
 onclick="document.getElementById('surprise').classList.toggle('show')"
 >
-
 Click Me ❤️
-
 </button>
 
 </div>
@@ -932,7 +1200,11 @@ If I could relive one chapter of my life, I'd choose the chapter where I met you
 
 And if I had to choose my forever…<br><br>
 
-<strong>I'd choose you.</strong><br><br>
+<strong>
+I'd choose you.
+</strong>
+
+<br><br>
 
 Every single time. ❤️
 
@@ -941,7 +1213,9 @@ Every single time. ❤️
 </section>
 
 
-<!-- END -->
+<!-- =========================
+     END
+========================= -->
 
 <section class="final">
 
@@ -962,7 +1236,68 @@ Made with all my heart, just for you.
 
 <script>
 
-/* MUSIC PLAYER ANIMATION */
+/* =========================
+   SECRET PASSCODE
+========================= */
+
+function unlockHeart(){
+
+const correctCode = "220426";
+
+const enteredCode =
+document.getElementById("passcode").value;
+
+const lockScreen =
+document.getElementById("lockScreen");
+
+const wrongCode =
+document.getElementById("wrongCode");
+
+if(enteredCode === correctCode){
+
+lockScreen.classList.add("hidden");
+
+setTimeout(function(){
+
+lockScreen.style.display = "none";
+
+},900);
+
+}else{
+
+wrongCode.classList.remove("show");
+
+void wrongCode.offsetWidth;
+
+wrongCode.classList.add("show");
+
+document.getElementById("passcode").value = "";
+
+}
+
+}
+
+
+/* PRESS ENTER TO UNLOCK */
+
+document
+.getElementById("passcode")
+.addEventListener(
+"keydown",
+function(event){
+
+if(event.key === "Enter"){
+
+unlockHeart();
+
+}
+
+});
+
+
+/* =========================
+   MUSIC PLAYER
+========================= */
 
 const loveSong =
 document.getElementById("loveSong");
@@ -973,21 +1308,27 @@ document.getElementById("musicPlayer");
 loveSong.addEventListener(
 "play",
 function(){
+
 musicPlayer.classList.add("playing");
+
 }
 );
 
 loveSong.addEventListener(
 "pause",
 function(){
+
 musicPlayer.classList.remove("playing");
+
 }
 );
 
 loveSong.addEventListener(
 "ended",
 function(){
+
 musicPlayer.classList.remove("playing");
+
 }
 );
 
