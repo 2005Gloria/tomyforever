@@ -7,8 +7,13 @@
 <meta name="description" content="A little piece of my heart, made just for you.">
 
 <style>
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
+*{
+box-sizing:border-box
+}
+
+html{
+scroll-behavior:smooth
+}
 
 body{
 margin:0;
@@ -34,7 +39,10 @@ transparent 0 4px,
 );
 }
 
-button,input{font:inherit}
+button,
+input{
+font:inherit
+}
 
 
 /* =====================================================
@@ -599,7 +607,7 @@ margin:25px 0;
 .cake-stage{
 position:relative;
 width:min(520px,100%);
-height:480px;
+height:500px;
 margin:20px auto 10px;
 }
 
@@ -789,44 +797,202 @@ display:block;
 
 
 /* =====================================================
-   CAKE
+   TWO-TIER CUTE SUPERMAN CAKE
 ===================================================== */
 
 .cake{
 position:absolute;
-width:310px;
-height:175px;
+width:330px;
+height:165px;
 left:50%;
-bottom:55px;
+bottom:45px;
 transform:translateX(-50%);
-border-radius:22px 22px 35px 35px;
+border-radius:20px 20px 30px 30px;
 
 background:
 linear-gradient(
 180deg,
-#245d9a 0 45%,
-#174b86 46% 100%
+#2e6db0 0 38%,
+#1c528e 39% 100%
 );
 
-border-bottom:16px solid #b52c29;
+border-bottom:15px solid #b72c29;
 
 box-shadow:
-0 20px 25px #50352545,
-inset 0 -12px 0 #103c70;
+0 22px 28px #50352545,
+inset 0 -12px 0 #123e70;
 
 z-index:4;
 }
 
+.cake:before{
+content:"";
+position:absolute;
+left:0;
+right:0;
+top:25px;
+height:20px;
+background:#f5dfb5;
+opacity:.9;
+
+clip-path:
+polygon(
+0 0,
+8% 0,
+10% 60%,
+15% 60%,
+18% 0,
+27% 0,
+30% 65%,
+35% 65%,
+39% 0,
+48% 0,
+51% 60%,
+57% 60%,
+61% 0,
+70% 0,
+73% 65%,
+79% 65%,
+83% 0,
+92% 0,
+95% 60%,
+100% 60%,
+100% 100%,
+0 100%
+);
+}
+
 .cake-top{
 position:absolute;
-width:310px;
-height:65px;
+width:330px;
+height:66px;
 left:50%;
 top:-25px;
 transform:translateX(-50%);
 border-radius:50%;
-background:#2b69aa;
-border:7px solid #d4ad32;
+
+background:
+radial-gradient(
+ellipse at center,
+#4a86c4 0 45%,
+#2e69a8 46% 100%
+);
+
+border:7px solid #d8ad2f;
+
+box-shadow:
+inset 0 -7px 0 #194d86;
+
+z-index:5;
+}
+
+
+/* =====================================================
+   SMALL SECOND CAKE TIER
+===================================================== */
+
+.cake-upper{
+position:absolute;
+width:205px;
+height:92px;
+left:50%;
+bottom:190px;
+transform:translateX(-50%);
+border-radius:17px 17px 22px 22px;
+
+background:
+linear-gradient(
+180deg,
+#3d7fbd 0 35%,
+#20578f 36% 100%
+);
+
+border-bottom:10px solid #b72c29;
+
+box-shadow:
+0 12px 20px #50352535,
+inset 0 -7px 0 #164577;
+
+z-index:6;
+}
+
+.cake-upper:before{
+content:"";
+position:absolute;
+left:0;
+right:0;
+top:17px;
+height:15px;
+background:#f5dfb5;
+
+clip-path:
+polygon(
+0 0,
+12% 0,
+15% 65%,
+20% 65%,
+24% 0,
+35% 0,
+39% 60%,
+44% 60%,
+48% 0,
+59% 0,
+63% 65%,
+68% 65%,
+72% 0,
+83% 0,
+87% 60%,
+92% 60%,
+96% 0,
+100% 0,
+100% 100%,
+0 100%
+);
+}
+
+.upper-top{
+position:absolute;
+width:205px;
+height:48px;
+left:50%;
+top:-18px;
+transform:translateX(-50%);
+border-radius:50%;
+
+background:#3979b9;
+
+border:5px solid #d8ad2f;
+
+z-index:7;
+}
+
+.upper-emblem{
+position:absolute;
+width:58px;
+height:44px;
+left:50%;
+top:31px;
+transform:translateX(-50%);
+
+background:#e5b52c;
+color:#c72e28;
+
+clip-path:
+polygon(
+50% 0,
+100% 23%,
+82% 100%,
+18% 100%,
+0 23%
+);
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+font:bold 29px Arial,sans-serif;
+
+z-index:8;
 }
 
 .cake-emblem{
@@ -836,6 +1002,7 @@ height:82px;
 left:50%;
 top:55px;
 transform:translateX(-50%);
+
 background:#e5b52c;
 color:#c72e28;
 
@@ -856,42 +1023,78 @@ font:bold 54px Arial,sans-serif;
 
 text-shadow:
 2px 2px #71311e;
+
+z-index:8;
+}
+
+
+/* Little Superman stars */
+
+.cake-star{
+position:absolute;
+color:#f6df9c;
+font-size:17px;
+z-index:9;
+}
+
+.cake-star.s1{
+left:18px;
+top:70px;
+}
+
+.cake-star.s2{
+right:20px;
+top:86px;
+}
+
+.cake-star.s3{
+left:45px;
+bottom:24px;
+}
+
+.cake-star.s4{
+right:48px;
+bottom:30px;
 }
 
 
 /* =====================================================
-   22 CANDLES
-   POSITIONED DIRECTLY ON CAKE TOP
+   22 CANDLES — DIRECTLY ON TOP OF UPPER CAKE
 ===================================================== */
 
 .candles{
 position:absolute;
-width:390px;
-height:240px;
+width:225px;
+height:70px;
 left:50%;
-bottom:185px;
+top:132px;
 transform:translateX(-50%);
-z-index:12;
+z-index:20;
 pointer-events:none;
 }
 
 .candle{
 position:absolute;
-width:9px;
-height:42px;
+width:8px;
+height:38px;
 border-radius:4px;
 
 background:
 repeating-linear-gradient(
 45deg,
-#e8c443 0 5px,
-#b52d2a 5px 10px
+#f0ca43 0 5px,
+#b72d2a 5px 10px
 );
 
 cursor:pointer;
 pointer-events:auto;
+
 transform-origin:bottom center;
+
 transition:.3s;
+
+box-shadow:
+1px 2px 3px #54311f35;
 }
 
 .candle:hover{
@@ -915,7 +1118,8 @@ background:#ffb72c;
 
 box-shadow:
 0 0 7px #ff9b16,
-0 0 15px #ffcc4b;
+0 0 15px #ffcc4b,
+0 0 25px #ffd86a;
 
 animation:
 flicker .45s infinite alternate;
@@ -1201,13 +1405,108 @@ animation:pulse 1.6s infinite;
 
 
 /* =====================================================
-   ANIMATION
+   SCROLL REVEAL ANIMATIONS
 ===================================================== */
 
-@keyframes pulse{
+.scroll-reveal{
+opacity:0;
 
-50%{
-transform:scale(1.18);
+transform:
+translateY(55px)
+rotate(1.5deg)
+scale(.97);
+
+transition:
+opacity 1s cubic-bezier(.22,1,.36,1),
+transform 1s cubic-bezier(.22,1,.36,1);
+
+will-change:
+opacity,
+transform;
+}
+
+.scroll-reveal.from-left{
+transform:
+translateX(-70px)
+rotate(-2deg)
+scale(.97);
+}
+
+.scroll-reveal.from-right{
+transform:
+translateX(70px)
+rotate(2deg)
+scale(.97);
+}
+
+.scroll-reveal.visible{
+opacity:1;
+
+transform:
+translate(0)
+rotate(0)
+scale(1);
+}
+
+.paper.scroll-reveal.visible{
+transform:
+translateY(0)
+rotate(-1deg)
+scale(1);
+}
+
+.photo-page.scroll-reveal.visible{
+transform:
+translateY(0)
+rotate(0)
+scale(1);
+}
+
+.birthday-finale.scroll-reveal{
+transform:
+translateY(90px)
+scale(.92);
+}
+
+.birthday-finale.scroll-reveal.visible{
+animation:
+cakeArrive 1.1s cubic-bezier(.22,1,.36,1);
+}
+
+@keyframes cakeArrive{
+
+0%{
+opacity:0;
+transform:
+translateY(90px)
+scale(.88);
+}
+
+65%{
+opacity:1;
+transform:
+translateY(-8px)
+scale(1.02);
+}
+
+100%{
+transform:
+translateY(0)
+scale(1);
+}
+
+}
+
+@media(prefers-reduced-motion:reduce){
+
+.scroll-reveal,
+.scroll-reveal.from-left,
+.scroll-reveal.from-right,
+.birthday-finale.scroll-reveal{
+opacity:1;
+transform:none;
+transition:none;
+animation:none;
 }
 
 }
@@ -1233,6 +1532,15 @@ margin-bottom:-60px;
 .cake,
 .cake-top{
 width:290px;
+}
+
+.cake-upper,
+.upper-top{
+width:180px;
+}
+
+.candles{
+width:198px;
 }
 
 }
@@ -1887,7 +2195,7 @@ SPACE
 </div>
 
 
-<!-- CAKE -->
+<!-- MAIN CAKE -->
 
 <div class="cake">
 
@@ -1895,6 +2203,37 @@ SPACE
 
 
 <div class="cake-emblem">
+S
+</div>
+
+
+<div class="cake-star s1">
+✦
+</div>
+
+<div class="cake-star s2">
+✦
+</div>
+
+<div class="cake-star s3">
+★
+</div>
+
+<div class="cake-star s4">
+★
+</div>
+
+</div>
+
+
+<!-- SECOND CAKE TIER -->
+
+<div class="cake-upper">
+
+<div class="upper-top"></div>
+
+
+<div class="upper-emblem">
 S
 </div>
 
@@ -2092,7 +2431,8 @@ Made with all my heart, just for you.
    CODE: 220426
 ===================================================== */
 
-const correctCode = "220426";
+const correctCode =
+"220426";
 
 const inputs =
 document.querySelectorAll(
@@ -2134,7 +2474,9 @@ index <
 inputs.length - 1
 ){
 
-inputs[index + 1].focus();
+inputs[
+index + 1
+].focus();
 
 }
 
@@ -2152,7 +2494,9 @@ event.key === "Backspace" &&
 index > 0
 ){
 
-inputs[index - 1].focus();
+inputs[
+index - 1
+].focus();
 
 }
 
@@ -2173,6 +2517,7 @@ unlock();
 function unlock(){
 
 let entered = "";
+
 
 inputs.forEach(
 input=>{
@@ -2292,18 +2637,22 @@ document.getElementById(
 );
 
 
-const totalCandles = 22;
+const totalCandles =
+22;
 
-let candlesOut = 0;
+let candlesOut =
+0;
 
-let completed = false;
+let completed =
+false;
 
 
 /*
-Create all 22 candles.
+Create 22 candles.
 
-They are positioned across the
-oval top of the Superman cake.
+They are positioned directly
+on the oval top of the smaller
+second cake tier.
 */
 
 for(
@@ -2317,7 +2666,6 @@ document.createElement(
 "div"
 );
 
-
 candle.className =
 "candle";
 
@@ -2330,23 +2678,25 @@ totalCandles
 
 
 /*
-These values keep the candles
-on the cake's oval top.
+Keep the candle bases on
+the upper cake tier.
 */
 
-const radiusX = 125;
+const radiusX =
+82;
 
-const radiusY = 25;
+const radiusY =
+12;
 
 
 const x =
-195 +
+112 +
 Math.cos(angle) *
 radiusX;
 
 
 const y =
-45 +
+29 +
 Math.sin(angle) *
 radiusY;
 
@@ -2460,15 +2810,20 @@ remaining[0]
    MICROPHONE BLOW
 ===================================================== */
 
-let audioContext = null;
+let audioContext =
+null;
 
-let analyser = null;
+let analyser =
+null;
 
-let microphone = null;
+let microphone =
+null;
 
-let blowListening = false;
+let blowListening =
+false;
 
-let lastBlow = 0;
+let lastBlow =
+0;
 
 
 async function startBlowing(){
@@ -2584,7 +2939,8 @@ data
 );
 
 
-let total = 0;
+let total =
+0;
 
 
 for(
@@ -2787,6 +3143,98 @@ document
 .addEventListener(
 "click",
 blowOneCandle
+);
+
+
+/* =====================================================
+   SCROLL REVEAL
+===================================================== */
+
+const revealItems =
+document.querySelectorAll(
+".paper, .photo-page, .note, .reasons, .click-section, .birthday-finale, .next"
+);
+
+
+revealItems.forEach(
+(item,index)=>{
+
+item.classList.add(
+"scroll-reveal"
+);
+
+
+if(
+index % 3 === 1
+){
+
+item.classList.add(
+"from-left"
+);
+
+}
+
+
+if(
+index % 3 === 2
+){
+
+item.classList.add(
+"from-right"
+);
+
+}
+
+});
+
+
+const revealObserver =
+new IntersectionObserver(
+(entries,observer)=>{
+
+entries.forEach(
+entry=>{
+
+if(
+entry.isIntersecting
+){
+
+entry.target.classList.add(
+"visible"
+);
+
+/*
+Each scrapbook section
+reveals only once.
+*/
+
+observer.unobserve(
+entry.target
+);
+
+}
+
+});
+
+},
+{
+threshold:.14,
+rootMargin:
+"0px 0px -60px 0px"
+}
+);
+
+
+document
+.querySelectorAll(
+".scroll-reveal"
+)
+.forEach(
+item=>{
+revealObserver.observe(
+item
+);
+}
 );
 
 
