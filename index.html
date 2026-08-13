@@ -3,1545 +3,2276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>To My Forever ❤️</title>
-<meta name="description" content="A little piece of my heart, made just for you.">
+
+<meta
+  name="description"
+  content="A little piece of my heart, made just for you."
+>
 
 <style>
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
 *{
-box-sizing:border-box
+  box-sizing:border-box;
 }
 
 html{
-scroll-behavior:smooth
+  scroll-behavior:smooth;
 }
 
 body{
-margin:0;
-background:#b99370;
-color:#493027;
-font-family:Georgia,serif;
-overflow-x:hidden;
-}
-
-body:before{
-content:"";
-position:fixed;
-inset:0;
-pointer-events:none;
-z-index:20;
-opacity:.11;
-background:
-radial-gradient(circle at 20% 20%,#fff 0,transparent 20%),
-repeating-linear-gradient(
-0deg,
-transparent 0 4px,
-#76543c08 5px
-);
+  margin:0;
+  overflow-x:hidden;
+  background:#b99472;
+  color:#4b3027;
+  font-family:Georgia,serif;
 }
 
 button,
 input{
-font:inherit
+  font:inherit;
 }
 
 
-/* =====================================================
+/* =========================================================
+   PAPER TEXTURE
+========================================================= */
+
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:100;
+  opacity:.12;
+
+  background:
+    radial-gradient(
+      circle at 20% 15%,
+      #ffffff 0,
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      #6d4b38 0,
+      transparent 25%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 4px,
+      #68473408 5px
+    );
+}
+
+
+/* =========================================================
    LOCK SCREEN
-===================================================== */
+========================================================= */
 
 #lockScreen{
-position:fixed;
-inset:0;
-z-index:999999;
-background:linear-gradient(145deg,#b99370,#ead8b9);
-display:flex;
-align-items:center;
-justify-content:center;
-padding:22px;
-text-align:center;
+  position:fixed;
+  inset:0;
+  z-index:999999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  text-align:center;
+
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      #f4e3c4,
+      #d3b08b 75%
+    );
+
+  transition:opacity .7s ease;
 }
 
 .lock-paper{
-width:min(430px,100%);
-padding:45px 25px 40px;
-background:#ead8b9;
-box-shadow:0 20px 55px #3d281c55;
-position:relative;
+  width:min(430px,100%);
+
+  padding:45px 25px 40px;
+
+  background:#ead8b8;
+
+  box-shadow:
+    0 25px 60px #4c302044;
+
+  position:relative;
 }
 
 .lock-tape{
-position:absolute;
-width:120px;
-height:26px;
-background:#ddc79daa;
-top:-10px;
-left:50%;
-transform:translateX(-50%) rotate(-3deg);
+  position:absolute;
+
+  width:125px;
+  height:27px;
+
+  top:-12px;
+  left:50%;
+
+  transform:
+    translateX(-50%)
+    rotate(-3deg);
+
+  background:#dcc49bba;
 }
 
 .lock-heart{
-font-size:58px;
-animation:pulse 1.5s infinite;
+  font-size:58px;
+
+  animation:
+    pulse 1.5s infinite;
 }
 
 .lock-paper h1{
-font-size:clamp(40px,11vw,58px);
-font-weight:400;
-color:#633a2d;
-margin:12px 0;
+  margin:10px 0;
+
+  font-size:
+    clamp(42px,11vw,60px);
+
+  font-weight:400;
+
+  color:#673a2e;
 }
 
 .lock-paper p{
-font-size:17px;
-line-height:1.7;
+  line-height:1.8;
+  font-size:17px;
 }
 
 .passcode{
-display:flex;
-justify-content:center;
-gap:9px;
-margin:22px 0;
+  display:flex;
+  justify-content:center;
+
+  gap:8px;
+
+  margin:25px 0;
 }
 
 .passcode input{
-width:48px;
-height:55px;
-text-align:center;
-border:1px solid #b98f72;
-background:#f5e7cc;
-color:#633a2d;
-font-size:24px;
-outline:none;
+  width:46px;
+  height:55px;
+
+  border:
+    1px solid
+    #b99172;
+
+  background:#f7e8ca;
+
+  text-align:center;
+
+  color:#63392d;
+
+  font-size:23px;
+
+  outline:none;
 }
 
 .unlock-btn{
-border:0;
-background:#743b30;
-color:#f8e6c9;
-padding:13px 28px;
-border-radius:5px;
-cursor:pointer;
-box-shadow:4px 5px 0 #43291f;
+  border:0;
+
+  padding:14px 27px;
+
+  background:#713c31;
+
+  color:#f8e7c8;
+
+  cursor:pointer;
+
+  box-shadow:
+    4px 5px 0 #452b22;
+
+  border-radius:5px;
 }
 
 .lock-error{
-height:24px;
-color:#9a302d;
-margin-top:12px;
+  min-height:24px;
+
+  margin-top:12px;
+
+  color:#9d3730;
 }
 
 
-/* =====================================================
-   SCRAPBOOK
-===================================================== */
+/* =========================================================
+   MAIN SCRAPBOOK
+========================================================= */
 
 .page{
-width:min(820px,100%);
-margin:auto;
-padding:28px 15px 80px;
+  width:min(850px,100%);
+
+  margin:auto;
+
+  padding:
+    25px
+    15px
+    80px;
 }
 
 .scrap{
-background:#ead8b9;
-box-shadow:0 15px 45px #3d281c55;
-padding:30px 18px 70px;
-position:relative;
-}
+  position:relative;
 
-.scrap:before{
-content:"";
-position:absolute;
-inset:0;
-pointer-events:none;
-opacity:.2;
-background:
-radial-gradient(circle at 10% 10%,#fff 0,transparent 18%),
-radial-gradient(circle at 90% 80%,#8a6548 0,transparent 20%);
+  padding:
+    30px
+    18px
+    70px;
+
+  background:#ead8b8;
+
+  box-shadow:
+    0 18px 50px #4a302244;
 }
 
 
-/* =====================================================
+/* =========================================================
    COVER
-===================================================== */
+========================================================= */
 
 .cover{
-min-height:85svh;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-text-align:center;
-position:relative;
+  min-height:90svh;
+
+  display:flex;
+  flex-direction:column;
+
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+
+  position:relative;
 }
 
 .label{
-font-family:"Brush Script MT","Segoe Script",cursive;
-font-size:28px;
-color:#76503e;
-transform:rotate(-3deg);
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:29px;
+
+  color:#76503e;
+
+  transform:rotate(-3deg);
 }
 
 .cover h1{
-font-size:clamp(58px,16vw,105px);
-line-height:.82;
-font-weight:400;
-color:#633a2d;
-margin:20px 0;
-text-shadow:2px 3px #c5a27d;
+  margin:22px 0 15px;
+
+  font-size:
+    clamp(55px,15vw,105px);
+
+  line-height:.82;
+
+  font-weight:400;
+
+  color:#64392e;
+
+  text-shadow:
+    2px 4px 0 #c6a27d;
 }
 
 .cover h2{
-font-size:clamp(28px,7vw,48px);
-font-style:italic;
-font-weight:400;
-color:#704333;
-margin:0;
+  margin:0;
+
+  font-size:
+    clamp(29px,7vw,48px);
+
+  font-style:italic;
+
+  font-weight:400;
+
+  color:#704233;
 }
 
 .cover p{
-font-size:18px;
-line-height:1.8;
-max-width:540px;
+  max-width:550px;
+
+  font-size:18px;
+
+  line-height:1.8;
 }
 
 
-/* =====================================================
+/* =========================================================
    TAPE
-===================================================== */
+========================================================= */
 
 .tape{
-position:absolute;
-width:120px;
-height:27px;
-background:#dfc89eaa;
-box-shadow:0 2px 4px #55352222;
+  position:absolute;
+
+  width:120px;
+  height:27px;
+
+  background:#dfc79db5;
+
+  box-shadow:
+    0 2px 5px #4d332333;
 }
 
 .tape.one{
-top:25px;
-left:8%;
-transform:rotate(-8deg);
+  top:25px;
+  left:7%;
+
+  transform:rotate(-7deg);
 }
 
 .tape.two{
-top:55px;
-right:8%;
-transform:rotate(7deg);
+  top:55px;
+  right:7%;
+
+  transform:rotate(7deg);
 }
 
 
-/* =====================================================
-   MUSIC PLAYER
-===================================================== */
+/* =========================================================
+   MUSIC
+========================================================= */
 
 .music-player{
-margin:25px auto 0;
-max-width:390px;
-padding:18px;
-border:1px solid #ffffff70;
-border-radius:24px;
-background:#f7ead155;
-backdrop-filter:blur(7px);
-box-shadow:0 12px 30px #50362225;
+  width:min(390px,100%);
+
+  margin:25px auto 0;
+
+  padding:18px;
+
+  border-radius:24px;
+
+  background:#f8ecd766;
+
+  border:
+    1px solid
+    #ffffff70;
+
+  box-shadow:
+    0 12px 30px #50352225;
+
+  backdrop-filter:blur(8px);
 }
 
 .music-title{
-font-family:"Brush Script MT","Segoe Script",cursive;
-font-size:25px;
-color:#6e3c31;
-margin-bottom:10px;
+  margin-bottom:5px;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:25px;
+
+  color:#6d3c30;
 }
 
 .music-subtitle{
-font-size:13px;
-opacity:.75;
-margin-bottom:10px;
+  margin-bottom:10px;
+
+  font-size:13px;
+
+  opacity:.7;
 }
 
 .music-player audio{
-width:100%;
-height:42px;
+  width:100%;
+  height:42px;
 }
 
 
-/* =====================================================
-   NEXT LABEL
-===================================================== */
+/* =========================================================
+   NEXT
+========================================================= */
 
 .next{
-width:max-content;
-margin:60px auto;
-padding:7px 28px;
-background:#e1c89d;
-box-shadow:0 8px 18px #50362230;
-transform:rotate(-4deg);
-font-family:"Brush Script MT","Segoe Script",cursive;
-font-size:34px;
-color:#69392c;
+  width:max-content;
+
+  margin:
+    60px
+    auto;
+
+  padding:
+    7px
+    28px;
+
+  background:#e1c99e;
+
+  box-shadow:
+    0 8px 18px #50362230;
+
+  transform:rotate(-4deg);
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:32px;
+
+  color:#693a2e;
 }
 
 
-/* =====================================================
-   PAPER LETTER
-===================================================== */
+/* =========================================================
+   LETTER PAPER
+========================================================= */
 
 .paper{
-position:relative;
-margin:75px 0;
-padding:40px 24px;
-background:#e8d4ad;
-box-shadow:0 12px 30px #59402c35;
-transform:rotate(-1deg);
+  position:relative;
+
+  margin:75px 0;
+
+  padding:
+    42px
+    24px;
+
+  background:#e8d4ad;
+
+  box-shadow:
+    0 13px 32px #59402c35;
+
+  transform:rotate(-1deg);
 }
 
 .paper:before{
-content:"";
-position:absolute;
-left:0;
-right:0;
-top:-8px;
-height:13px;
-background:#e8d4ad;
+  content:"";
 
-clip-path:
-polygon(
-0 40%,
-8% 0,
-16% 45%,
-25% 5%,
-34% 50%,
-43% 0,
-52% 48%,
-62% 5%,
-73% 50%,
-84% 0,
-93% 42%,
-100% 8%,
-100% 100%,
-0 100%
-);
+  position:absolute;
+
+  top:-8px;
+  left:0;
+  right:0;
+
+  height:14px;
+
+  background:#e8d4ad;
+
+  clip-path:
+    polygon(
+      0 40%,
+      8% 0,
+      16% 45%,
+      25% 5%,
+      34% 50%,
+      43% 0,
+      52% 48%,
+      62% 5%,
+      73% 50%,
+      84% 0,
+      93% 42%,
+      100% 8%,
+      100% 100%,
+      0 100%
+    );
 }
 
 .paper h2{
-font-size:clamp(34px,8vw,55px);
-font-weight:400;
-color:#693a2d;
-margin:0 0 25px;
-text-align:center;
+  margin:
+    0
+    0
+    25px;
+
+  text-align:center;
+
+  font-size:
+    clamp(34px,8vw,55px);
+
+  font-weight:400;
+
+  color:#693a2d;
 }
 
 .paper h2:after{
-content:"♡";
-display:block;
-font-size:18px;
-margin-top:10px;
+  content:"♡";
+
+  display:block;
+
+  margin-top:10px;
+
+  font-size:18px;
 }
 
 .letter{
-font-size:17px;
-line-height:2;
-white-space:pre-line;
+  font-size:17px;
+
+  line-height:2;
+
+  white-space:pre-line;
 }
 
 
-/* =====================================================
-   PHOTO SECTIONS
-===================================================== */
+/* =========================================================
+   PHOTO PAGES
+========================================================= */
 
 .photo-page{
-margin:65px 0;
-position:relative;
-text-align:center;
+  margin:65px 0;
+
+  text-align:center;
 }
 
 .photo-page h2{
-font-family:"Brush Script MT","Segoe Script",cursive;
-font-size:42px;
-font-weight:400;
-color:#693a2d;
-margin-bottom:40px;
+  margin-bottom:40px;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:42px;
+
+  font-weight:400;
+
+  color:#693a2d;
 }
 
 .polaroid{
-background:#f8f1df;
-padding:10px 10px 18px;
-box-shadow:0 12px 22px #50362245;
-position:relative;
-width:min(390px,90%);
-margin:20px auto;
+  position:relative;
+
+  width:min(390px,90%);
+
+  margin:20px auto;
+
+  padding:
+    10px
+    10px
+    18px;
+
+  background:#f8f1df;
+
+  box-shadow:
+    0 14px 25px #50362245;
 }
 
 .polaroid:nth-child(odd){
-transform:rotate(-3deg);
+  transform:rotate(-3deg);
 }
 
 .polaroid:nth-child(even){
-transform:rotate(3deg);
-}
-
-.photo{
-aspect-ratio:1;
-background:#d7c3a0;
-display:flex;
-align-items:center;
-justify-content:center;
-text-align:center;
-color:#76533f;
-font-family:"Brush Script MT","Segoe Script",cursive;
-font-size:28px;
-overflow:hidden;
-}
-
-.photo img{
-width:100%;
-height:100%;
-object-fit:cover;
-display:block;
-}
-
-.caption{
-text-align:center;
-padding-top:10px;
-font-size:16px;
-color:#684235;
+  transform:rotate(3deg);
 }
 
 .pin{
-position:absolute;
-width:78px;
-height:22px;
-background:#dfc69caa;
-top:-10px;
-left:50%;
-transform:translateX(-50%) rotate(-2deg);
-z-index:5;
+  position:absolute;
+
+  width:78px;
+  height:22px;
+
+  top:-10px;
+  left:50%;
+
+  transform:
+    translateX(-50%)
+    rotate(-2deg);
+
+  background:#dfc79baa;
+
+  z-index:5;
+}
+
+.photo{
+  aspect-ratio:1;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+
+  background:#d5c09c;
+
+  color:#76533f;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:28px;
+
+  overflow:hidden;
+}
+
+.photo img{
+  width:100%;
+  height:100%;
+
+  display:block;
+
+  object-fit:cover;
+}
+
+.caption{
+  padding-top:10px;
+
+  font-size:16px;
+
+  color:#684235;
 }
 
 
-/* =====================================================
-   HANDWRITTEN NOTE
-===================================================== */
+/* =========================================================
+   NOTE
+========================================================= */
 
 .note{
-background:#f1dfbb;
-padding:30px 25px;
-box-shadow:0 12px 25px #59402c30;
-transform:rotate(2deg);
-max-width:600px;
-margin:70px auto;
-position:relative;
+  max-width:600px;
+
+  margin:
+    70px
+    auto;
+
+  padding:
+    30px
+    25px;
+
+  background:#f1dfbb;
+
+  box-shadow:
+    0 12px 25px #59402c30;
+
+  transform:rotate(2deg);
+
+  position:relative;
 }
 
 .note:before{
-content:"";
-position:absolute;
-width:110px;
-height:23px;
-top:-12px;
-left:50%;
-transform:translateX(-50%) rotate(-3deg);
-background:#dfc79baa;
+  content:"";
+
+  position:absolute;
+
+  width:110px;
+  height:23px;
+
+  top:-12px;
+  left:50%;
+
+  transform:
+    translateX(-50%)
+    rotate(-3deg);
+
+  background:#dfc79baa;
 }
 
 .hand{
-font-family:"Brush Script MT","Segoe Script",cursive;
-font-size:31px;
-line-height:1.5;
-text-align:center;
-color:#713c2d;
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:31px;
+
+  line-height:1.5;
+
+  text-align:center;
+
+  color:#713c2d;
 }
 
 
-/* =====================================================
+/* =========================================================
    REASONS
-===================================================== */
+========================================================= */
 
 .reasons{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:15px;
 }
 
 .reason{
-background:#e8d3aa;
-padding:25px 15px;
-min-height:120px;
-display:flex;
-align-items:center;
-justify-content:center;
-text-align:center;
-box-shadow:0 9px 20px #50362225;
-font-family:"Brush Script MT","Segoe Script",cursive;
-font-size:26px;
-transform:rotate(-1deg);
+  min-height:120px;
+
+  padding:25px 15px;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+
+  background:#e8d3aa;
+
+  box-shadow:
+    0 9px 20px #50362225;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:26px;
+
+  transform:rotate(-1deg);
 }
 
 .reason:nth-child(even){
-transform:rotate(2deg);
+  transform:rotate(2deg);
 }
 
 
-/* =====================================================
+/* =========================================================
    CLICK ME
-===================================================== */
+========================================================= */
 
 .click-section{
-background:#684033;
-color:#f5e5c7;
-padding:55px 22px;
-text-align:center;
-box-shadow:0 15px 35px #3e281d55;
-position:relative;
-overflow:hidden;
+  position:relative;
+
+  overflow:hidden;
+
+  padding:
+    55px
+    22px;
+
+  text-align:center;
+
+  color:#f5e5c7;
+
+  background:#684033;
+
+  box-shadow:
+    0 15px 35px #3e281d55;
 }
 
 .click-section h2{
-font-size:clamp(38px,9vw,58px);
-font-weight:400;
-margin:0 0 25px;
+  margin:
+    0
+    0
+    25px;
+
+  font-size:
+    clamp(38px,9vw,58px);
+
+  font-weight:400;
 }
 
 .click-btn{
-border:2px solid #dfc79d;
-background:#e7d0aa;
-color:#663a2d;
-border-radius:5px;
-padding:13px 30px;
-font:25px "Brush Script MT","Segoe Script",cursive;
-cursor:pointer;
-box-shadow:4px 5px 0 #3f281d;
-transition:.25s;
+  padding:
+    13px
+    30px;
+
+  border:
+    2px solid
+    #dfc79d;
+
+  border-radius:5px;
+
+  background:#e7d0aa;
+
+  color:#663a2d;
+
+  font:
+    25px
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  cursor:pointer;
+
+  box-shadow:
+    4px 5px 0 #3f281d;
+
+  transition:.2s;
 }
 
 .click-btn:active{
-transform:translate(3px,4px);
-box-shadow:1px 2px 0 #3f281d;
+  transform:
+    translate(3px,4px);
+
+  box-shadow:
+    1px 2px 0 #3f281d;
 }
 
 .surprise{
-max-height:0;
-opacity:0;
-overflow:hidden;
-transition:
-max-height 1s ease,
-opacity .8s ease,
-margin .8s ease;
-font-size:20px;
-line-height:1.9;
+  max-height:0;
+
+  opacity:0;
+
+  overflow:hidden;
+
+  transition:
+    max-height 1s ease,
+    opacity .8s ease,
+    margin .8s ease;
+
+  font-size:20px;
+
+  line-height:1.9;
 }
 
 .surprise.show{
-max-height:700px;
-opacity:1;
-margin-top:30px;
+  max-height:700px;
+
+  opacity:1;
+
+  margin-top:30px;
 }
 
 .surprise-heart{
-font-size:55px;
-animation:pulse 1.5s infinite;
-display:block;
+  display:block;
+
+  font-size:55px;
+
+  animation:
+    pulse 1.5s infinite;
 }
 
 
-/* =====================================================
-   BIRTHDAY FINALE
-===================================================== */
+/* =========================================================
+   REALISTIC-STYLE SUPERMAN BIRTHDAY SECTION
+========================================================= */
 
 .birthday-finale{
-position:relative;
-max-width:920px;
-margin:80px auto;
-padding:65px 10px 80px;
-text-align:center;
-overflow:hidden;
-color:#563426;
-background:#d7b28c;
+  position:relative;
+
+  margin:
+    90px
+    auto;
+
+  padding:
+    70px
+    10px
+    90px;
+
+  text-align:center;
+
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      #d5b18b,
+      #e8cfaa
+    );
+
+  color:#563528;
 }
 
 .birthday-paper{
-max-width:720px;
-margin:auto;
-padding:40px 22px 55px;
-position:relative;
-background:#ead8b7;
-box-shadow:0 18px 45px #4c302344;
+  max-width:720px;
+
+  margin:auto;
+
+  padding:
+    45px
+    18px
+    60px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f1dfbd,
+      #ead5ae
+    );
+
+  box-shadow:
+    0 22px 50px #4d302344;
+
+  position:relative;
 }
 
 .birthday-paper:before{
-content:"";
-position:absolute;
-width:120px;
-height:28px;
-top:-13px;
-left:50%;
-transform:translateX(-50%) rotate(-3deg);
-background:#ddc79daa;
+  content:"";
+
+  position:absolute;
+
+  width:125px;
+  height:28px;
+
+  top:-13px;
+  left:50%;
+
+  transform:
+    translateX(-50%)
+    rotate(-3deg);
+
+  background:#ddc79daa;
 }
 
 .birthday-title{
-font-family:"Brush Script MT","Segoe Script",cursive;
-font-size:clamp(38px,10vw,65px);
-font-weight:400;
-color:#69392d;
-margin:0 0 12px;
+  margin:
+    0
+    0
+    15px;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:
+    clamp(38px,10vw,65px);
+
+  font-weight:400;
+
+  color:#69392d;
 }
 
 .birthday-intro{
-font-size:19px;
-line-height:1.8;
-margin-bottom:30px;
+  font-size:19px;
+
+  line-height:1.8;
+
+  margin-bottom:25px;
 }
 
 .wish-text{
-font-family:"Brush Script MT","Segoe Script",cursive;
-font-size:clamp(27px,7vw,40px);
-color:#813c32;
-margin:25px 0;
+  margin:
+    25px
+    0
+    15px;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:
+    clamp(27px,7vw,40px);
+
+  color:#813c32;
 }
 
 
-/* =====================================================
+/* =========================================================
    CAKE STAGE
-===================================================== */
+========================================================= */
 
 .cake-stage{
-position:relative;
-width:min(520px,100%);
-height:500px;
-margin:20px auto 10px;
+  position:relative;
+
+  width:min(540px,100%);
+
+  height:590px;
+
+  margin:
+    15px
+    auto
+    0;
 }
 
 
-/* =====================================================
+/* =========================================================
+   SOFT CAKE SHADOW
+========================================================= */
+
+.cake-shadow{
+  position:absolute;
+
+  width:380px;
+  height:45px;
+
+  left:50%;
+  bottom:40px;
+
+  transform:
+    translateX(-50%);
+
+  background:#5b3a2740;
+
+  border-radius:50%;
+
+  filter:blur(10px);
+
+  z-index:1;
+}
+
+
+/* =========================================================
    SUPERMAN FIGURE
-===================================================== */
+========================================================= */
 
 .superhero{
-position:absolute;
-width:125px;
-height:180px;
-left:50%;
-top:15px;
-transform:translateX(-50%);
-z-index:8;
+  position:absolute;
+
+  width:130px;
+  height:190px;
+
+  left:50%;
+  top:5px;
+
+  transform:
+    translateX(-50%);
+
+  z-index:15;
 }
 
+
+/* CAPE */
+
 .cape{
-position:absolute;
-width:105px;
-height:125px;
-left:13px;
-top:45px;
-background:#b52b27;
+  position:absolute;
 
-clip-path:
-polygon(
-15% 0,
-85% 0,
-100% 90%,
-52% 72%,
-0 100%
-);
+  width:110px;
+  height:130px;
 
-z-index:0;
-animation:capeMove 2.4s ease-in-out infinite;
+  left:10px;
+  top:43px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #e33935,
+      #a91e28
+    );
+
+  clip-path:
+    polygon(
+      14% 0,
+      86% 0,
+      100% 91%,
+      53% 70%,
+      0 100%
+    );
+
+  filter:
+    drop-shadow(
+      5px
+      8px
+      5px
+      #52251e45
+    );
+
+  animation:
+    capeMove 2.5s ease-in-out infinite;
 }
 
 @keyframes capeMove{
-50%{
-transform:
-skewX(-5deg)
-translateX(3px);
+
+  50%{
+    transform:
+      skewX(-4deg)
+      translateX(3px);
+  }
+
 }
-}
+
+
+/* BODY */
 
 .hero-body{
-position:absolute;
-width:67px;
-height:100px;
-top:57px;
-left:29px;
-background:#174f91;
-border-radius:25px 25px 15px 15px;
-z-index:2;
+  position:absolute;
+
+  width:72px;
+  height:105px;
+
+  top:58px;
+  left:29px;
+
+  border-radius:
+    28px
+    28px
+    18px
+    18px;
+
+  background:
+    linear-gradient(
+      100deg,
+      #17477f,
+      #2e75bd,
+      #123e72
+    );
+
+  box-shadow:
+    inset
+    -6px
+    0
+    10px
+    #0c315c55;
+
+  z-index:4;
 }
+
+
+/* S EMBLEM */
 
 .hero-logo{
-position:absolute;
-top:15px;
-left:50%;
-transform:translateX(-50%);
-width:42px;
-height:32px;
-background:#e6b62d;
-color:#c52e27;
+  position:absolute;
 
-clip-path:
-polygon(
-50% 0,
-100% 25%,
-80% 100%,
-20% 100%,
-0 25%
-);
+  width:45px;
+  height:35px;
 
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-font-family:Arial,sans-serif;
-font-size:20px;
+  left:50%;
+  top:17px;
+
+  transform:
+    translateX(-50%);
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffd94c,
+      #e7aa19
+    );
+
+  color:#c32d29;
+
+  clip-path:
+    polygon(
+      50% 0,
+      100% 25%,
+      80% 100%,
+      20% 100%,
+      0 25%
+    );
+
+  font:
+    bold
+    22px
+    Arial,sans-serif;
+
+  box-shadow:
+    0 4px 6px #5e351f35;
 }
 
+
+/* ARMS */
+
 .arm{
-position:absolute;
-width:24px;
-height:80px;
-background:#174f91;
-top:64px;
-border-radius:15px;
-z-index:1;
+  position:absolute;
+
+  width:25px;
+  height:80px;
+
+  top:66px;
+
+  border-radius:18px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #123e72,
+      #2d70b2,
+      #123e72
+    );
+
+  z-index:3;
 }
 
 .arm.left{
-left:13px;
-transform:rotate(15deg);
+  left:12px;
+
+  transform:
+    rotate(14deg);
 }
 
 .arm.right{
-right:13px;
-transform:rotate(-15deg);
+  right:12px;
+
+  transform:
+    rotate(-14deg);
 }
 
+
+/* LEGS */
+
 .leg{
-position:absolute;
-width:27px;
-height:55px;
-background:#174f91;
-top:135px;
-z-index:1;
+  position:absolute;
+
+  width:29px;
+  height:58px;
+
+  top:139px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #123e72,
+      #2c70b3,
+      #123e72
+    );
+
+  z-index:3;
 }
 
 .leg.left{
-left:32px;
+  left:32px;
 }
 
 .leg.right{
-right:32px;
+  right:32px;
 }
 
+
+/* BOOTS */
+
 .boot{
-position:absolute;
-width:34px;
-height:23px;
-background:#b72c29;
-bottom:-6px;
-border-radius:4px 4px 12px 12px;
+  position:absolute;
+
+  width:36px;
+  height:24px;
+
+  bottom:-7px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #e13a34,
+      #9d2027
+    );
+
+  border-radius:
+    5px
+    5px
+    14px
+    14px;
 }
 
 .leg.left .boot{
-left:-7px;
+  left:-7px;
 }
 
 .leg.right .boot{
-right:-7px;
+  right:-7px;
 }
 
 
-/* =====================================================
-   BLANK BABY PHOTO SPACE
-===================================================== */
+/* =========================================================
+   BABY PHOTO PLACEHOLDER
+========================================================= */
 
 .baby-head{
-position:absolute;
-width:76px;
-height:76px;
-top:-2px;
-left:50%;
-transform:translateX(-50%);
-z-index:10;
+  position:absolute;
 
-display:flex;
-align-items:center;
-justify-content:center;
+  width:82px;
+  height:82px;
 
-background:
-repeating-linear-gradient(
-45deg,
-#d8bd98,
-#d8bd98 8px,
-#ceb18b 8px,
-#ceb18b 16px
-);
+  top:-5px;
+  left:50%;
 
-clip-path:ellipse(
-43% 48%
-at 50% 50%
-);
+  transform:
+    translateX(-50%);
 
-color:#76533f;
+  z-index:20;
 
-font-family:
-"Brush Script MT",
-"Segoe Script",
-cursive;
+  display:flex;
 
-font-size:13px;
-line-height:1.15;
-text-align:center;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      #f1d9b4,
+      #cda778
+    );
+
+  border:
+    5px solid
+    #b88d5e;
+
+  box-shadow:
+    0 5px 12px #55341f45;
+
+  color:#76533f;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:13px;
+
+  line-height:1.1;
 }
 
 .baby-head span{
-display:block;
+  display:block;
 }
 
 
-/* =====================================================
-   TWO-TIER CUTE SUPERMAN CAKE
-===================================================== */
+/* =========================================================
+   REALISTIC-STYLE TWO TIER CAKE
+========================================================= */
 
 .cake{
-position:absolute;
-width:330px;
-height:165px;
-left:50%;
-bottom:45px;
-transform:translateX(-50%);
-border-radius:20px 20px 30px 30px;
+  position:absolute;
 
-background:
-linear-gradient(
-180deg,
-#2e6db0 0 38%,
-#1c528e 39% 100%
-);
+  width:350px;
+  height:175px;
 
-border-bottom:15px solid #b72c29;
+  left:50%;
+  bottom:55px;
 
-box-shadow:
-0 22px 28px #50352545,
-inset 0 -12px 0 #123e70;
+  transform:
+    translateX(-50%);
 
-z-index:4;
+  border-radius:
+    18px
+    18px
+    30px
+    30px;
+
+  background:
+    linear-gradient(
+      100deg,
+      #174b82 0%,
+      #2c6fae 22%,
+      #367fbe 50%,
+      #2865a3 78%,
+      #123f72 100%
+    );
+
+  border-bottom:
+    14px solid
+    #aa2429;
+
+  box-shadow:
+    0 24px 30px #4b302144,
+    inset 0 -18px 15px #0e376455,
+    inset 0 7px 10px #ffffff22;
+
+  z-index:5;
 }
 
-.cake:before{
-content:"";
-position:absolute;
-left:0;
-right:0;
-top:25px;
-height:20px;
-background:#f5dfb5;
-opacity:.9;
 
-clip-path:
-polygon(
-0 0,
-8% 0,
-10% 60%,
-15% 60%,
-18% 0,
-27% 0,
-30% 65%,
-35% 65%,
-39% 0,
-48% 0,
-51% 60%,
-57% 60%,
-61% 0,
-70% 0,
-73% 65%,
-79% 65%,
-83% 0,
-92% 0,
-95% 60%,
-100% 60%,
-100% 100%,
-0 100%
-);
-}
+/* MAIN CAKE TOP */
 
 .cake-top{
-position:absolute;
-width:330px;
-height:66px;
-left:50%;
-top:-25px;
-transform:translateX(-50%);
-border-radius:50%;
+  position:absolute;
 
-background:
-radial-gradient(
-ellipse at center,
-#4a86c4 0 45%,
-#2e69a8 46% 100%
-);
+  width:350px;
+  height:72px;
 
-border:7px solid #d8ad2f;
+  left:50%;
+  top:-28px;
 
-box-shadow:
-inset 0 -7px 0 #194d86;
+  transform:
+    translateX(-50%);
 
-z-index:5;
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      ellipse at 45% 35%,
+      #4b91ce,
+      #2c6dad 60%,
+      #194f87 100%
+    );
+
+  border:
+    7px solid
+    #d8ad2f;
+
+  box-shadow:
+    inset
+    0
+    -9px
+    12px
+    #123c6744,
+
+    0
+    5px
+    8px
+    #57392333;
+
+  z-index:6;
 }
 
 
-/* =====================================================
-   SMALL SECOND CAKE TIER
-===================================================== */
+/* FROSTING DRIPS */
+
+.frosting{
+  position:absolute;
+
+  left:5px;
+  right:5px;
+
+  top:25px;
+
+  height:30px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fff3d4,
+      #e9d5aa
+    );
+
+  border-radius:
+    20px
+    20px
+    8px
+    8px;
+
+  clip-path:
+    polygon(
+      0 0,
+      100% 0,
+      100% 65%,
+      94% 65%,
+      91% 100%,
+      86% 100%,
+      84% 62%,
+      76% 62%,
+      73% 90%,
+      68% 90%,
+      65% 60%,
+      57% 60%,
+      54% 100%,
+      49% 100%,
+      46% 63%,
+      38% 63%,
+      35% 92%,
+      30% 92%,
+      27% 60%,
+      19% 60%,
+      16% 100%,
+      11% 100%,
+      8% 62%,
+      0 62%
+    );
+
+  z-index:8;
+}
+
+
+/* =========================================================
+   UPPER TIER
+========================================================= */
 
 .cake-upper{
-position:absolute;
-width:205px;
-height:92px;
-left:50%;
-bottom:190px;
-transform:translateX(-50%);
-border-radius:17px 17px 22px 22px;
+  position:absolute;
 
-background:
-linear-gradient(
-180deg,
-#3d7fbd 0 35%,
-#20578f 36% 100%
-);
+  width:215px;
+  height:100px;
 
-border-bottom:10px solid #b72c29;
+  left:50%;
 
-box-shadow:
-0 12px 20px #50352535,
-inset 0 -7px 0 #164577;
+  bottom:205px;
 
-z-index:6;
-}
+  transform:
+    translateX(-50%);
 
-.cake-upper:before{
-content:"";
-position:absolute;
-left:0;
-right:0;
-top:17px;
-height:15px;
-background:#f5dfb5;
+  border-radius:
+    18px
+    18px
+    24px
+    24px;
 
-clip-path:
-polygon(
-0 0,
-12% 0,
-15% 65%,
-20% 65%,
-24% 0,
-35% 0,
-39% 60%,
-44% 60%,
-48% 0,
-59% 0,
-63% 65%,
-68% 65%,
-72% 0,
-83% 0,
-87% 60%,
-92% 60%,
-96% 0,
-100% 0,
-100% 100%,
-0 100%
-);
+  background:
+    linear-gradient(
+      100deg,
+      #184a7e,
+      #3278b8 45%,
+      #17477b
+    );
+
+  border-bottom:
+    10px solid
+    #aa2429;
+
+  box-shadow:
+    0 15px 22px #49302144,
+    inset 0 -10px 12px #10375b55;
+
+  z-index:9;
 }
 
 .upper-top{
-position:absolute;
-width:205px;
-height:48px;
-left:50%;
-top:-18px;
-transform:translateX(-50%);
-border-radius:50%;
+  position:absolute;
 
-background:#3979b9;
+  width:215px;
+  height:50px;
 
-border:5px solid #d8ad2f;
+  left:50%;
+  top:-19px;
 
-z-index:7;
+  transform:
+    translateX(-50%);
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      ellipse at 45% 35%,
+      #4a8dca,
+      #2666a3
+    );
+
+  border:
+    5px solid
+    #d8ad2f;
+
+  box-shadow:
+    inset
+    0
+    -5px
+    8px
+    #153f6744;
+
+  z-index:10;
 }
+
+
+/* UPPER FROSTING */
+
+.upper-frosting{
+  position:absolute;
+
+  left:4px;
+  right:4px;
+
+  top:18px;
+
+  height:20px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fff3d4,
+      #e8d3a8
+    );
+
+  border-radius:12px;
+
+  z-index:11;
+}
+
+
+/* S EMBLEM UPPER */
 
 .upper-emblem{
-position:absolute;
-width:58px;
-height:44px;
-left:50%;
-top:31px;
-transform:translateX(-50%);
+  position:absolute;
 
-background:#e5b52c;
-color:#c72e28;
+  width:60px;
+  height:45px;
 
-clip-path:
-polygon(
-50% 0,
-100% 23%,
-82% 100%,
-18% 100%,
-0 23%
-);
+  left:50%;
+  top:32px;
 
-display:flex;
-align-items:center;
-justify-content:center;
+  transform:
+    translateX(-50%);
 
-font:bold 29px Arial,sans-serif;
+  display:flex;
 
-z-index:8;
+  align-items:center;
+  justify-content:center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffd94b,
+      #dda617
+    );
+
+  color:#c32d28;
+
+  clip-path:
+    polygon(
+      50% 0,
+      100% 23%,
+      82% 100%,
+      18% 100%,
+      0 23%
+    );
+
+  font:
+    bold
+    30px
+    Arial,sans-serif;
+
+  text-shadow:
+    1px
+    2px
+    0
+    #9d641e;
+
+  z-index:13;
 }
+
+
+/* MAIN EMBLEM */
 
 .cake-emblem{
-position:absolute;
-width:105px;
-height:82px;
-left:50%;
-top:55px;
-transform:translateX(-50%);
+  position:absolute;
 
-background:#e5b52c;
-color:#c72e28;
+  width:110px;
+  height:85px;
 
-clip-path:
-polygon(
-50% 0,
-100% 23%,
-82% 100%,
-18% 100%,
-0 23%
-);
+  left:50%;
+  top:56px;
 
-display:flex;
-align-items:center;
-justify-content:center;
+  transform:
+    translateX(-50%);
 
-font:bold 54px Arial,sans-serif;
+  display:flex;
 
-text-shadow:
-2px 2px #71311e;
+  align-items:center;
+  justify-content:center;
 
-z-index:8;
+  background:
+    linear-gradient(
+      135deg,
+      #ffdc4c,
+      #dfa817
+    );
+
+  color:#c72e28;
+
+  clip-path:
+    polygon(
+      50% 0,
+      100% 23%,
+      82% 100%,
+      18% 100%,
+      0 23%
+    );
+
+  font:
+    bold
+    56px
+    Arial,sans-serif;
+
+  text-shadow:
+    2px
+    3px
+    0
+    #9b641e;
+
+  box-shadow:
+    0 6px 8px #5d371f30;
+
+  z-index:9;
 }
 
 
-/* Little Superman stars */
+/* =========================================================
+   CAKE DECORATIONS
+========================================================= */
 
 .cake-star{
-position:absolute;
-color:#f6df9c;
-font-size:17px;
-z-index:9;
+  position:absolute;
+
+  color:#ffe9a7;
+
+  text-shadow:
+    0
+    2px
+    5px
+    #56351f55;
+
+  z-index:12;
 }
 
 .cake-star.s1{
-left:18px;
-top:70px;
+  left:25px;
+  top:77px;
+  font-size:18px;
 }
 
 .cake-star.s2{
-right:20px;
-top:86px;
+  right:25px;
+  top:87px;
+  font-size:16px;
 }
 
 .cake-star.s3{
-left:45px;
-bottom:24px;
+  left:48px;
+  bottom:29px;
+  font-size:15px;
 }
 
 .cake-star.s4{
-right:48px;
-bottom:30px;
+  right:50px;
+  bottom:34px;
+  font-size:18px;
 }
 
 
-/* =====================================================
-   22 CANDLES — DIRECTLY ON TOP OF UPPER CAKE
-===================================================== */
+/* =========================================================
+   22 CANDLES
+   DIRECTLY ON THE UPPER CAKE
+========================================================= */
 
 .candles{
-position:absolute;
-width:225px;
-height:70px;
-left:50%;
-top:132px;
-transform:translateX(-50%);
-z-index:20;
-pointer-events:none;
+  position:absolute;
+
+  width:230px;
+  height:70px;
+
+  left:50%;
+
+  top:130px;
+
+  transform:
+    translateX(-50%);
+
+  z-index:30;
+
+  pointer-events:none;
 }
 
 .candle{
-position:absolute;
-width:8px;
-height:38px;
-border-radius:4px;
+  position:absolute;
 
-background:
-repeating-linear-gradient(
-45deg,
-#f0ca43 0 5px,
-#b72d2a 5px 10px
-);
+  width:9px;
+  height:40px;
 
-cursor:pointer;
-pointer-events:auto;
+  border-radius:5px;
 
-transform-origin:bottom center;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      #f2ce45 0 5px,
+      #b72d2a 5px 10px
+    );
 
-transition:.3s;
+  box-shadow:
+    2px
+    3px
+    4px
+    #4b2c1d35;
 
-box-shadow:
-1px 2px 3px #54311f35;
+  cursor:pointer;
+
+  pointer-events:auto;
+
+  transition:
+    transform .25s ease;
 }
 
 .candle:hover{
-transform:scale(1.12);
+  transform:scale(1.12);
 }
 
 .flame{
-position:absolute;
-width:13px;
-height:21px;
-left:50%;
-top:-19px;
+  position:absolute;
 
-transform:
-translateX(-50%)
-rotate(4deg);
+  width:14px;
+  height:22px;
 
-border-radius:50% 50% 45% 45%;
+  left:50%;
+  top:-20px;
 
-background:#ffb72c;
+  transform:
+    translateX(-50%);
 
-box-shadow:
-0 0 7px #ff9b16,
-0 0 15px #ffcc4b,
-0 0 25px #ffd86a;
+  border-radius:
+    50%
+    50%
+    45%
+    45%;
 
-animation:
-flicker .45s infinite alternate;
-}
+  background:
+    radial-gradient(
+      circle at 50% 70%,
+      #fff5a4 0 22%,
+      #ffbd28 35%,
+      #ff781d 70%,
+      transparent 71%
+    );
 
-.flame:after{
-content:"";
-position:absolute;
-width:5px;
-height:10px;
-left:4px;
-top:5px;
-border-radius:50%;
-background:#fff4a5;
+  filter:
+    drop-shadow(
+      0
+      0
+      7px
+      #ffad27
+    );
+
+  animation:
+    flicker .45s
+    infinite alternate;
 }
 
 @keyframes flicker{
 
-from{
-transform:
-translateX(-50%)
-rotate(-5deg)
-scale(.9);
-}
+  from{
+    transform:
+      translateX(-50%)
+      rotate(-5deg)
+      scale(.9);
+  }
 
-to{
-transform:
-translateX(-50%)
-rotate(7deg)
-scale(1.08);
-}
+  to{
+    transform:
+      translateX(-50%)
+      rotate(5deg)
+      scale(1.08);
+  }
 
 }
 
 .candle.out .flame{
-display:none;
+  display:none;
 }
 
 .smoke{
-position:absolute;
-left:50%;
-top:-20px;
-font-size:18px;
-opacity:0;
-pointer-events:none;
+  position:absolute;
+
+  left:50%;
+  top:-20px;
+
+  opacity:0;
+
+  font-size:20px;
+
+  pointer-events:none;
 }
 
 .candle.out .smoke{
-animation:
-smokeUp 1.3s ease-out;
+  animation:
+    smokeUp
+    1.3s
+    ease-out;
 }
 
 @keyframes smokeUp{
 
-0%{
-opacity:.7;
-transform:
-translate(-50%,0)
-scale(.6);
+  0%{
+    opacity:.8;
+
+    transform:
+      translate(-50%,0)
+      scale(.6);
+  }
+
+  100%{
+    opacity:0;
+
+    transform:
+      translate(-50%,-45px)
+      scale(1.5);
+  }
+
 }
 
-100%{
-opacity:0;
-transform:
-translate(-50%,-45px)
-scale(1.5);
-}
 
-}
-
-
-/* =====================================================
+/* =========================================================
    COUNTER
-===================================================== */
+========================================================= */
 
 .candle-counter{
-width:max-content;
-margin:10px auto 20px;
-padding:10px 25px;
-background:#e6cea3;
-transform:rotate(-2deg);
-box-shadow:0 7px 18px #563b2830;
+  width:max-content;
 
-font-family:
-"Brush Script MT",
-"Segoe Script",
-cursive;
+  margin:
+    5px
+    auto
+    20px;
 
-font-size:27px;
+  padding:
+    11px
+    27px;
+
+  background:#e6cea3;
+
+  transform:rotate(-2deg);
+
+  box-shadow:
+    0 8px 20px #563b2830;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:28px;
 }
 
 
-/* =====================================================
+/* =========================================================
    BIRTHDAY BUTTONS
-===================================================== */
+========================================================= */
 
 .birthday-controls{
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
-gap:12px;
-margin-top:20px;
+  display:flex;
+
+  justify-content:center;
+
+  flex-wrap:wrap;
+
+  gap:12px;
+
+  margin-top:20px;
 }
 
 .birthday-button{
-border:0;
-padding:14px 23px;
-border-radius:6px;
+  padding:
+    14px
+    23px;
 
-background:#743b30;
-color:#f8e6c9;
+  border:0;
 
-font:
-23px "Brush Script MT",
-"Segoe Script",
-cursive;
+  border-radius:6px;
 
-cursor:pointer;
+  background:#743b30;
 
-box-shadow:
-4px 5px 0 #43291f;
+  color:#f8e6c9;
 
-transition:.2s;
+  font:
+    23px
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  cursor:pointer;
+
+  box-shadow:
+    4px
+    5px
+    0
+    #43291f;
 }
 
 .birthday-button:active{
-transform:translate(3px,4px);
-box-shadow:1px 1px 0 #43291f;
+  transform:
+    translate(3px,4px);
+
+  box-shadow:
+    1px
+    2px
+    0
+    #43291f;
 }
 
 .blow-status{
-margin:17px auto 0;
-min-height:25px;
-font-style:italic;
-font-size:15px;
+  min-height:25px;
+
+  margin-top:17px;
+
+  font-style:italic;
+
+  font-size:15px;
 }
 
 
-/* =====================================================
-   BIRTHDAY CELEBRATION
-===================================================== */
+/* =========================================================
+   CELEBRATION
+========================================================= */
 
 .birthday-celebration{
-display:none;
+  display:none;
 
-position:relative;
+  max-width:680px;
 
-margin:45px auto 0;
-max-width:680px;
+  margin:
+    45px
+    auto
+    0;
 
-padding:40px 25px;
+  padding:
+    40px
+    25px;
 
-background:#f0dfbd;
+  background:
+    linear-gradient(
+      145deg,
+      #f5e6c8,
+      #ead3aa
+    );
 
-box-shadow:
-0 15px 35px #4d302b45;
+  box-shadow:
+    0
+    18px
+    40px
+    #4d302b45;
 }
 
 .birthday-celebration.show{
-display:block;
-animation:
-birthdayReveal 1.2s ease;
+  display:block;
+
+  animation:
+    birthdayReveal
+    1.2s
+    ease;
 }
 
 @keyframes birthdayReveal{
 
-from{
-opacity:0;
-transform:
-scale(.75)
-rotate(-3deg);
-}
+  from{
+    opacity:0;
 
-65%{
-transform:
-scale(1.04)
-rotate(1deg);
-}
+    transform:
+      scale(.75)
+      rotate(-3deg);
+  }
 
-to{
-opacity:1;
-transform:
-scale(1);
-}
+  65%{
+    transform:
+      scale(1.04)
+      rotate(1deg);
+  }
+
+  to{
+    opacity:1;
+
+    transform:
+      scale(1);
+  }
 
 }
 
 .birthday-celebration h2{
-font-family:
-"Brush Script MT",
-"Segoe Script",
-cursive;
+  margin:0 0 20px;
 
-font-size:
-clamp(38px,9vw,60px);
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
 
-color:#74372e;
+  font-size:
+    clamp(38px,9vw,60px);
 
-margin:
-0 0 20px;
+  color:#74372e;
 }
 
 .birthday-celebration p{
-font-size:19px;
-line-height:1.9;
+  font-size:19px;
+
+  line-height:1.9;
 }
 
 .birthday-numbers{
-margin-top:30px;
+  margin-top:30px;
 
-font-family:
-"Brush Script MT",
-"Segoe Script",
-cursive;
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
 
-font-size:
-clamp(25px,6vw,36px);
+  font-size:
+    clamp(25px,6vw,36px);
 
-color:#713b30;
+  color:#713b30;
 }
 
 
-/* =====================================================
+/* =========================================================
    CONFETTI
-===================================================== */
+========================================================= */
 
 .confetti-piece{
-position:fixed;
-width:9px;
-height:13px;
-top:-20px;
-z-index:999999;
-pointer-events:none;
+  position:fixed;
 
-animation:
-confettiFall 4s linear forwards;
+  width:9px;
+  height:13px;
+
+  top:-20px;
+
+  z-index:999999;
+
+  pointer-events:none;
+
+  animation:
+    confettiFall
+    4s
+    linear
+    forwards;
 }
 
 @keyframes confettiFall{
 
-to{
-transform:
-translateY(110vh)
-rotate(720deg);
-}
+  to{
+    transform:
+      translateY(110vh)
+      rotate(720deg);
+  }
 
 }
 
 
-/* =====================================================
+/* =========================================================
    FINAL
-===================================================== */
+========================================================= */
 
 .final{
-text-align:center;
-min-height:70svh;
+  min-height:70svh;
 
-display:flex;
-flex-direction:column;
-justify-content:center;
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
 }
 
 .final h2{
-font-size:
-clamp(52px,13vw,90px);
+  margin:0;
 
-font-weight:400;
+  font-size:
+    clamp(52px,13vw,90px);
 
-color:#633a2d;
+  font-weight:400;
 
-margin:0;
+  color:#633a2d;
 }
 
 .final p{
-font-style:italic;
-font-size:19px;
+  font-style:italic;
+
+  font-size:19px;
 }
 
 .heart{
-font-size:52px;
-animation:pulse 1.6s infinite;
+  font-size:52px;
+
+  animation:
+    pulse
+    1.6s
+    infinite;
 }
 
 
-/* =====================================================
-   SCROLL REVEAL ANIMATIONS
-===================================================== */
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
 
 .scroll-reveal{
-opacity:0;
+  opacity:0;
 
-transform:
-translateY(55px)
-rotate(1.5deg)
-scale(.97);
+  transform:
+    translateY(55px)
+    rotate(1.5deg)
+    scale(.97);
 
-transition:
-opacity 1s cubic-bezier(.22,1,.36,1),
-transform 1s cubic-bezier(.22,1,.36,1);
-
-will-change:
-opacity,
-transform;
+  transition:
+    opacity 1s cubic-bezier(.22,1,.36,1),
+    transform 1s cubic-bezier(.22,1,.36,1);
 }
 
 .scroll-reveal.from-left{
-transform:
-translateX(-70px)
-rotate(-2deg)
-scale(.97);
+  transform:
+    translateX(-70px)
+    rotate(-2deg)
+    scale(.97);
 }
 
 .scroll-reveal.from-right{
-transform:
-translateX(70px)
-rotate(2deg)
-scale(.97);
+  transform:
+    translateX(70px)
+    rotate(2deg)
+    scale(.97);
 }
 
 .scroll-reveal.visible{
-opacity:1;
+  opacity:1;
 
-transform:
-translate(0)
-rotate(0)
-scale(1);
-}
-
-.paper.scroll-reveal.visible{
-transform:
-translateY(0)
-rotate(-1deg)
-scale(1);
-}
-
-.photo-page.scroll-reveal.visible{
-transform:
-translateY(0)
-rotate(0)
-scale(1);
+  transform:
+    translate(0)
+    rotate(0)
+    scale(1);
 }
 
 .birthday-finale.scroll-reveal{
-transform:
-translateY(90px)
-scale(.92);
+  transform:
+    translateY(90px)
+    scale(.92);
 }
 
 .birthday-finale.scroll-reveal.visible{
-animation:
-cakeArrive 1.1s cubic-bezier(.22,1,.36,1);
+  animation:
+    cakeArrive
+    1.1s
+    cubic-bezier(.22,1,.36,1);
 }
 
 @keyframes cakeArrive{
 
-0%{
-opacity:0;
-transform:
-translateY(90px)
-scale(.88);
+  0%{
+    opacity:0;
+
+    transform:
+      translateY(90px)
+      scale(.88);
+  }
+
+  65%{
+    opacity:1;
+
+    transform:
+      translateY(-8px)
+      scale(1.02);
+  }
+
+  100%{
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
 }
 
-65%{
-opacity:1;
-transform:
-translateY(-8px)
-scale(1.02);
-}
+@keyframes pulse{
 
-100%{
-transform:
-translateY(0)
-scale(1);
-}
-
-}
-
-@media(prefers-reduced-motion:reduce){
-
-.scroll-reveal,
-.scroll-reveal.from-left,
-.scroll-reveal.from-right,
-.birthday-finale.scroll-reveal{
-opacity:1;
-transform:none;
-transition:none;
-animation:none;
-}
+  50%{
+    transform:scale(1.15);
+  }
 
 }
 
 
-/* =====================================================
+/* =========================================================
    MOBILE
-===================================================== */
+========================================================= */
 
 @media(max-width:550px){
 
-.birthday-finale{
-padding-left:10px;
-padding-right:10px;
+  .birthday-paper{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  .cake-stage{
+    transform:scale(.86);
+
+    transform-origin:
+      center top;
+
+    margin-bottom:-75px;
+  }
+
+  .reasons{
+    gap:10px;
+  }
+
+  .reason{
+    font-size:23px;
+  }
+
+  .paper{
+    padding-left:19px;
+    padding-right:19px;
+  }
+
 }
 
-.cake-stage{
-transform:scale(.85);
-transform-origin:center top;
-margin-bottom:-60px;
-}
 
-.cake,
-.cake-top{
-width:290px;
-}
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
 
-.cake-upper,
-.upper-top{
-width:180px;
-}
+@media(prefers-reduced-motion:reduce){
 
-.candles{
-width:198px;
-}
+  *,
+  *:before,
+  *:after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    scroll-behavior:auto !important;
+    transition-duration:.01ms !important;
+  }
 
 }
 
@@ -1552,195 +2283,145 @@ width:198px;
 <body>
 
 
-<!-- =====================================================
+<!-- =========================================================
      LOCK SCREEN
-===================================================== -->
+========================================================= -->
 
 <div id="lockScreen">
 
-<div class="lock-paper">
+  <div class="lock-paper">
 
-<div class="lock-tape"></div>
+    <div class="lock-tape"></div>
 
-<div class="lock-heart">
-🔐❤️
-</div>
+    <div class="lock-heart">
+      🔐❤️
+    </div>
 
-<h1>
-Just For You
-</h1>
+    <h1>
+      Just For You
+    </h1>
 
-<p>
+    <p>
+      This little piece of my heart is private. ❤️
+      <br>
+      Enter the secret code to open it.
+    </p>
 
-This little piece of my heart is private. ❤️
+    <div
+      class="passcode"
+      id="passcode"
+    >
 
-<br>
+      <input inputmode="numeric" maxlength="1">
+      <input inputmode="numeric" maxlength="1">
+      <input inputmode="numeric" maxlength="1">
+      <input inputmode="numeric" maxlength="1">
+      <input inputmode="numeric" maxlength="1">
+      <input inputmode="numeric" maxlength="1">
 
-Enter the secret code to open it.
+    </div>
 
-</p>
+    <button
+      class="unlock-btn"
+      id="unlockBtn"
+    >
+      Open My Heart ❤️
+    </button>
 
+    <div
+      class="lock-error"
+      id="lockError"
+    ></div>
 
-<div
-class="passcode"
-id="passcode"
->
-
-<input
-inputmode="numeric"
-maxlength="1"
-aria-label="Digit 1"
->
-
-<input
-inputmode="numeric"
-maxlength="1"
-aria-label="Digit 2"
->
-
-<input
-inputmode="numeric"
-maxlength="1"
-aria-label="Digit 3"
->
-
-<input
-inputmode="numeric"
-maxlength="1"
-aria-label="Digit 4"
->
-
-<input
-inputmode="numeric"
-maxlength="1"
-aria-label="Digit 5"
->
-
-<input
-inputmode="numeric"
-maxlength="1"
-aria-label="Digit 6"
->
+  </div>
 
 </div>
 
 
-<button
-class="unlock-btn"
-id="unlockBtn"
->
-Open My Heart ❤️
-</button>
-
-
-<div
-class="lock-error"
-id="lockError"
-></div>
-
-</div>
-
-</div>
-
-
-<!-- =====================================================
+<!-- =========================================================
      WEBSITE
-===================================================== -->
+========================================================= -->
 
 <div class="page">
 
 <main class="scrap">
 
 
-<!-- =====================================================
-     OPENING
-===================================================== -->
+<!-- =========================================================
+     COVER
+========================================================= -->
 
 <section class="cover">
 
-<div class="tape one"></div>
+  <div class="tape one"></div>
+  <div class="tape two"></div>
 
-<div class="tape two"></div>
+  <div class="label">
+    A little piece of my heart
+  </div>
 
+  <h1>
+    To My<br>
+    Forever ❤️
+  </h1>
 
-<div class="label">
-A little piece of my heart
-</div>
+  <h2>
+    Happy Birthday, My Love
+  </h2>
 
-
-<h1>
-
-To My<br>
-Forever ❤️
-
-</h1>
-
-
-<h2>
-Happy Birthday, My Love
-</h2>
-
-
-<p>
-
-For the person who makes my world feel a little softer,
-brighter, and happier.
-
-</p>
+  <p>
+    For the person who makes my world feel a little softer,
+    brighter, and happier.
+  </p>
 
 
-<!-- MUSIC PLAYER -->
+  <!-- MUSIC -->
 
-<div class="music-player">
+  <div class="music-player">
 
-<div class="music-title">
+    <div class="music-title">
+      🎵 A song that reminds me of you
+    </div>
 
-🎵 A song that reminds me of you
+    <div class="music-subtitle">
+      Press play and read this with me. ❤️
+    </div>
 
-</div>
+    <audio
+      id="music"
+      controls
+      loop
+      preload="metadata"
+    >
 
-<div class="music-subtitle">
+      <source
+        src="Dandelions mp3.mp3"
+        type="audio/mpeg"
+      >
 
-Press play and read this with me. ❤️
+      Your browser does not support the audio player.
 
-</div>
+    </audio>
 
-<audio
-id="music"
-controls
-loop
-preload="metadata"
->
-
-<source
-src="Dandelions mp3.mp3"
-type="audio/mpeg"
->
-
-Your browser does not support the audio player.
-
-</audio>
-
-</div>
+  </div>
 
 </section>
 
 
 <div class="next">
-turn the page ♡
+  turn the page ♡
 </div>
 
 
-<!-- =====================================================
+<!-- =========================================================
      LETTER 1
-===================================================== -->
+========================================================= -->
 
 <section class="paper">
 
 <h2>
-To The Man I Love ❤️
+  To The Man I Love ❤️
 </h2>
-
 
 <div class="letter">
 
@@ -1757,34 +2438,29 @@ I pray you achieve everything you've worked for and everything you aim to achiev
 </section>
 
 
-<!-- PHOTO 1 -->
+<!-- PHOTO -->
 
 <section class="photo-page">
 
 <h2>
-A Little Memory Of Us 📸
+  A Little Memory Of Us 📸
 </h2>
-
 
 <div class="polaroid">
 
-<div class="pin"></div>
+  <div class="pin"></div>
 
+  <div class="photo">
 
-<div class="photo">
+    PHOTO SPACE
+    <br>
+    ❤️
 
-PHOTO SPACE
-<br>
-❤️
+  </div>
 
-</div>
-
-
-<div class="caption">
-
-Our first pic together ❤️
-
-</div>
+  <div class="caption">
+    Our first pic together ❤️
+  </div>
 
 </div>
 
@@ -1792,13 +2468,13 @@ Our first pic together ❤️
 
 
 <div class="next">
-keep reading ♡
+  keep reading ♡
 </div>
 
 
-<!-- =====================================================
+<!-- =========================================================
      LETTER 2
-===================================================== -->
+========================================================= -->
 
 <section class="paper">
 
@@ -1817,31 +2493,25 @@ But the truth was… I was crying because I was secretly building this website f
 </section>
 
 
-<!-- PHOTO 2 -->
+<!-- PHOTO -->
 
 <section class="photo-page">
 
 <h2>
-That Little Moment ❤️
+  That Little Moment ❤️
 </h2>
-
 
 <div class="polaroid">
 
-<div class="photo">
+  <div class="photo">
+    PHOTO SPACE
+    <br>
+    ♡
+  </div>
 
-PHOTO SPACE
-<br>
-♡
-
-</div>
-
-
-<div class="caption">
-
-A moment that means more than you know
-
-</div>
+  <div class="caption">
+    A moment that means more than you know
+  </div>
 
 </div>
 
@@ -1849,13 +2519,13 @@ A moment that means more than you know
 
 
 <div class="next">
-one more page ♡
+  one more page ♡
 </div>
 
 
-<!-- =====================================================
+<!-- =========================================================
      LETTER 3
-===================================================== -->
+========================================================= -->
 
 <section class="paper">
 
@@ -1876,43 +2546,36 @@ Happy birthday again, my forever. ❤️
 </section>
 
 
-<!-- PHOTO 3 -->
+<!-- PHOTO -->
 
 <section class="photo-page">
 
 <h2>
-Another Little Piece Of Us
+  Another Little Piece Of Us
 </h2>
-
 
 <div class="polaroid">
 
-<div class="pin"></div>
+  <div class="pin"></div>
 
+  <div class="photo">
+    PHOTO SPACE
+    <br>
+    ♥
+  </div>
 
-<div class="photo">
-
-PHOTO SPACE
-<br>
-♥
-
-</div>
-
-
-<div class="caption">
-
-One of my favorite memories
-
-</div>
+  <div class="caption">
+    One of my favorite memories
+  </div>
 
 </div>
 
 </section>
 
 
-<!-- =====================================================
+<!-- =========================================================
      LETTER 4
-===================================================== -->
+========================================================= -->
 
 <section class="paper">
 
@@ -1941,13 +2604,13 @@ Your girl ❤️
 
 
 <div class="next">
-a few things I love ♡
+  a few things I love ♡
 </div>
 
 
-<!-- =====================================================
+<!-- =========================================================
      REASONS
-===================================================== -->
+========================================================= -->
 
 <section>
 
@@ -1967,35 +2630,35 @@ are some of my favorite things.
 <div class="reasons">
 
 <div class="reason">
-Your heart ❤️
+  Your heart ❤️
 </div>
 
 <div class="reason">
-Your smile
+  Your smile
 </div>
 
 <div class="reason">
-The way you make me laugh
+  The way you make me laugh
 </div>
 
 <div class="reason">
-Your patience
+  Your patience
 </div>
 
 <div class="reason">
-The way you care
+  The way you care
 </div>
 
 <div class="reason">
-Your presence
+  Your presence
 </div>
 
 <div class="reason">
-The little things you do
+  The little things you do
 </div>
 
 <div class="reason">
-Simply because you are YOU ❤️
+  Simply because you are YOU ❤️
 </div>
 
 </div>
@@ -2004,32 +2667,31 @@ Simply because you are YOU ❤️
 
 
 <div class="next">
-one more thing ♡
+  one more thing ♡
 </div>
 
 
-<!-- =====================================================
+<!-- =========================================================
      CLICK ME
-===================================================== -->
+========================================================= -->
 
 <section class="click-section">
 
 <h2>
-One More Thing…
+  One More Thing…
 </h2>
 
-
 <button
-class="click-btn"
-id="clickBtn"
+  class="click-btn"
+  id="clickBtn"
 >
-Click Me ❤️
+  Click Me ❤️
 </button>
 
 
 <div
-class="surprise"
-id="surprise"
+  class="surprise"
+  id="surprise"
 >
 
 If I could choose one person to write a thousand love letters to,
@@ -2054,7 +2716,6 @@ I'd choose you.
 
 Every single time. ❤️
 
-
 <span class="surprise-heart">
 ♥
 </span>
@@ -2064,20 +2725,19 @@ Every single time. ❤️
 </section>
 
 
-<!-- =====================================================
+<!-- =========================================================
      NEVER FORGET
-===================================================== -->
+========================================================= -->
 
 <section class="paper">
 
 <h2>
-Never Forget This…
+  Never Forget This…
 </h2>
 
-
 <div
-class="letter"
-style="text-align:center"
+  class="letter"
+  style="text-align:center"
 >
 
 You are loved.
@@ -2098,21 +2758,17 @@ I hope you always remember that you have someone who loves you deeply.
 </section>
 
 
-<!-- =====================================================
-     BIRTHDAY CAKE FINALE
-===================================================== -->
+<!-- =========================================================
+     BIRTHDAY FINALE
+========================================================= -->
 
 <section class="birthday-finale">
 
 <div class="birthday-paper">
 
-
 <h2 class="birthday-title">
-
-Last But Not Least… 🎂
-
+  Last But Not Least… 🎂
 </h2>
-
 
 <p class="birthday-intro">
 
@@ -2131,52 +2787,53 @@ your 22 candles ✨
 </div>
 
 
-<!-- CAKE STAGE -->
+<!-- =======================================================
+     CAKE
+======================================================= -->
 
 <div class="cake-stage">
 
 
-<!-- SUPERMAN FIGURE -->
+<!-- SHADOW -->
+
+<div class="cake-shadow"></div>
+
+
+<!-- =====================================================
+     SUPERMAN FIGURE
+===================================================== -->
 
 <div class="superhero">
 
-
 <div class="cape"></div>
 
-
 <div class="arm left"></div>
-
 <div class="arm right"></div>
 
 
 <div class="hero-body">
 
 <div class="hero-logo">
-S
+  S
 </div>
 
 </div>
 
 
 <div class="leg left">
-
-<div class="boot"></div>
-
+  <div class="boot"></div>
 </div>
-
 
 <div class="leg right">
-
-<div class="boot"></div>
-
+  <div class="boot"></div>
 </div>
 
 
-<!-- BLANK BABY PHOTO SPACE -->
+<!-- BABY PHOTO SPACE -->
 
 <div
-class="baby-head"
-id="babyPhotoSpace"
+  class="baby-head"
+  id="babyPhotoSpace"
 >
 
 <span>
@@ -2191,62 +2848,68 @@ SPACE
 
 </div>
 
-
 </div>
 
 
-<!-- MAIN CAKE -->
+<!-- =====================================================
+     LOWER CAKE TIER
+===================================================== -->
 
 <div class="cake">
 
 <div class="cake-top"></div>
 
+<div class="frosting"></div>
 
 <div class="cake-emblem">
-S
+  S
 </div>
 
 
 <div class="cake-star s1">
-✦
+  ✦
 </div>
 
 <div class="cake-star s2">
-✦
+  ✦
 </div>
 
 <div class="cake-star s3">
-★
+  ★
 </div>
 
 <div class="cake-star s4">
-★
+  ★
 </div>
 
 </div>
 
 
-<!-- SECOND CAKE TIER -->
+<!-- =====================================================
+     UPPER CAKE TIER
+===================================================== -->
 
 <div class="cake-upper">
 
 <div class="upper-top"></div>
 
+<div class="upper-frosting"></div>
 
 <div class="upper-emblem">
-S
+  S
 </div>
 
 </div>
 
 
-<!-- 22 CANDLES -->
+<!-- =====================================================
+     22 CANDLES
+===================================================== -->
 
 <div
-class="candles"
-id="candles"
->
-</div>
+  class="candles"
+  id="candles"
+></div>
 
 
 </div>
@@ -2255,12 +2918,10 @@ id="candles"
 <!-- COUNTER -->
 
 <div
-class="candle-counter"
-id="candleCounter"
+  class="candle-counter"
+  id="candleCounter"
 >
-
-0 / 22 candles
-
+  0 / 22 candles
 </div>
 
 
@@ -2283,46 +2944,39 @@ or
 
 <div class="birthday-controls">
 
-
 <button
-class="birthday-button"
-id="blowButton"
+  class="birthday-button"
+  id="blowButton"
 >
-
-💨 Start Blowing
-
+  💨 Start Blowing
 </button>
 
-
 <button
-class="birthday-button"
-id="tapButton"
+  class="birthday-button"
+  id="tapButton"
 >
-
-👆 Tap A Candle
-
+  👆 Tap A Candle
 </button>
 
 </div>
 
 
 <div
-class="blow-status"
-id="blowStatus"
+  class="blow-status"
+  id="blowStatus"
 >
-
-Make a wish first… 🥺❤️
-
+  Make a wish first… 🥺❤️
 </div>
 
 
-<!-- CELEBRATION -->
+<!-- =====================================================
+     CELEBRATION
+===================================================== -->
 
 <div
-class="birthday-celebration"
-id="birthdayCelebration"
+  class="birthday-celebration"
+  id="birthdayCelebration"
 >
-
 
 <h2>
 
@@ -2342,9 +2996,11 @@ And happy 7 months to us. 🥹💕
 Seven months of us.
 
 <br>
+
 Seven months of choosing each other.
 
 <br>
+
 Seven months of memories,
 laughter, love and growing together.
 
@@ -2375,7 +3031,6 @@ I love you, my forever. ❤️
 
 </div>
 
-
 </div>
 
 </div>
@@ -2383,37 +3038,26 @@ I love you, my forever. ❤️
 </section>
 
 
-<!-- =====================================================
+<!-- =========================================================
      FINAL
-===================================================== -->
+========================================================= -->
 
 <section class="final">
 
 <div class="label">
-
-Always and forever
-
+  Always and forever
 </div>
 
-
 <h2>
-
-Forever Yours ❤️
-
+  Forever Yours ❤️
 </h2>
 
-
 <p>
-
-Made with all my heart, just for you.
-
+  Made with all my heart, just for you.
 </p>
 
-
 <div class="heart">
-
-♥
-
+  ♥
 </div>
 
 </section>
@@ -2426,824 +3070,781 @@ Made with all my heart, just for you.
 
 <script>
 
-/* =====================================================
+/* =========================================================
    PASSCODE
-   CODE: 220426
-===================================================== */
+   220426
+========================================================= */
 
-const correctCode =
-"220426";
+const correctCode = "220426";
 
 const inputs =
-document.querySelectorAll(
-"#passcode input"
-);
+  document.querySelectorAll(
+    "#passcode input"
+  );
 
 const unlockBtn =
-document.getElementById(
-"unlockBtn"
-);
+  document.getElementById(
+    "unlockBtn"
+  );
 
 const lockScreen =
-document.getElementById(
-"lockScreen"
-);
+  document.getElementById(
+    "lockScreen"
+  );
 
 const lockError =
-document.getElementById(
-"lockError"
-);
+  document.getElementById(
+    "lockError"
+  );
 
 
 inputs.forEach(
-(input,index)=>{
+  (input,index)=>{
 
-input.addEventListener(
-"input",
-()=>{
+    input.addEventListener(
+      "input",
+      ()=>{
 
-input.value =
-input.value.replace(
-/[^0-9]/g,
-""
+        input.value =
+          input.value.replace(
+            /[^0-9]/g,
+            ""
+          );
+
+        if(
+          input.value &&
+          index < inputs.length - 1
+        ){
+
+          inputs[index + 1].focus();
+
+        }
+
+      }
+    );
+
+
+    input.addEventListener(
+      "keydown",
+      event=>{
+
+        if(
+          event.key === "Backspace" &&
+          !input.value &&
+          index > 0
+        ){
+
+          inputs[index - 1].focus();
+
+        }
+
+        if(
+          event.key === "Enter"
+        ){
+
+          unlock();
+
+        }
+
+      }
+    );
+
+  }
 );
-
-if(
-input.value &&
-index <
-inputs.length - 1
-){
-
-inputs[
-index + 1
-].focus();
-
-}
-
-}
-);
-
-
-input.addEventListener(
-"keydown",
-(event)=>{
-
-if(
-event.key === "Backspace" &&
-!input.value &&
-index > 0
-){
-
-inputs[
-index - 1
-].focus();
-
-}
-
-if(
-event.key === "Enter"
-){
-
-unlock();
-
-}
-
-}
-);
-
-});
 
 
 function unlock(){
 
-let entered = "";
+  let entered = "";
+
+  inputs.forEach(
+    input=>{
+      entered += input.value;
+    }
+  );
 
 
-inputs.forEach(
-input=>{
-entered += input.value;
-}
-);
+  if(
+    entered === correctCode
+  ){
 
+    lockScreen.style.opacity = "0";
 
-if(
-entered === correctCode
-){
+    setTimeout(
+      ()=>{
+        lockScreen.style.display = "none";
+        document.body.style.overflow = "auto";
+      },
+      700
+    );
 
-lockScreen.style.opacity =
-"0";
+  }
 
-lockScreen.style.transition =
-"opacity .7s ease";
+  else{
 
+    lockError.textContent =
+      "That isn't the secret code 🥺❤️";
 
-setTimeout(
-()=>{
+    inputs.forEach(
+      input=>{
+        input.value = "";
+      }
+    );
 
-lockScreen.style.display =
-"none";
+    inputs[0].focus();
 
-document.body.style.overflow =
-"auto";
-
-},
-700
-);
-
-}else{
-
-lockError.textContent =
-"That isn't the secret code 🥺❤️";
-
-
-inputs.forEach(
-input=>{
-input.value = "";
-});
-
-
-inputs[0].focus();
-
-}
+  }
 
 }
 
 
 unlockBtn.addEventListener(
-"click",
-unlock
+  "click",
+  unlock
 );
 
 
-/* =====================================================
+/* =========================================================
    CLICK ME
-===================================================== */
+========================================================= */
 
 const clickBtn =
-document.getElementById(
-"clickBtn"
-);
+  document.getElementById(
+    "clickBtn"
+  );
 
 const surprise =
-document.getElementById(
-"surprise"
-);
+  document.getElementById(
+    "surprise"
+  );
 
 
 clickBtn.addEventListener(
-"click",
-()=>{
+  "click",
+  ()=>{
 
-surprise.classList.toggle(
-"show"
+    surprise.classList.toggle(
+      "show"
+    );
+
+    clickBtn.textContent =
+      surprise.classList.contains(
+        "show"
+      )
+      ?
+      "I Love You ❤️"
+      :
+      "Click Me ❤️";
+
+  }
 );
 
 
-clickBtn.textContent =
-surprise.classList.contains(
-"show"
-)
-?
-"I Love You ❤️"
-:
-"Click Me ❤️";
-
-}
-);
-
-
-/* =====================================================
-   22 CANDLES
-===================================================== */
+/* =========================================================
+   CREATE 22 CANDLES
+========================================================= */
 
 const candleContainer =
-document.getElementById(
-"candles"
-);
+  document.getElementById(
+    "candles"
+  );
 
 const counter =
-document.getElementById(
-"candleCounter"
-);
+  document.getElementById(
+    "candleCounter"
+  );
 
 const celebration =
-document.getElementById(
-"birthdayCelebration"
-);
+  document.getElementById(
+    "birthdayCelebration"
+  );
 
 const blowStatus =
-document.getElementById(
-"blowStatus"
-);
+  document.getElementById(
+    "blowStatus"
+  );
 
+const totalCandles = 22;
 
-const totalCandles =
-22;
+let candlesOut = 0;
 
-let candlesOut =
-0;
-
-let completed =
-false;
+let completed = false;
 
 
 /*
-Create 22 candles.
+   The candles are arranged around
+   the TOP of the upper cake tier.
 
-They are positioned directly
-on the oval top of the smaller
-second cake tier.
+   They are not floating beside it —
+   their bases sit directly over
+   the cake's top surface.
 */
 
 for(
-let i = 0;
-i < totalCandles;
-i++
+  let i = 0;
+  i < totalCandles;
+  i++
 ){
 
-const candle =
-document.createElement(
-"div"
-);
+  const candle =
+    document.createElement(
+      "div"
+    );
 
-candle.className =
-"candle";
-
-
-const angle =
-(
-Math.PI * 2 * i /
-totalCandles
-);
+  candle.className =
+    "candle";
 
 
-/*
-Keep the candle bases on
-the upper cake tier.
-*/
+  /*
+     Horizontal arrangement across
+     the upper cake.
+  */
 
-const radiusX =
-82;
-
-const radiusY =
-12;
-
-
-const x =
-112 +
-Math.cos(angle) *
-radiusX;
+  const x =
+    8 +
+    (
+      i /
+      (totalCandles - 1)
+    ) *
+    198;
 
 
-const y =
-29 +
-Math.sin(angle) *
-radiusY;
+  /*
+     Slight curved arrangement
+     following the cake's oval top.
+  */
+
+  const middle =
+    Math.abs(
+      i - 10.5
+    );
+
+  const y =
+    19 +
+    (
+      middle *
+      0.45
+    );
 
 
-candle.style.left =
-x + "px";
+  candle.style.left =
+    x + "px";
 
-candle.style.top =
-y + "px";
-
-
-candle.innerHTML = `
-
-<div class="flame"></div>
-
-<div class="smoke">
-〰
-</div>
-
-`;
+  candle.style.top =
+    y + "px";
 
 
-candle.addEventListener(
-"click",
-()=>{
+  candle.innerHTML = `
 
-extinguishCandle(
-candle
-);
+    <div class="flame"></div>
 
-});
+    <div class="smoke">
+      〰
+    </div>
+
+  `;
 
 
-candleContainer.appendChild(
-candle
-);
+  candle.addEventListener(
+    "click",
+    ()=>{
+      extinguishCandle(
+        candle
+      );
+    }
+  );
+
+
+  candleContainer.appendChild(
+    candle
+  );
 
 }
 
 
-/* =====================================================
+/* =========================================================
    EXTINGUISH CANDLE
-===================================================== */
+========================================================= */
 
 function extinguishCandle(
-candle
+  candle
 ){
 
-if(
-candle.classList.contains(
-"out"
-)
-){
+  if(
+    candle.classList.contains(
+      "out"
+    )
+  ){
+    return;
+  }
 
-return;
+
+  candle.classList.add(
+    "out"
+  );
+
+
+  candlesOut++;
+
+
+  counter.textContent =
+    candlesOut +
+    " / 22 candles";
+
+
+  if(
+    candlesOut ===
+    totalCandles
+  ){
+
+    birthdayComplete();
+
+  }
 
 }
 
 
-candle.classList.add(
-"out"
-);
-
-
-candlesOut++;
-
-
-counter.textContent =
-candlesOut +
-" / 22 candles";
-
-
-if(
-candlesOut ===
-totalCandles
-){
-
-birthdayComplete();
-
-}
-
-}
-
-
-/* =====================================================
-   TAP CANDLE
-===================================================== */
+/* =========================================================
+   TAP
+========================================================= */
 
 function blowOneCandle(){
 
-const remaining =
-document.querySelectorAll(
-".candle:not(.out)"
-);
+  const remaining =
+    document.querySelectorAll(
+      ".candle:not(.out)"
+    );
 
 
-if(
-remaining.length
-){
+  if(
+    remaining.length
+  ){
 
-extinguishCandle(
-remaining[0]
-);
+    extinguishCandle(
+      remaining[0]
+    );
+
+  }
 
 }
 
-}
 
+/* =========================================================
+   MICROPHONE
+========================================================= */
 
-/* =====================================================
-   MICROPHONE BLOW
-===================================================== */
+let audioContext = null;
 
-let audioContext =
-null;
+let analyser = null;
 
-let analyser =
-null;
+let microphone = null;
 
-let microphone =
-null;
+let blowListening = false;
 
-let blowListening =
-false;
-
-let lastBlow =
-0;
+let lastBlow = 0;
 
 
 async function startBlowing(){
 
-if(
-blowListening
-){
+  if(
+    blowListening
+  ){
 
-blowStatus.textContent =
-"I'm listening… blow! 💨❤️";
+    blowStatus.textContent =
+      "I'm listening… blow! 💨❤️";
 
-return;
+    return;
 
-}
-
-
-if(
-!navigator.mediaDevices ||
-!navigator.mediaDevices.getUserMedia
-){
-
-blowStatus.innerHTML =
-"Microphone isn't available here 🥺<br>" +
-"Use the tap button instead ❤️";
-
-return;
-
-}
+  }
 
 
-try{
+  if(
+    !navigator.mediaDevices ||
+    !navigator.mediaDevices.getUserMedia
+  ){
 
-const stream =
-await navigator.mediaDevices
-.getUserMedia({
-audio:true
-});
+    blowStatus.innerHTML =
+      "Microphone isn't available here 🥺<br>" +
+      "Use the tap button instead ❤️";
 
+    return;
 
-audioContext =
-new(
-window.AudioContext ||
-window.webkitAudioContext
-)();
+  }
 
 
-analyser =
-audioContext.createAnalyser();
+  try{
+
+    const stream =
+      await navigator.mediaDevices
+        .getUserMedia({
+          audio:true
+        });
 
 
-analyser.fftSize =
-256;
+    audioContext =
+      new(
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
 
 
-microphone =
-audioContext
-.createMediaStreamSource(
-stream
-);
+    analyser =
+      audioContext.createAnalyser();
+
+    analyser.fftSize = 256;
 
 
-microphone.connect(
-analyser
-);
+    microphone =
+      audioContext
+        .createMediaStreamSource(
+          stream
+        );
 
 
-blowListening =
-true;
+    microphone.connect(
+      analyser
+    );
 
 
-blowStatus.textContent =
-"I'm listening… blow toward your phone! 💨";
+    blowListening = true;
 
 
-listenForBlow();
+    blowStatus.textContent =
+      "I'm listening… blow toward your phone! 💨";
 
-}
 
-catch(error){
+    listenForBlow();
 
-blowStatus.innerHTML =
-"I couldn't access the microphone 🥺<br>" +
-"You can still tap the candles ❤️";
+  }
 
-}
+  catch(error){
+
+    blowStatus.innerHTML =
+      "I couldn't access the microphone 🥺<br>" +
+      "You can still tap the candles ❤️";
+
+  }
 
 }
 
 
-/* =====================================================
-   DETECT BLOW
-===================================================== */
+/* =========================================================
+   BLOW DETECTION
+========================================================= */
 
 function listenForBlow(){
 
-if(
-!blowListening
-){
-
-return;
-
-}
+  if(
+    !blowListening
+  ){
+    return;
+  }
 
 
-const data =
-new Uint8Array(
-analyser.frequencyBinCount
-);
+  const data =
+    new Uint8Array(
+      analyser.frequencyBinCount
+    );
 
 
-analyser.getByteFrequencyData(
-data
-);
+  analyser.getByteFrequencyData(
+    data
+  );
 
 
-let total =
-0;
+  let total = 0;
 
 
-for(
-let i = 0;
-i < data.length;
-i++
-){
+  for(
+    let i = 0;
+    i < data.length;
+    i++
+  ){
 
-total +=
-data[i];
+    total += data[i];
 
-}
-
-
-const average =
-total /
-data.length;
+  }
 
 
-const now =
-Date.now();
+  const average =
+    total / data.length;
 
 
-if(
-average > 55 &&
-now - lastBlow > 450
-){
-
-lastBlow =
-now;
+  const now =
+    Date.now();
 
 
-blowOneCandle();
+  if(
+    average > 55 &&
+    now - lastBlow > 450
+  ){
 
-}
+    lastBlow = now;
+
+    blowOneCandle();
+
+  }
 
 
-requestAnimationFrame(
-listenForBlow
-);
+  requestAnimationFrame(
+    listenForBlow
+  );
 
 }
 
 
-/* =====================================================
-   ALL 22 CANDLES OUT
-===================================================== */
+/* =========================================================
+   FINISH
+========================================================= */
 
 function birthdayComplete(){
 
-if(
-completed
-){
-
-return;
-
-}
+  if(
+    completed
+  ){
+    return;
+  }
 
 
-completed =
-true;
+  completed = true;
+
+  blowListening = false;
 
 
-blowListening =
-false;
+  if(
+    audioContext
+  ){
+
+    audioContext.close();
+
+  }
 
 
-if(
-audioContext
-){
-
-audioContext.close();
-
-}
+  blowStatus.textContent =
+    "YOU DID IT!!! 🎂❤️";
 
 
-blowStatus.textContent =
-"You did it!!! 🎂❤️";
+  setTimeout(
+    ()=>{
+
+      celebration.classList.add(
+        "show"
+      );
 
 
-setTimeout(
-()=>{
-
-celebration.classList.add(
-"show"
-);
+      celebration.scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+      });
 
 
-celebration.scrollIntoView({
-behavior:"smooth",
-block:"center"
-});
+      launchConfetti();
 
-
-launchConfetti();
-
-},
-900
-);
+    },
+    900
+  );
 
 }
 
 
-/* =====================================================
+/* =========================================================
    CONFETTI
-===================================================== */
+========================================================= */
 
 function launchConfetti(){
 
-const colors = [
-
-"#b72e2b",
-"#174f91",
-"#e4b62e",
-"#f3dfbd",
-"#8a4b60"
-
-];
+  const colors = [
+    "#b72e2b",
+    "#174f91",
+    "#e4b62e",
+    "#f3dfbd",
+    "#8a4b60"
+  ];
 
 
-for(
-let i = 0;
-i < 120;
-i++
-){
+  for(
+    let i = 0;
+    i < 120;
+    i++
+  ){
 
-const piece =
-document.createElement(
-"div"
-);
-
-
-piece.className =
-"confetti-piece";
+    const piece =
+      document.createElement(
+        "div"
+      );
 
 
-piece.style.left =
-Math.random() *
-100 +
-"vw";
+    piece.className =
+      "confetti-piece";
 
 
-piece.style.background =
-colors[
-Math.floor(
-Math.random() *
-colors.length
-)
-];
+    piece.style.left =
+      Math.random() *
+      100 +
+      "vw";
 
 
-piece.style.animationDelay =
-Math.random() *
-1.5 +
-"s";
+    piece.style.background =
+      colors[
+        Math.floor(
+          Math.random() *
+          colors.length
+        )
+      ];
 
 
-piece.style.animationDuration =
-(
-3 +
-Math.random() *
-2
-) +
-"s";
+    piece.style.animationDelay =
+      Math.random() *
+      1.5 +
+      "s";
 
 
-document.body.appendChild(
-piece
-);
+    piece.style.animationDuration =
+      (
+        3 +
+        Math.random() * 2
+      ) +
+      "s";
 
 
-setTimeout(
-()=>piece.remove(),
-6000
-);
+    document.body.appendChild(
+      piece
+    );
+
+
+    setTimeout(
+      ()=>{
+        piece.remove();
+      },
+      6000
+    );
+
+  }
 
 }
 
-}
 
-
-/* =====================================================
+/* =========================================================
    BUTTONS
-===================================================== */
+========================================================= */
 
 document
-.getElementById(
-"blowButton"
-)
-.addEventListener(
-"click",
-startBlowing
-);
+  .getElementById(
+    "blowButton"
+  )
+  .addEventListener(
+    "click",
+    startBlowing
+  );
 
 
 document
-.getElementById(
-"tapButton"
-)
-.addEventListener(
-"click",
-blowOneCandle
-);
+  .getElementById(
+    "tapButton"
+  )
+  .addEventListener(
+    "click",
+    blowOneCandle
+  );
 
 
-/* =====================================================
-   SCROLL REVEAL
-===================================================== */
+/* =========================================================
+   SCROLL ANIMATION
+========================================================= */
 
 const revealItems =
-document.querySelectorAll(
-".paper, .photo-page, .note, .reasons, .click-section, .birthday-finale, .next"
-);
+  document.querySelectorAll(
+    ".paper, .photo-page, .note, .reasons, .click-section, .birthday-finale, .next"
+  );
 
 
 revealItems.forEach(
-(item,index)=>{
+  (item,index)=>{
 
-item.classList.add(
-"scroll-reveal"
+    item.classList.add(
+      "scroll-reveal"
+    );
+
+
+    if(
+      index % 3 === 1
+    ){
+
+      item.classList.add(
+        "from-left"
+      );
+
+    }
+
+
+    if(
+      index % 3 === 2
+    ){
+
+      item.classList.add(
+        "from-right"
+      );
+
+    }
+
+  }
 );
-
-
-if(
-index % 3 === 1
-){
-
-item.classList.add(
-"from-left"
-);
-
-}
-
-
-if(
-index % 3 === 2
-){
-
-item.classList.add(
-"from-right"
-);
-
-}
-
-});
 
 
 const revealObserver =
-new IntersectionObserver(
-(entries,observer)=>{
+  new IntersectionObserver(
+    (entries,observer)=>{
 
-entries.forEach(
-entry=>{
+      entries.forEach(
+        entry=>{
 
-if(
-entry.isIntersecting
-){
+          if(
+            entry.isIntersecting
+          ){
 
-entry.target.classList.add(
-"visible"
-);
+            entry.target.classList.add(
+              "visible"
+            );
 
-/*
-Each scrapbook section
-reveals only once.
-*/
 
-observer.unobserve(
-entry.target
-);
+            observer.unobserve(
+              entry.target
+            );
 
-}
+          }
 
-});
+        }
+      );
 
-},
-{
-threshold:.14,
-rootMargin:
-"0px 0px -60px 0px"
-}
-);
+    },
+    {
+      threshold:.14,
+
+      rootMargin:
+        "0px 0px -60px 0px"
+    }
+  );
 
 
 document
-.querySelectorAll(
-".scroll-reveal"
-)
-.forEach(
-item=>{
-revealObserver.observe(
-item
-);
-}
-);
+  .querySelectorAll(
+    ".scroll-reveal"
+  )
+  .forEach(
+    item=>{
+      revealObserver.observe(
+        item
+      );
+    }
+  );
 
 
-/* =====================================================
-   START LOCKED
-===================================================== */
+/* =========================================================
+   KEEP WEBSITE LOCKED AT START
+========================================================= */
 
 document.body.style.overflow =
-"hidden";
+  "hidden";
 
 </script>
 
