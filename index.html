@@ -2,14 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <title>To My Forever ❤️</title>
 
-<meta
-  name="description"
-  content="A little piece of my heart, made just for you."
->
+<meta name="description" content="A little piece of my heart, made just for you.">
+<meta name="theme-color" content="#b99472">
+
+<!-- Nice preview when you send the link on WhatsApp -->
+<meta property="og:title" content="To My Forever ❤️">
+<meta property="og:description" content="A little piece of my heart, made just for you.">
+<meta property="og:type" content="website">
 
 <style>
 
@@ -31,11 +34,45 @@ body{
   background:#b99472;
   color:#4b3027;
   font-family:Georgia,serif;
+  -webkit-text-size-adjust:100%;
+}
+
+/* FIX: locking scroll with a class instead of inline styles,
+   so unlocking restores overflow-x:hidden (no sideways scroll
+   caused by the rotated/tilted cards). */
+body.locked{
+  overflow:hidden;
+  height:100%;
 }
 
 button,
 input{
   font:inherit;
+}
+
+button{
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+
+noscript .noscript-warning{
+  position:fixed;
+  inset:0;
+  z-index:1000000;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:30px;
+
+  text-align:center;
+
+  background:#ead8b8;
+  color:#63392d;
+
+  font-size:18px;
+  line-height:1.7;
 }
 
 
@@ -147,6 +184,9 @@ body:before{
 .lock-paper p{
   line-height:1.8;
   font-size:17px;
+
+  /* FIX: keeps the intended line break between the two sentences */
+  white-space:pre-line;
 }
 
 .passcode{
@@ -175,6 +215,13 @@ body:before{
   font-size:23px;
 
   outline:none;
+
+  border-radius:4px;
+}
+
+.passcode input:focus{
+  border-color:#713c31;
+  box-shadow:0 0 0 2px #713c3133;
 }
 
 .unlock-btn{
@@ -194,12 +241,23 @@ body:before{
   border-radius:5px;
 }
 
+.unlock-btn:active{
+  transform:translate(3px,4px);
+  box-shadow:1px 2px 0 #452b22;
+}
+
 .lock-error{
   min-height:24px;
 
   margin-top:12px;
 
   color:#9d3730;
+}
+
+.lock-hint{
+  margin-top:14px;
+  font-size:13px;
+  opacity:.65;
 }
 
 
@@ -238,6 +296,7 @@ body:before{
 ========================================================= */
 
 .cover{
+  min-height:90vh;      /* fallback for older iOS/Android */
   min-height:90svh;
 
   display:flex;
@@ -270,7 +329,7 @@ body:before{
   font-size:
     clamp(55px,15vw,105px);
 
-  line-height:.82;
+  line-height:.9;
 
   font-weight:400;
 
@@ -355,6 +414,7 @@ body:before{
   box-shadow:
     0 12px 30px #50352225;
 
+  -webkit-backdrop-filter:blur(8px);
   backdrop-filter:blur(8px);
 }
 
@@ -384,6 +444,17 @@ body:before{
   height:42px;
 }
 
+.music-note{
+  margin-top:8px;
+  font-size:12px;
+  color:#9d3730;
+  display:none;
+}
+
+.music-note.show{
+  display:block;
+}
+
 
 /* =========================================================
    NEXT
@@ -391,6 +462,7 @@ body:before{
 
 .next{
   width:max-content;
+  max-width:100%;
 
   margin:
     60px
@@ -547,13 +619,14 @@ body:before{
 
   box-shadow:
     0 14px 25px #50362245;
-}
 
-.polaroid:nth-child(odd){
   transform:rotate(-3deg);
 }
 
-.polaroid:nth-child(even){
+/* FIX: the old rule was .polaroid:nth-child(odd/even), but every
+   polaroid is the 2nd child of its own section, so they ALL tilted
+   the same way. Alternate on the section instead. */
+.photo-page:nth-of-type(even) .polaroid{
   transform:rotate(3deg);
 }
 
@@ -597,6 +670,9 @@ body:before{
   font-size:28px;
 
   overflow:hidden;
+
+  /* FIX: keeps the line break in "PHOTO SPACE / ❤️" */
+  white-space:pre-line;
 }
 
 .photo img{
@@ -793,6 +869,8 @@ body:before{
     1px 2px 0 #3f281d;
 }
 
+/* FIX: max-height is now set in JS from the real content height,
+   so long text can never be clipped on a narrow phone. */
 .surprise{
   max-height:0;
 
@@ -810,9 +888,11 @@ body:before{
   line-height:1.9;
 }
 
-.surprise.show{
-  max-height:700px;
+.surprise p{
+  margin:0 0 22px;
+}
 
+.surprise.show{
   opacity:1;
 
   margin-top:30px;
@@ -924,6 +1004,8 @@ body:before{
   line-height:1.8;
 
   margin-bottom:25px;
+
+  white-space:pre-line;
 }
 
 .wish-text{
@@ -941,6 +1023,13 @@ body:before{
     clamp(27px,7vw,40px);
 
   color:#813c32;
+
+  white-space:pre-line;
+}
+
+.blow-help{
+  white-space:pre-line;
+  line-height:1.9;
 }
 
 
@@ -1141,17 +1230,28 @@ body:before{
 }
 
 
-/* ARMS */
+/* =========================================================
+   ARMS — CLASSIC HANDS-ON-HIPS SUPERMAN POSE
+
+   Each arm is now two segments:
+     upper arm  → angles OUT to a raised elbow
+     forearm    → angles back IN and DOWN to the hip
+     fist       → rests on the waist
+========================================================= */
 
 .arm{
   position:absolute;
 
-  width:25px;
-  height:80px;
+  width:19px;
+  height:42px;
 
-  top:66px;
+  top:62px;
 
-  border-radius:18px;
+  border-radius:
+    10px
+    10px
+    8px
+    8px;
 
   background:
     linear-gradient(
@@ -1161,21 +1261,161 @@ body:before{
       #123e72
     );
 
-  z-index:3;
+  box-shadow:
+    inset
+    -3px
+    0
+    5px
+    #0c315c40;
+
+  transform-origin:
+    top center;
+
+  z-index:6;
 }
 
+/* positive rotation swings the elbow outward */
 .arm.left{
-  left:12px;
+  left:17px;
 
   transform:
-    rotate(14deg);
+    rotate(18deg);
 }
 
 .arm.right{
-  right:12px;
+  right:17px;
 
   transform:
-    rotate(-14deg);
+    rotate(-18deg);
+}
+
+.forearm{
+  position:absolute;
+
+  width:17px;
+  height:35px;
+
+  left:1px;
+  top:38px;
+
+  border-radius:
+    8px
+    8px
+    7px
+    7px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #123e72,
+      #2d70b2,
+      #123e72
+    );
+
+  box-shadow:
+    inset
+    -3px
+    0
+    5px
+    #0c315c40;
+
+  transform-origin:
+    top center;
+}
+
+/* swings back inward so the hand lands on the waist */
+.arm.left .forearm{
+  transform:
+    rotate(-48deg);
+}
+
+.arm.right .forearm{
+  transform:
+    rotate(48deg);
+}
+
+.fist{
+  position:absolute;
+
+  width:17px;
+  height:15px;
+
+  left:0;
+  bottom:-7px;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      #f1d9b4,
+      #cda778
+    );
+
+  box-shadow:
+    0 2px 4px #55341f45;
+}
+
+
+/* =========================================================
+   TRUNKS + BELT
+   (gives the fists a waist to actually rest on)
+========================================================= */
+
+.trunks{
+  position:absolute;
+
+  width:74px;
+  height:28px;
+
+  left:28px;
+  top:130px;
+
+  border-radius:
+    5px
+    5px
+    12px
+    12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #e13a34,
+      #a91e28
+    );
+
+  box-shadow:
+    inset
+    -5px
+    0
+    8px
+    #7a161c55;
+
+  z-index:5;
+}
+
+.belt{
+  position:absolute;
+
+  width:76px;
+  height:10px;
+
+  left:27px;
+  top:125px;
+
+  border-radius:3px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffd94c,
+      #dda617
+    );
+
+  box-shadow:
+    0 2px 4px #5e351f35;
+
+  z-index:5;
 }
 
 
@@ -1293,9 +1533,19 @@ body:before{
   font-size:13px;
 
   line-height:1.1;
+
+  overflow:hidden;
 }
 
 .baby-head span{
+  display:block;
+}
+
+/* Drop a real photo in and it crops itself into the circle */
+.baby-head img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
   display:block;
 }
 
@@ -1701,18 +1951,21 @@ body:before{
 
 /* =========================================================
    22 CANDLES
-   DIRECTLY ON THE UPPER CAKE
+   FIX: the container used to sit at top:130px, which put the
+   candle bases ~90px ABOVE the cake (floating in mid-air,
+   overlapping Superman). It now sits on the upper tier, in two
+   rows so 22 candles are not crushed into one 9px-apart line.
 ========================================================= */
 
 .candles{
   position:absolute;
 
-  width:230px;
-  height:70px;
+  width:220px;
+  height:130px;
 
   left:50%;
 
-  top:130px;
+  top:200px;
 
   transform:
     translateX(-50%);
@@ -1725,8 +1978,8 @@ body:before{
 .candle{
   position:absolute;
 
-  width:9px;
-  height:40px;
+  width:10px;
+  height:38px;
 
   border-radius:5px;
 
@@ -1747,8 +2000,19 @@ body:before{
 
   pointer-events:auto;
 
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+
   transition:
     transform .25s ease;
+}
+
+/* Bigger invisible tap target — 10px candles are hard to hit
+   with a thumb. */
+.candle:before{
+  content:"";
+  position:absolute;
+  inset:-12px -7px -6px;
 }
 
 .candle:hover{
@@ -1953,6 +2217,8 @@ body:before{
   font-style:italic;
 
   font-size:15px;
+
+  white-space:pre-line;
 }
 
 
@@ -2034,12 +2300,16 @@ body:before{
     clamp(38px,9vw,60px);
 
   color:#74372e;
+
+  white-space:pre-line;
 }
 
 .birthday-celebration p{
   font-size:19px;
 
   line-height:1.9;
+
+  margin:0 0 22px;
 }
 
 .birthday-numbers{
@@ -2054,6 +2324,382 @@ body:before{
     clamp(25px,6vw,36px);
 
   color:#713b30;
+}
+
+
+/* =========================================================
+   UNLOCK CELEBRATION
+   Fires the moment the correct passcode is entered.
+========================================================= */
+
+/* LAYER ORDER during the greeting:
+     999996  opaque paper backdrop  (hides the scrapbook)
+     999999  confetti
+    1000000  fireworks canvas
+    1000001  the greeting text itself
+   ...so the fireworks burst BETWEEN the backdrop and the words. */
+
+.unlock-backdrop{
+  position:fixed;
+
+  inset:0;
+
+  z-index:999996;
+
+  display:none;
+
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      #f4e3c4,
+      #d3b08b 75%
+    );
+
+  opacity:0;
+
+  transition:opacity .8s ease;
+}
+
+.unlock-backdrop.visible{
+  display:block;
+}
+
+.unlock-backdrop.show{
+  opacity:1;
+}
+
+.unlock-banner{
+  position:fixed;
+
+  inset:0;
+
+  z-index:1000001;
+
+  display:none;
+
+  flex-direction:column;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  text-align:center;
+
+  pointer-events:none;
+
+  opacity:0;
+
+  transition:opacity .8s ease;
+}
+
+.unlock-banner.visible{
+  display:flex;
+}
+
+.unlock-banner.show{
+  opacity:1;
+}
+
+.unlock-banner-text{
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:
+    clamp(44px,13vw,88px);
+
+  line-height:1.05;
+
+  color:#6d3327;
+
+  text-shadow:
+    3px
+    5px
+    0
+    #f4e3c4,
+
+    0
+    10px
+    28px
+    #4c302055;
+}
+
+/* each word/letter pops in one after another */
+.pop-letter{
+  display:inline-block;
+
+  opacity:0;
+
+  transform:
+    translateY(38px)
+    scale(.4)
+    rotate(-14deg);
+
+  animation:
+    letterPop
+    .62s
+    cubic-bezier(.2,1.5,.4,1)
+    forwards;
+}
+
+@keyframes letterPop{
+
+  60%{
+    transform:
+      translateY(-7px)
+      scale(1.16)
+      rotate(4deg);
+  }
+
+  100%{
+    opacity:1;
+
+    transform:
+      translateY(0)
+      scale(1)
+      rotate(0);
+  }
+
+}
+
+.unlock-sub{
+  margin-top:14px;
+
+  font-family:Georgia,serif;
+
+  font-size:
+    clamp(16px,4.5vw,22px);
+
+  font-style:italic;
+
+  color:#74402f;
+
+  opacity:0;
+
+  animation:
+    fadeUp
+    .9s
+    ease
+    1.5s
+    forwards;
+}
+
+@keyframes fadeUp{
+
+  from{
+    opacity:0;
+    transform:translateY(18px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+}
+
+
+/* =========================================================
+   FIREWORKS CANVAS
+   Sits above the page, ignores taps.
+========================================================= */
+
+#fireworksCanvas{
+  position:fixed;
+
+  inset:0;
+
+  width:100%;
+  height:100%;
+
+  z-index:1000000;
+
+  pointer-events:none;
+
+  display:none;
+}
+
+#fireworksCanvas.show{
+  display:block;
+}
+
+
+/* =========================================================
+   FINALE MESSAGE OVERLAY
+========================================================= */
+
+.boom-overlay{
+  position:fixed;
+
+  inset:0;
+
+  z-index:1000001;
+
+  display:none;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  text-align:center;
+
+  pointer-events:none;
+}
+
+.boom-overlay.show{
+  display:flex;
+}
+
+/* =========================================================
+   FINALE MESSAGES
+
+   Two lines that appear ONE AFTER THE OTHER:
+     1. "I love you, Michael"   (romantic script)
+     2. "You're my Superman"    (bold comic style)
+
+   Only one is on screen at a time, so nothing overlaps.
+========================================================= */
+
+.boom-line{
+  display:none;
+
+  max-width:94vw;
+
+  line-height:1.1;
+}
+
+.boom-line.show{
+  display:block;
+
+  animation:
+    boomIn
+    1.5s
+    cubic-bezier(.15,1.6,.35,1)
+    forwards;
+}
+
+/* line 1 — soft, handwritten, loving */
+.boom-line.love{
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
+  font-size:
+    clamp(46px,15vw,120px);
+
+  color:#fff1cf;
+
+  text-shadow:
+    0 0 22px #ff7aa8,
+    0 0 55px #e0407a,
+    4px 6px 0 #8d2340,
+    0 14px 40px #2a121c88;
+}
+
+/* line 2 — the Superman punch */
+.boom-line.superman{
+  font:
+    bold
+    clamp(40px,12.5vw,105px)
+    Arial,
+    sans-serif;
+
+  letter-spacing:1px;
+
+  text-transform:uppercase;
+
+  color:#ffd94c;
+
+  text-shadow:
+    0 0 18px #ff9c1e,
+    0 0 42px #ff5a1e,
+    4px 6px 0 #1b4f8f,
+    7px 10px 0 #b72d2a,
+    0 16px 45px #2a121c88;
+}
+
+@keyframes boomIn{
+
+  0%{
+    opacity:0;
+
+    transform:
+      scale(0)
+      rotate(-18deg);
+  }
+
+  45%{
+    opacity:1;
+
+    transform:
+      scale(1.28)
+      rotate(5deg);
+  }
+
+  62%{
+    transform:
+      scale(.94)
+      rotate(-2deg);
+  }
+
+  78%{
+    transform:
+      scale(1.06)
+      rotate(1deg);
+  }
+
+  100%{
+    opacity:1;
+
+    transform:
+      scale(1)
+      rotate(0);
+  }
+
+}
+
+/* screen shake on the boom */
+.shake{
+  animation:
+    screenShake
+    .62s
+    ease-in-out;
+}
+
+@keyframes screenShake{
+
+  0%,100%{
+    transform:translate(0,0);
+  }
+
+  12%{
+    transform:translate(-11px,6px);
+  }
+
+  25%{
+    transform:translate(10px,-8px);
+  }
+
+  38%{
+    transform:translate(-8px,-5px);
+  }
+
+  52%{
+    transform:translate(7px,7px);
+  }
+
+  68%{
+    transform:translate(-5px,3px);
+  }
+
+  84%{
+    transform:translate(4px,-3px);
+  }
+
 }
 
 
@@ -2096,6 +2742,7 @@ body:before{
 ========================================================= */
 
 .final{
+  min-height:70vh;
   min-height:70svh;
 
   display:flex;
@@ -2137,9 +2784,12 @@ body:before{
 
 /* =========================================================
    SCROLL REVEAL
+   FIX: elements start hidden ONLY when JS is running
+   (js-reveal on <html>), otherwise a JS error would leave the
+   whole page invisible.
 ========================================================= */
 
-.scroll-reveal{
+.js-reveal .scroll-reveal{
   opacity:0;
 
   transform:
@@ -2152,21 +2802,21 @@ body:before{
     transform 1s cubic-bezier(.22,1,.36,1);
 }
 
-.scroll-reveal.from-left{
+.js-reveal .scroll-reveal.from-left{
   transform:
     translateX(-70px)
     rotate(-2deg)
     scale(.97);
 }
 
-.scroll-reveal.from-right{
+.js-reveal .scroll-reveal.from-right{
   transform:
     translateX(70px)
     rotate(2deg)
     scale(.97);
 }
 
-.scroll-reveal.visible{
+.js-reveal .scroll-reveal.visible{
   opacity:1;
 
   transform:
@@ -2175,13 +2825,13 @@ body:before{
     scale(1);
 }
 
-.birthday-finale.scroll-reveal{
+.js-reveal .birthday-finale.scroll-reveal{
   transform:
     translateY(90px)
     scale(.92);
 }
 
-.birthday-finale.scroll-reveal.visible{
+.js-reveal .birthday-finale.scroll-reveal.visible{
   animation:
     cakeArrive
     1.1s
@@ -2256,6 +2906,15 @@ body:before{
     padding-right:19px;
   }
 
+  .passcode{
+    gap:6px;
+  }
+
+  .passcode input{
+    width:42px;
+    height:52px;
+  }
+
 }
 
 
@@ -2280,7 +2939,15 @@ body:before{
 </head>
 
 
-<body>
+<body class="locked">
+
+
+<noscript>
+  <div class="noscript-warning">
+    This page needs JavaScript to open. 🥺❤️<br>
+    Please enable JavaScript in your browser settings.
+  </div>
+</noscript>
 
 
 <!-- =========================================================
@@ -2301,29 +2968,28 @@ body:before{
       Just For You
     </h1>
 
-    <p>
-      This little piece of my heart is private. ❤️
-      <br>
-      Enter the secret code to open it.
-    </p>
+    <p>This little piece of my heart is private. ❤️
+
+Enter the secret code to open it.</p>
 
     <div
       class="passcode"
       id="passcode"
     >
 
-      <input inputmode="numeric" maxlength="1">
-      <input inputmode="numeric" maxlength="1">
-      <input inputmode="numeric" maxlength="1">
-      <input inputmode="numeric" maxlength="1">
-      <input inputmode="numeric" maxlength="1">
-      <input inputmode="numeric" maxlength="1">
+      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 1">
+      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 2">
+      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 3">
+      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 4">
+      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 5">
+      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 6">
 
     </div>
 
     <button
       class="unlock-btn"
       id="unlockBtn"
+      type="button"
     >
       Open My Heart ❤️
     </button>
@@ -2331,8 +2997,43 @@ body:before{
     <div
       class="lock-error"
       id="lockError"
+      role="status"
+      aria-live="polite"
     ></div>
 
+    <div class="lock-hint" id="lockHint"></div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     FIREWORKS + CELEBRATION OVERLAYS
+========================================================= -->
+
+<canvas id="fireworksCanvas"></canvas>
+
+<div class="unlock-backdrop" id="unlockBackdrop"></div>
+
+<div class="unlock-banner" id="unlockBanner">
+
+  <div class="unlock-banner-text" id="unlockBannerText"></div>
+
+  <div class="unlock-sub">
+    Made with all my heart, just for you ❤️
+  </div>
+
+</div>
+
+<div class="boom-overlay" id="boomOverlay">
+
+  <div class="boom-line love" id="boomLine1">
+    I love you, Michael ❤️
+  </div>
+
+  <div class="boom-line superman" id="boomLine2">
+    You're my Superman 🦸
   </div>
 
 </div>
@@ -2387,6 +3088,9 @@ body:before{
       Press play and read this with me. ❤️
     </div>
 
+    <!-- FIX: the space in the filename is now URL-encoded (%20).
+         Keep the mp3 in the SAME folder as this file, and make
+         sure the name matches EXACTLY, including capital letters. -->
     <audio
       id="music"
       controls
@@ -2395,13 +3099,17 @@ body:before{
     >
 
       <source
-        src="Dandelions mp3.mp3"
+        src="Dandelions%20mp3.mp3"
         type="audio/mpeg"
       >
 
       Your browser does not support the audio player.
 
     </audio>
+
+    <div class="music-note" id="musicNote">
+      Song file not found — check that “Dandelions mp3.mp3” is in the same folder. 🥺
+    </div>
 
   </div>
 
@@ -2451,11 +3159,10 @@ I pray you achieve everything you've worked for and everything you aim to achiev
   <div class="pin"></div>
 
   <div class="photo">
-
-    PHOTO SPACE
-    <br>
-    ❤️
-
+    <!-- To add the real photo, delete the two text lines below
+         and paste:  <img src="photo1.jpg" alt="Us"> -->
+PHOTO SPACE
+❤️
   </div>
 
   <div class="caption">
@@ -2503,10 +3210,11 @@ But the truth was… I was crying because I was secretly building this website f
 
 <div class="polaroid">
 
+  <div class="pin"></div>
+
   <div class="photo">
-    PHOTO SPACE
-    <br>
-    ♡
+PHOTO SPACE
+♡
   </div>
 
   <div class="caption">
@@ -2559,9 +3267,8 @@ Happy birthday again, my forever. ❤️
   <div class="pin"></div>
 
   <div class="photo">
-    PHOTO SPACE
-    <br>
-    ♥
+PHOTO SPACE
+♥
   </div>
 
   <div class="caption">
@@ -2617,11 +3324,8 @@ Your girl ❤️
 <div class="note">
 
 <div class="hand">
-
-The little things about you
-<br>
-are some of my favorite things.
-
+  The little things about you<br>
+  are some of my favorite things.
 </div>
 
 </div>
@@ -2684,6 +3388,9 @@ are some of my favorite things.
 <button
   class="click-btn"
   id="clickBtn"
+  type="button"
+  aria-expanded="false"
+  aria-controls="surprise"
 >
   Click Me ❤️
 </button>
@@ -2694,27 +3401,27 @@ are some of my favorite things.
   id="surprise"
 >
 
-If I could choose one person to write a thousand love letters to,
-it would still be you.
+<p>
+  If I could choose one person to write a thousand love letters to,
+  it would still be you.
+</p>
 
-<br><br>
+<p>
+  If I could relive one chapter of my life,
+  I'd choose the chapter where I met you.
+</p>
 
-If I could relive one chapter of my life,
-I'd choose the chapter where I met you.
+<p>
+  And if I had to choose my forever…
+</p>
 
-<br><br>
+<p>
+  <strong>I'd choose you.</strong>
+</p>
 
-And if I had to choose my forever…
-
-<br><br>
-
-<strong>
-I'd choose you.
-</strong>
-
-<br><br>
-
-Every single time. ❤️
+<p>
+  Every single time. ❤️
+</p>
 
 <span class="surprise-heart">
 ♥
@@ -2770,21 +3477,13 @@ I hope you always remember that you have someone who loves you deeply.
   Last But Not Least… 🎂
 </h2>
 
-<p class="birthday-intro">
-
-Before you go,
+<p class="birthday-intro">Before you go,
 there's one last thing I want you to do,
-birthday boy… ❤️
-
-</p>
+birthday boy… ❤️</p>
 
 
-<div class="wish-text">
-
-Make a wish and blow out
-your 22 candles ✨
-
-</div>
+<div class="wish-text">Make a wish and blow out
+your 22 candles ✨</div>
 
 
 <!-- =======================================================
@@ -2807,9 +3506,6 @@ your 22 candles ✨
 
 <div class="cape"></div>
 
-<div class="arm left"></div>
-<div class="arm right"></div>
-
 
 <div class="hero-body">
 
@@ -2818,6 +3514,25 @@ your 22 candles ✨
 </div>
 
 </div>
+
+
+<!-- HANDS ON HIPS -->
+
+<div class="arm left">
+  <div class="forearm">
+    <div class="fist"></div>
+  </div>
+</div>
+
+<div class="arm right">
+  <div class="forearm">
+    <div class="fist"></div>
+  </div>
+</div>
+
+
+<div class="belt"></div>
+<div class="trunks"></div>
 
 
 <div class="leg left">
@@ -2829,7 +3544,9 @@ your 22 candles ✨
 </div>
 
 
-<!-- BABY PHOTO SPACE -->
+<!-- BABY PHOTO SPACE
+     To use his baby photo: replace the <span> below with
+     <img src="baby.jpg" alt="Baby photo"> -->
 
 <div
   class="baby-head"
@@ -2837,13 +3554,9 @@ your 22 candles ✨
 >
 
 <span>
-
-BABY
-<br>
-PHOTO
-<br>
+BABY<br>
+PHOTO<br>
 SPACE
-
 </span>
 
 </div>
@@ -2903,7 +3616,7 @@ SPACE
 
 
 <!-- =====================================================
-     22 CANDLES
+     22 CANDLES (built by JavaScript)
 ===================================================== -->
 
 <div
@@ -2920,24 +3633,18 @@ SPACE
 <div
   class="candle-counter"
   id="candleCounter"
+  role="status"
+  aria-live="polite"
 >
   0 / 22 candles
 </div>
 
 
-<p>
-
-💨 Blow into your phone
-
-<br>
+<p class="blow-help">💨 Blow into your phone
 
 or
 
-<br>
-
-👆 tap each candle to blow it out.
-
-</p>
+👆 tap each candle to blow it out.</p>
 
 
 <!-- BUTTONS -->
@@ -2947,6 +3654,7 @@ or
 <button
   class="birthday-button"
   id="blowButton"
+  type="button"
 >
   💨 Start Blowing
 </button>
@@ -2954,6 +3662,7 @@ or
 <button
   class="birthday-button"
   id="tapButton"
+  type="button"
 >
   👆 Tap A Candle
 </button>
@@ -2964,6 +3673,8 @@ or
 <div
   class="blow-status"
   id="blowStatus"
+  role="status"
+  aria-live="polite"
 >
   Make a wish first… 🥺❤️
 </div>
@@ -2978,57 +3689,31 @@ or
   id="birthdayCelebration"
 >
 
-<h2>
+<h2>HAPPY 22ND BIRTHDAY,
+MY LOVE! 🎂❤️</h2>
 
-HAPPY 22ND BIRTHDAY,
-<br>
-MY LOVE! 🎂❤️
 
-</h2>
-
+<p>And happy 7 months to us. 🥹💕</p>
 
 <p>
-
-And happy 7 months to us. 🥹💕
-
-<br><br>
-
-Seven months of us.
-
-<br>
-
-Seven months of choosing each other.
-
-<br>
-
-Seven months of memories,
-laughter, love and growing together.
-
-<br><br>
-
-<strong>
-
-Here's to 22 years of you
-<br>
-and 7 beautiful months of us.
-
-</strong>
-
-<br><br>
-
-I love you, my forever. ❤️
-
+  Seven months of us.<br>
+  Seven months of choosing each other.<br>
+  Seven months of memories,
+  laughter, love and growing together.
 </p>
+
+<p>
+  <strong>
+    Here's to 22 years of you<br>
+    and 7 beautiful months of us.
+  </strong>
+</p>
+
+<p>I love you, my forever. ❤️</p>
 
 
 <div class="birthday-numbers">
-
-22 candles 🕯️
-&nbsp; • &nbsp;
-7 months 💕
-&nbsp; • &nbsp;
-1 love ❤️
-
+  22 candles 🕯️ • 7 months 💕 • 1 love ❤️
 </div>
 
 </div>
@@ -3069,47 +3754,94 @@ I love you, my forever. ❤️
 
 
 <script>
+"use strict";
+
+/* =========================================================
+   DEBUG HELPERS
+
+   Add ?debug=1 to the web address to:
+     - skip the lock screen
+     - show a "Relight candles" button
+   Example:  index.html?debug=1
+========================================================= */
+
+var DEBUG =
+  new URLSearchParams(
+    window.location.search
+  ).has("debug");
+
+
+/* If anything ever crashes, say so on screen instead of
+   silently doing nothing. */
+window.addEventListener(
+  "error",
+  function(event){
+
+    var box =
+      document.getElementById("lockError");
+
+    if(box){
+
+      box.textContent =
+        "Something broke: " +
+        event.message;
+
+    }
+
+    console.error(
+      "Script error:",
+      event.message,
+      "line",
+      event.lineno
+    );
+
+  }
+);
+
+
+/* Reveal animations only run when JS is alive */
+document.documentElement.classList.add("js-reveal");
+
 
 /* =========================================================
    PASSCODE
    220426
 ========================================================= */
 
-const correctCode = "220426";
+var correctCode = "220426";
 
-const inputs =
+var inputs =
   document.querySelectorAll(
     "#passcode input"
   );
 
-const unlockBtn =
-  document.getElementById(
-    "unlockBtn"
-  );
+var unlockBtn =
+  document.getElementById("unlockBtn");
 
-const lockScreen =
-  document.getElementById(
-    "lockScreen"
-  );
+var lockScreen =
+  document.getElementById("lockScreen");
 
-const lockError =
-  document.getElementById(
-    "lockError"
-  );
+var lockError =
+  document.getElementById("lockError");
+
+var music =
+  document.getElementById("music");
 
 
 inputs.forEach(
-  (input,index)=>{
+  function(input,index){
 
     input.addEventListener(
       "input",
-      ()=>{
+      function(){
 
+        /* strip anything that is not a digit */
         input.value =
-          input.value.replace(
-            /[^0-9]/g,
-            ""
-          );
+          input.value
+            .replace(/[^0-9]/g,"")
+            .slice(0,1);
+
+        lockError.textContent = "";
 
         if(
           input.value &&
@@ -3120,13 +3852,23 @@ inputs.forEach(
 
         }
 
+        /* auto check once all six boxes are filled */
+        if(
+          index === inputs.length - 1 &&
+          input.value
+        ){
+
+          unlock();
+
+        }
+
       }
     );
 
 
     input.addEventListener(
       "keydown",
-      event=>{
+      function(event){
 
         if(
           event.key === "Backspace" &&
@@ -3138,9 +3880,9 @@ inputs.forEach(
 
         }
 
-        if(
-          event.key === "Enter"
-        ){
+        if(event.key === "Enter"){
+
+          event.preventDefault();
 
           unlock();
 
@@ -3149,34 +3891,153 @@ inputs.forEach(
       }
     );
 
+
+    /* FIX: pasting the whole code now fills every box */
+    input.addEventListener(
+      "paste",
+      function(event){
+
+        var text =
+          (
+            event.clipboardData ||
+            window.clipboardData
+          ).getData("text") || "";
+
+        var digits =
+          text.replace(/[^0-9]/g,"");
+
+        if(!digits){
+          return;
+        }
+
+        event.preventDefault();
+
+        for(
+          var i = 0;
+          i < digits.length &&
+          index + i < inputs.length;
+          i++
+        ){
+
+          inputs[index + i].value = digits[i];
+
+        }
+
+        var last =
+          Math.min(
+            index + digits.length,
+            inputs.length - 1
+          );
+
+        inputs[last].focus();
+
+        unlock();
+
+      }
+    );
+
+
+    input.addEventListener(
+      "focus",
+      function(){
+        input.select();
+      }
+    );
+
   }
 );
 
 
+function openSite(silent){
+
+  /* the tap that unlocked counts as the user gesture that
+     browsers require before any audio is allowed to play */
+  initSound();
+
+  /* SEQUENCE:
+       passcode  →  Happy Birthday greeting (full screen)
+                 →  greeting fades  →  scrapbook
+
+     The greeting is raised BEFORE the lock screen is torn down,
+     so there is never a frame where the main page is visible
+     behind it. */
+
+  if(silent){
+
+    lockScreen.style.opacity = "0";
+
+    setTimeout(
+      function(){
+
+        lockScreen.style.display = "none";
+
+        revealSite();
+
+      },
+      700
+    );
+
+  }
+
+  else{
+
+    celebrateUnlock();
+
+  }
+
+
+  /* The unlock tap counts as a user gesture, so most phones
+     will allow the song to start here. If not, the play button
+     still works. */
+  if(music && music.play){
+
+    var attempt = music.play();
+
+    if(attempt && attempt.catch){
+
+      attempt.catch(function(){
+        /* autoplay blocked — that's fine, controls are visible */
+      });
+
+    }
+
+  }
+
+}
+
+
+/* Unlocks scrolling and shows the scrapbook. Called only once
+   the greeting has finished. */
+function revealSite(){
+
+  document.body.classList.remove("locked");
+
+  window.scrollTo(0,0);
+
+}
+
+
 function unlock(){
 
-  let entered = "";
+  var entered = "";
 
   inputs.forEach(
-    input=>{
+    function(input){
       entered += input.value;
     }
   );
 
 
-  if(
-    entered === correctCode
-  ){
+  if(entered.length < inputs.length){
+    return;
+  }
 
-    lockScreen.style.opacity = "0";
 
-    setTimeout(
-      ()=>{
-        lockScreen.style.display = "none";
-        document.body.style.overflow = "auto";
-      },
-      700
-    );
+  if(entered === correctCode){
+
+    lockError.textContent = "";
+
+    openSite();
 
   }
 
@@ -3186,7 +4047,7 @@ function unlock(){
       "That isn't the secret code 🥺❤️";
 
     inputs.forEach(
-      input=>{
+      function(input){
         input.value = "";
       }
     );
@@ -3198,204 +4059,276 @@ function unlock(){
 }
 
 
-unlockBtn.addEventListener(
-  "click",
-  unlock
-);
+unlockBtn.addEventListener("click",unlock);
 
 
-/* =========================================================
-   CLICK ME
-========================================================= */
+/* focus the first box so the keyboard opens right away */
+window.addEventListener(
+  "load",
+  function(){
 
-const clickBtn =
-  document.getElementById(
-    "clickBtn"
-  );
-
-const surprise =
-  document.getElementById(
-    "surprise"
-  );
-
-
-clickBtn.addEventListener(
-  "click",
-  ()=>{
-
-    surprise.classList.toggle(
-      "show"
-    );
-
-    clickBtn.textContent =
-      surprise.classList.contains(
-        "show"
-      )
-      ?
-      "I Love You ❤️"
-      :
-      "Click Me ❤️";
+    if(!DEBUG){
+      inputs[0].focus();
+    }
 
   }
 );
 
 
-/* =========================================================
-   CREATE 22 CANDLES
-========================================================= */
+if(DEBUG){
 
-const candleContainer =
-  document.getElementById(
-    "candles"
-  );
+  document.getElementById("lockHint").textContent =
+    "debug mode: code is " + correctCode;
 
-const counter =
-  document.getElementById(
-    "candleCounter"
-  );
-
-const celebration =
-  document.getElementById(
-    "birthdayCelebration"
-  );
-
-const blowStatus =
-  document.getElementById(
-    "blowStatus"
-  );
-
-const totalCandles = 22;
-
-let candlesOut = 0;
-
-let completed = false;
-
-
-/*
-   The candles are arranged around
-   the TOP of the upper cake tier.
-
-   They are not floating beside it —
-   their bases sit directly over
-   the cake's top surface.
-*/
-
-for(
-  let i = 0;
-  i < totalCandles;
-  i++
-){
-
-  const candle =
-    document.createElement(
-      "div"
-    );
-
-  candle.className =
-    "candle";
-
-
-  /*
-     Horizontal arrangement across
-     the upper cake.
-  */
-
-  const x =
-    8 +
-    (
-      i /
-      (totalCandles - 1)
-    ) *
-    198;
-
-
-  /*
-     Slight curved arrangement
-     following the cake's oval top.
-  */
-
-  const middle =
-    Math.abs(
-      i - 10.5
-    );
-
-  const y =
-    19 +
-    (
-      middle *
-      0.45
-    );
-
-
-  candle.style.left =
-    x + "px";
-
-  candle.style.top =
-    y + "px";
-
-
-  candle.innerHTML = `
-
-    <div class="flame"></div>
-
-    <div class="smoke">
-      〰
-    </div>
-
-  `;
-
-
-  candle.addEventListener(
-    "click",
-    ()=>{
-      extinguishCandle(
-        candle
-      );
-    }
-  );
-
-
-  candleContainer.appendChild(
-    candle
+  /* silent = skip the greeting so reloads aren't noisy.
+     Use ?debug=1&party=1 to preview the unlock celebration. */
+  openSite(
+    !new URLSearchParams(location.search).has("party")
   );
 
 }
 
 
 /* =========================================================
-   EXTINGUISH CANDLE
+   MUSIC FILE CHECK
+   Tells you when the mp3 name/path is wrong instead of
+   just sitting there doing nothing.
 ========================================================= */
 
-function extinguishCandle(
-  candle
-){
+if(music){
+
+  music.addEventListener(
+    "error",
+    function(){
+
+      document
+        .getElementById("musicNote")
+        .classList.add("show");
+
+      console.warn(
+        "Audio failed to load. Check the file name and that " +
+        "it is in the same folder as index.html"
+      );
+
+    },
+    true
+  );
+
+}
+
+
+/* =========================================================
+   CLICK ME
+========================================================= */
+
+var clickBtn =
+  document.getElementById("clickBtn");
+
+var surprise =
+  document.getElementById("surprise");
+
+
+clickBtn.addEventListener(
+  "click",
+  function(){
+
+    var showing =
+      surprise.classList.toggle("show");
+
+
+    /* FIX: measure the real height instead of a fixed 700px,
+       so nothing gets cut off on a small screen. */
+    surprise.style.maxHeight =
+      showing
+        ? surprise.scrollHeight + 60 + "px"
+        : "0px";
+
+
+    clickBtn.textContent =
+      showing
+        ? "I Love You ❤️"
+        : "Click Me ❤️";
+
+    clickBtn.setAttribute(
+      "aria-expanded",
+      showing ? "true" : "false"
+    );
+
+  }
+);
+
+
+/* keep it correct if the phone is rotated */
+window.addEventListener(
+  "resize",
+  function(){
+
+    if(surprise.classList.contains("show")){
+
+      surprise.style.maxHeight =
+        surprise.scrollHeight + 60 + "px";
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   BUILD THE 22 CANDLES
+
+   They are laid out in two rows that follow the oval top of
+   the upper tier, so every candle base actually touches the
+   cake and no two candles overlap.
+========================================================= */
+
+var candleContainer =
+  document.getElementById("candles");
+
+var counter =
+  document.getElementById("candleCounter");
+
+var celebration =
+  document.getElementById("birthdayCelebration");
+
+var blowStatus =
+  document.getElementById("blowStatus");
+
+var totalCandles = 22;
+
+var candlesOut = 0;
+
+var completed = false;
+
+
+/* geometry, in pixels inside the .candles box (220 x 130) */
+var CANDLE_H = 38;
+
+var rows = [
+  {
+    count:11,
+    halfWidth:72,   /* back row sits deeper on the cake */
+    baseY:74,
+    curve:9,
+    z:1,
+    scale:.92
+  },
+  {
+    count:11,
+    halfWidth:94,   /* front row is wider and lower */
+    baseY:92,
+    curve:11,
+    z:2,
+    scale:1
+  }
+];
+
+
+function buildCandles(){
+
+  candleContainer.innerHTML = "";
+
+  var centerX = 110;   /* half of the 220px container */
+
+  rows.forEach(
+    function(row){
+
+      for(
+        var i = 0;
+        i < row.count;
+        i++
+      ){
+
+        var t =
+          row.count === 1
+            ? 0
+            : (i / (row.count - 1)) * 2 - 1;   /* -1 .. 1 */
+
+        var x =
+          centerX + t * row.halfWidth;
+
+        /* parabola = the oval top of the cake */
+        var base =
+          row.baseY + (t * t) * row.curve;
+
+
+        var candle =
+          document.createElement("div");
+
+        candle.className = "candle";
+
+        candle.style.left =
+          (x - 5) + "px";
+
+        candle.style.top =
+          (base - CANDLE_H) + "px";
+
+        candle.style.zIndex = row.z;
+
+        candle.style.transform =
+          "scale(" + row.scale + ")";
+
+
+        candle.innerHTML =
+          '<div class="flame"></div>' +
+          '<div class="smoke">〰</div>';
+
+
+        candle.addEventListener(
+          "click",
+          function(){
+            extinguishCandle(this);
+          }
+        );
+
+
+        candleContainer.appendChild(candle);
+
+      }
+
+    }
+  );
+
+
+  candlesOut = 0;
+
+  completed = false;
+
+  updateCounter();
+
+}
+
+
+function updateCounter(){
+
+  counter.textContent =
+    candlesOut + " / " + totalCandles + " candles";
+
+}
+
+
+/* =========================================================
+   EXTINGUISH A CANDLE
+========================================================= */
+
+function extinguishCandle(candle){
 
   if(
-    candle.classList.contains(
-      "out"
-    )
+    !candle ||
+    candle.classList.contains("out")
   ){
     return;
   }
 
 
-  candle.classList.add(
-    "out"
-  );
-
+  candle.classList.add("out");
 
   candlesOut++;
 
-
-  counter.textContent =
-    candlesOut +
-    " / 22 candles";
+  updateCounter();
 
 
-  if(
-    candlesOut ===
-    totalCandles
-  ){
+  if(candlesOut === totalCandles){
 
     birthdayComplete();
 
@@ -3404,25 +4337,24 @@ function extinguishCandle(
 }
 
 
-/* =========================================================
-   TAP
-========================================================= */
-
 function blowOneCandle(){
 
-  const remaining =
+  var remaining =
     document.querySelectorAll(
       ".candle:not(.out)"
     );
 
+  if(remaining.length){
 
-  if(
-    remaining.length
-  ){
+    /* random one looks more natural than always the first */
+    var pick =
+      remaining[
+        Math.floor(
+          Math.random() * remaining.length
+        )
+      ];
 
-    extinguishCandle(
-      remaining[0]
-    );
+    extinguishCandle(pick);
 
   }
 
@@ -3430,25 +4362,49 @@ function blowOneCandle(){
 
 
 /* =========================================================
-   MICROPHONE
+   MICROPHONE / BLOW DETECTION
 ========================================================= */
 
-let audioContext = null;
+var audioContext = null;
 
-let analyser = null;
+var analyser = null;
 
-let microphone = null;
+var microphone = null;
 
-let blowListening = false;
+var micStream = null;
 
-let lastBlow = 0;
+var blowListening = false;
+
+var lastBlow = 0;
+
+var noiseFloor = 0.02;
+
+var calibrating = true;
 
 
-async function startBlowing(){
+function micUnavailableMessage(){
 
-  if(
-    blowListening
-  ){
+  var secure =
+    window.isSecureContext ||
+    location.protocol === "https:" ||
+    location.hostname === "localhost";
+
+  if(!secure){
+
+    return "The microphone only works on an https:// link 🥺\n" +
+           "Tap the candles instead ❤️";
+
+  }
+
+  return "Microphone isn't available here 🥺\n" +
+         "Use the tap button instead ❤️";
+
+}
+
+
+function startBlowing(){
+
+  if(blowListening){
 
     blowStatus.textContent =
       "I'm listening… blow! 💨❤️";
@@ -3463,132 +4419,194 @@ async function startBlowing(){
     !navigator.mediaDevices.getUserMedia
   ){
 
-    blowStatus.innerHTML =
-      "Microphone isn't available here 🥺<br>" +
-      "Use the tap button instead ❤️";
+    /* FIX: this used to be a string broken across two lines,
+       which is a syntax error and killed the WHOLE script. */
+    blowStatus.textContent =
+      micUnavailableMessage();
 
     return;
 
   }
 
 
-  try{
-
-    const stream =
-      await navigator.mediaDevices
-        .getUserMedia({
-          audio:true
-        });
+  blowStatus.textContent =
+    "Allow the microphone so I can hear you… 🎤";
 
 
-    audioContext =
-      new(
+  navigator.mediaDevices
+    .getUserMedia({
+      audio:{
+        echoCancellation:false,
+        noiseSuppression:false,
+        autoGainControl:false
+      }
+    })
+    .then(function(stream){
+
+      micStream = stream;
+
+      var Ctx =
         window.AudioContext ||
-        window.webkitAudioContext
-      )();
+        window.webkitAudioContext;
+
+      audioContext = new Ctx();
 
 
-    analyser =
-      audioContext.createAnalyser();
+      /* iOS starts the audio context suspended */
+      if(audioContext.state === "suspended"){
 
-    analyser.fftSize = 256;
+        audioContext.resume();
 
-
-    microphone =
-      audioContext
-        .createMediaStreamSource(
-          stream
-        );
+      }
 
 
-    microphone.connect(
-      analyser
-    );
+      analyser = audioContext.createAnalyser();
+
+      analyser.fftSize = 1024;
+
+      analyser.smoothingTimeConstant = .3;
 
 
-    blowListening = true;
+      microphone =
+        audioContext.createMediaStreamSource(stream);
+
+      microphone.connect(analyser);
 
 
-    blowStatus.textContent =
-      "I'm listening… blow toward your phone! 💨";
+      blowListening = true;
+
+      calibrating = true;
+
+      noiseFloor = 0.02;
 
 
-    listenForBlow();
+      blowStatus.textContent =
+        "I'm listening… blow toward your phone! 💨";
 
-  }
 
-  catch(error){
+      /* learn the room noise for 1 second, then start */
+      setTimeout(
+        function(){
+          calibrating = false;
+        },
+        1000
+      );
 
-    blowStatus.innerHTML =
-      "I couldn't access the microphone 🥺<br>" +
-      "You can still tap the candles ❤️";
 
-  }
+      listenForBlow();
+
+    })
+    .catch(function(error){
+
+      console.warn("Microphone error:",error);
+
+      blowStatus.textContent =
+        "I couldn't access the microphone 🥺\n" +
+        "You can still tap the candles ❤️";
+
+    });
 
 }
 
 
-/* =========================================================
-   BLOW DETECTION
-========================================================= */
-
+/* Uses loudness of the waveform (RMS), which reacts to the
+   rush of air much better than the old frequency average. */
 function listenForBlow(){
 
   if(
-    !blowListening
+    !blowListening ||
+    !analyser
   ){
     return;
   }
 
 
-  const data =
-    new Uint8Array(
-      analyser.frequencyBinCount
+  var data =
+    new Uint8Array(analyser.fftSize);
+
+  analyser.getByteTimeDomainData(data);
+
+
+  var sum = 0;
+
+  for(var i = 0; i < data.length; i++){
+
+    var v = (data[i] - 128) / 128;
+
+    sum += v * v;
+
+  }
+
+  var rms =
+    Math.sqrt(sum / data.length);
+
+
+  if(calibrating){
+
+    noiseFloor =
+      Math.max(noiseFloor, rms);
+
+  }
+
+  else{
+
+    var threshold =
+      Math.max(0.055, noiseFloor * 2.2);
+
+    var now = Date.now();
+
+    if(
+      rms > threshold &&
+      now - lastBlow > 220
+    ){
+
+      lastBlow = now;
+
+      blowOneCandle();
+
+    }
+
+  }
+
+
+  requestAnimationFrame(listenForBlow);
+
+}
+
+
+function stopMicrophone(){
+
+  blowListening = false;
+
+  /* FIX: the old code closed the AudioContext but never stopped
+     the microphone track, so the mic stayed on (red dot) after
+     the candles were out. */
+  if(micStream){
+
+    micStream.getTracks().forEach(
+      function(track){
+        track.stop();
+      }
     );
 
-
-  analyser.getByteFrequencyData(
-    data
-  );
-
-
-  let total = 0;
-
-
-  for(
-    let i = 0;
-    i < data.length;
-    i++
-  ){
-
-    total += data[i];
+    micStream = null;
 
   }
-
-
-  const average =
-    total / data.length;
-
-
-  const now =
-    Date.now();
-
 
   if(
-    average > 55 &&
-    now - lastBlow > 450
+    audioContext &&
+    audioContext.state !== "closed"
   ){
 
-    lastBlow = now;
-
-    blowOneCandle();
+    audioContext.close();
 
   }
 
+  audioContext = null;
 
-  requestAnimationFrame(
-    listenForBlow
-  );
+  analyser = null;
+
+  microphone = null;
 
 }
 
@@ -3599,49 +4617,37 @@ function listenForBlow(){
 
 function birthdayComplete(){
 
-  if(
-    completed
-  ){
+  if(completed){
     return;
   }
 
-
   completed = true;
 
-  blowListening = false;
-
-
-  if(
-    audioContext
-  ){
-
-    audioContext.close();
-
-  }
+  stopMicrophone();
 
 
   blowStatus.textContent =
     "YOU DID IT!!! 🎂❤️";
 
 
+  /* 💥 fireworks + the two love messages */
+  boomFinale();
+
+
+  /* waits for BOTH lines to finish (they clear at 5.4s) so the
+     birthday card never overlaps them */
   setTimeout(
-    ()=>{
+    function(){
 
-      celebration.classList.add(
-        "show"
-      );
-
+      celebration.classList.add("show");
 
       celebration.scrollIntoView({
         behavior:"smooth",
         block:"center"
       });
 
-
-      launchConfetti();
-
     },
-    900
+    6000
   );
 
 }
@@ -3651,75 +4657,954 @@ function birthdayComplete(){
    CONFETTI
 ========================================================= */
 
-function launchConfetti(){
+function launchConfetti(count){
 
-  const colors = [
+  var colors = [
     "#b72e2b",
     "#174f91",
     "#e4b62e",
     "#f3dfbd",
-    "#8a4b60"
+    "#8a4b60",
+    "#ffd94c",
+    "#ff6b3d"
   ];
+
+  count = count || 120;
 
 
   for(
-    let i = 0;
-    i < 120;
+    var i = 0;
+    i < count;
     i++
   ){
 
-    const piece =
-      document.createElement(
-        "div"
-      );
+    var piece =
+      document.createElement("div");
 
-
-    piece.className =
-      "confetti-piece";
-
+    piece.className = "confetti-piece";
 
     piece.style.left =
-      Math.random() *
-      100 +
-      "vw";
-
+      (Math.random() * 100) + "vw";
 
     piece.style.background =
       colors[
-        Math.floor(
-          Math.random() *
-          colors.length
-        )
+        Math.floor(Math.random() * colors.length)
       ];
 
-
     piece.style.animationDelay =
-      Math.random() *
-      1.5 +
-      "s";
-
+      (Math.random() * 1.5) + "s";
 
     piece.style.animationDuration =
-      (
-        3 +
-        Math.random() * 2
-      ) +
-      "s";
+      (3 + Math.random() * 2) + "s";
 
+    document.body.appendChild(piece);
 
-    document.body.appendChild(
-      piece
-    );
+    /* remove them so they don't pile up in memory */
+    (function(node){
 
+      setTimeout(
+        function(){
+          node.remove();
+        },
+        6000
+      );
 
-    setTimeout(
-      ()=>{
-        piece.remove();
-      },
-      6000
-    );
+    })(piece);
 
   }
+
+}
+
+
+/* =========================================================
+   SOUND ENGINE
+
+   All sounds are generated in the browser with the Web Audio
+   API, so there are NO extra files to upload and nothing can
+   go missing or 404. Works offline too.
+========================================================= */
+
+var sfxCtx = null;
+
+var soundReady = false;
+
+
+function initSound(){
+
+  if(sfxCtx){
+
+    if(sfxCtx.state === "suspended"){
+      sfxCtx.resume();
+    }
+
+    return sfxCtx;
+
+  }
+
+
+  try{
+
+    var Ctx =
+      window.AudioContext ||
+      window.webkitAudioContext;
+
+    if(!Ctx){
+      return null;
+    }
+
+    sfxCtx = new Ctx();
+
+    if(sfxCtx.state === "suspended"){
+      sfxCtx.resume();
+    }
+
+    soundReady = true;
+
+    return sfxCtx;
+
+  }
+
+  catch(e){
+
+    console.warn("Sound unavailable:",e);
+
+    return null;
+
+  }
+
+}
+
+
+/* soft "whoosh" of a rocket climbing */
+function playWhoosh(){
+
+  var ctx = initSound();
+
+  if(!ctx){
+    return;
+  }
+
+  var now = ctx.currentTime;
+
+  var osc = ctx.createOscillator();
+
+  var gain = ctx.createGain();
+
+  var filter = ctx.createBiquadFilter();
+
+  filter.type = "bandpass";
+
+  filter.frequency.setValueAtTime(420,now);
+
+  filter.frequency.exponentialRampToValueAtTime(1900,now + .55);
+
+  osc.type = "sawtooth";
+
+  osc.frequency.setValueAtTime(180,now);
+
+  osc.frequency.exponentialRampToValueAtTime(760,now + .55);
+
+  gain.gain.setValueAtTime(0.0001,now);
+
+  gain.gain.exponentialRampToValueAtTime(0.07,now + .12);
+
+  gain.gain.exponentialRampToValueAtTime(0.0001,now + .6);
+
+  osc.connect(filter);
+
+  filter.connect(gain);
+
+  gain.connect(ctx.destination);
+
+  osc.start(now);
+
+  osc.stop(now + .62);
+
+}
+
+
+/* the crackly bang of a shell bursting */
+function playBang(volume){
+
+  var ctx = initSound();
+
+  if(!ctx){
+    return;
+  }
+
+  volume = volume || .35;
+
+  var now = ctx.currentTime;
+
+  var length =
+    Math.floor(ctx.sampleRate * 0.9);
+
+  var buffer =
+    ctx.createBuffer(1,length,ctx.sampleRate);
+
+  var data = buffer.getChannelData(0);
+
+  for(var i = 0; i < length; i++){
+
+    /* white noise with a fast exponential decay */
+    var decay =
+      Math.pow(1 - i / length, 5);
+
+    data[i] =
+      (Math.random() * 2 - 1) * decay;
+
+  }
+
+  var source = ctx.createBufferSource();
+
+  source.buffer = buffer;
+
+  var filter = ctx.createBiquadFilter();
+
+  filter.type = "lowpass";
+
+  filter.frequency.setValueAtTime(2400,now);
+
+  filter.frequency.exponentialRampToValueAtTime(320,now + .8);
+
+  var gain = ctx.createGain();
+
+  gain.gain.setValueAtTime(volume,now);
+
+  gain.gain.exponentialRampToValueAtTime(0.0001,now + .85);
+
+  source.connect(filter);
+
+  filter.connect(gain);
+
+  gain.connect(ctx.destination);
+
+  source.start(now);
+
+}
+
+
+/* deep chest-thump for the BOOM */
+function playBoom(){
+
+  var ctx = initSound();
+
+  if(!ctx){
+    return;
+  }
+
+  var now = ctx.currentTime;
+
+  var osc = ctx.createOscillator();
+
+  var gain = ctx.createGain();
+
+  osc.type = "sine";
+
+  osc.frequency.setValueAtTime(140,now);
+
+  osc.frequency.exponentialRampToValueAtTime(32,now + .75);
+
+  gain.gain.setValueAtTime(0.0001,now);
+
+  gain.gain.exponentialRampToValueAtTime(0.6,now + .04);
+
+  gain.gain.exponentialRampToValueAtTime(0.0001,now + 1.1);
+
+  osc.connect(gain);
+
+  gain.connect(ctx.destination);
+
+  osc.start(now);
+
+  osc.stop(now + 1.15);
+
+
+  playBang(.5);
+
+}
+
+
+/* little rising sparkle for the unlock moment */
+function playSparkle(){
+
+  var ctx = initSound();
+
+  if(!ctx){
+    return;
+  }
+
+  var notes = [523.25,659.25,783.99,1046.5];
+
+  notes.forEach(
+    function(freq,i){
+
+      var now =
+        ctx.currentTime + i * 0.09;
+
+      var osc = ctx.createOscillator();
+
+      var gain = ctx.createGain();
+
+      osc.type = "triangle";
+
+      osc.frequency.setValueAtTime(freq,now);
+
+      gain.gain.setValueAtTime(0.0001,now);
+
+      gain.gain.exponentialRampToValueAtTime(0.16,now + .03);
+
+      gain.gain.exponentialRampToValueAtTime(0.0001,now + .5);
+
+      osc.connect(gain);
+
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+
+      osc.stop(now + .55);
+
+    }
+  );
+
+}
+
+
+/* a short happy birthday-ish fanfare after the boom */
+function playFanfare(){
+
+  var ctx = initSound();
+
+  if(!ctx){
+    return;
+  }
+
+  /* G G A G C B  —  the "Happy Birthday to you" opening */
+  var melody = [
+    {f:392.00,t:0.00,d:0.22},
+    {f:392.00,t:0.24,d:0.18},
+    {f:440.00,t:0.44,d:0.40},
+    {f:392.00,t:0.86,d:0.40},
+    {f:523.25,t:1.28,d:0.40},
+    {f:493.88,t:1.70,d:0.75}
+  ];
+
+  melody.forEach(
+    function(note){
+
+      var now =
+        ctx.currentTime + note.t;
+
+      var osc = ctx.createOscillator();
+
+      var gain = ctx.createGain();
+
+      osc.type = "triangle";
+
+      osc.frequency.setValueAtTime(note.f,now);
+
+      gain.gain.setValueAtTime(0.0001,now);
+
+      gain.gain.exponentialRampToValueAtTime(0.2,now + .04);
+
+      gain.gain.setValueAtTime(0.2,now + note.d * .7);
+
+      gain.gain.exponentialRampToValueAtTime(0.0001,now + note.d);
+
+      osc.connect(gain);
+
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+
+      osc.stop(now + note.d + .05);
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   FIREWORKS ENGINE (canvas particles)
+========================================================= */
+
+var fwCanvas =
+  document.getElementById("fireworksCanvas");
+
+var fwCtx =
+  fwCanvas.getContext("2d");
+
+var fwParticles = [];
+
+var fwRockets = [];
+
+var fwRunning = false;
+
+var fwStopAt = 0;
+
+var fwDpr = 1;
+
+
+function sizeFireworks(){
+
+  fwDpr =
+    Math.min(window.devicePixelRatio || 1, 2);
+
+  fwCanvas.width =
+    Math.floor(window.innerWidth * fwDpr);
+
+  fwCanvas.height =
+    Math.floor(window.innerHeight * fwDpr);
+
+  fwCtx.setTransform(fwDpr,0,0,fwDpr,0,0);
+
+}
+
+
+window.addEventListener("resize",sizeFireworks);
+
+sizeFireworks();
+
+
+var fwColors = [
+  "#ffd94c",
+  "#ff6b3d",
+  "#ff4d6d",
+  "#4dc3ff",
+  "#7cf59a",
+  "#e07bff",
+  "#fff3d4"
+];
+
+
+function launchRocket(targetX,targetY,color){
+
+  var w = window.innerWidth;
+
+  var h = window.innerHeight;
+
+  fwRockets.push({
+    x: targetX !== undefined
+        ? targetX
+        : w * (0.15 + Math.random() * 0.7),
+
+    y: h + 10,
+
+    targetY: targetY !== undefined
+        ? targetY
+        : h * (0.14 + Math.random() * 0.34),
+
+    vy: -(7.5 + Math.random() * 3),
+
+    color: color ||
+      fwColors[
+        Math.floor(Math.random() * fwColors.length)
+      ]
+  });
+
+  playWhoosh();
+
+}
+
+
+function burst(x,y,color,count,power){
+
+  count = count || 58;
+
+  power = power || 5.2;
+
+  var hueShift = Math.random() < .35;
+
+  for(var i = 0; i < count; i++){
+
+    var angle =
+      (Math.PI * 2 * i) / count +
+      Math.random() * 0.16;
+
+    /* slight randomness so it looks organic, not a perfect ring */
+    var speed =
+      power * (0.55 + Math.random() * 0.65);
+
+    fwParticles.push({
+      x:x,
+      y:y,
+
+      vx:Math.cos(angle) * speed,
+      vy:Math.sin(angle) * speed,
+
+      life:1,
+
+      decay:0.008 + Math.random() * 0.014,
+
+      size:1.6 + Math.random() * 2.2,
+
+      color: hueShift
+        ? fwColors[
+            Math.floor(Math.random() * fwColors.length)
+          ]
+        : color
+    });
+
+  }
+
+  playBang(.3);
+
+}
+
+
+function fireworksFrame(){
+
+  if(!fwRunning){
+    return;
+  }
+
+
+  /* fade the previous frame instead of clearing = light trails */
+  fwCtx.globalCompositeOperation = "destination-out";
+
+  fwCtx.fillStyle = "rgba(0,0,0,0.18)";
+
+  fwCtx.fillRect(0,0,window.innerWidth,window.innerHeight);
+
+  fwCtx.globalCompositeOperation = "lighter";
+
+
+  /* rockets climbing */
+  for(var r = fwRockets.length - 1; r >= 0; r--){
+
+    var rocket = fwRockets[r];
+
+    rocket.y += rocket.vy;
+
+    rocket.vy += 0.055;   /* gravity slows the climb */
+
+    fwCtx.beginPath();
+
+    fwCtx.fillStyle = rocket.color;
+
+    fwCtx.arc(rocket.x,rocket.y,2.4,0,Math.PI * 2);
+
+    fwCtx.fill();
+
+
+    /* trailing spark */
+    fwCtx.globalAlpha = .5;
+
+    fwCtx.beginPath();
+
+    fwCtx.arc(rocket.x,rocket.y + 7,1.5,0,Math.PI * 2);
+
+    fwCtx.fill();
+
+    fwCtx.globalAlpha = 1;
+
+
+    if(
+      rocket.y <= rocket.targetY ||
+      rocket.vy >= 0
+    ){
+
+      burst(rocket.x,rocket.y,rocket.color);
+
+      fwRockets.splice(r,1);
+
+    }
+
+  }
+
+
+  /* exploded particles */
+  for(var p = fwParticles.length - 1; p >= 0; p--){
+
+    var part = fwParticles[p];
+
+    part.x += part.vx;
+
+    part.y += part.vy;
+
+    part.vy += 0.055;      /* gravity */
+
+    part.vx *= 0.985;      /* air drag */
+
+    part.vy *= 0.985;
+
+    part.life -= part.decay;
+
+
+    if(part.life <= 0){
+
+      fwParticles.splice(p,1);
+
+      continue;
+
+    }
+
+
+    fwCtx.globalAlpha =
+      Math.max(0,part.life);
+
+    fwCtx.beginPath();
+
+    fwCtx.fillStyle = part.color;
+
+    fwCtx.arc(
+      part.x,
+      part.y,
+      part.size * part.life,
+      0,
+      Math.PI * 2
+    );
+
+    fwCtx.fill();
+
+  }
+
+  fwCtx.globalAlpha = 1;
+
+  fwCtx.globalCompositeOperation = "source-over";
+
+
+  /* stop once the show is over and the sky is empty */
+  if(
+    Date.now() > fwStopAt &&
+    !fwParticles.length &&
+    !fwRockets.length
+  ){
+
+    fwRunning = false;
+
+    fwCanvas.classList.remove("show");
+
+    fwCtx.clearRect(
+      0,0,
+      window.innerWidth,
+      window.innerHeight
+    );
+
+    return;
+
+  }
+
+
+  requestAnimationFrame(fireworksFrame);
+
+}
+
+
+function startFireworks(durationMs,intervalMs){
+
+  sizeFireworks();
+
+  fwCanvas.classList.add("show");
+
+  fwStopAt =
+    Date.now() + (durationMs || 6000);
+
+
+  if(!fwRunning){
+
+    fwRunning = true;
+
+    requestAnimationFrame(fireworksFrame);
+
+  }
+
+
+  var timer =
+    setInterval(
+      function(){
+
+        if(Date.now() > fwStopAt){
+
+          clearInterval(timer);
+
+          return;
+
+        }
+
+        launchRocket();
+
+        /* sometimes a quick double-shot */
+        if(Math.random() < .4){
+
+          setTimeout(launchRocket,180);
+
+        }
+
+      },
+      intervalMs || 520
+    );
+
+}
+
+
+/* =========================================================
+   UNLOCK CELEBRATION
+   Confetti + "Happy Birthday" letters popping in.
+========================================================= */
+
+var unlockBanner =
+  document.getElementById("unlockBanner");
+
+var unlockBannerText =
+  document.getElementById("unlockBannerText");
+
+var unlockBackdrop =
+  document.getElementById("unlockBackdrop");
+
+
+function buildBannerText(text){
+
+  unlockBannerText.innerHTML = "";
+
+  var words = text.split(" ");
+
+  words.forEach(
+    function(word,wordIndex){
+
+      var wordWrap =
+        document.createElement("span");
+
+      wordWrap.style.display = "inline-block";
+
+      wordWrap.style.whiteSpace = "nowrap";
+
+      for(var i = 0; i < word.length; i++){
+
+        var letter =
+          document.createElement("span");
+
+        letter.className = "pop-letter";
+
+        letter.textContent = word[i];
+
+        /* stagger so the letters cascade */
+        letter.style.animationDelay =
+          (0.25 + (wordIndex * word.length + i) * 0.055) + "s";
+
+        wordWrap.appendChild(letter);
+
+      }
+
+      unlockBannerText.appendChild(wordWrap);
+
+
+      if(wordIndex < words.length - 1){
+
+        var space =
+          document.createElement("span");
+
+        space.innerHTML = "&nbsp;";
+
+        unlockBannerText.appendChild(space);
+
+      }
+
+    }
+  );
+
+}
+
+
+function celebrateUnlock(){
+
+  buildBannerText("Happy Birthday ❤️");
+
+
+  /* 1. raise the greeting curtain WHILE the lock screen is
+        still up, so the scrapbook is never glimpsed early */
+  unlockBackdrop.classList.add("visible");
+
+  unlockBanner.classList.add("visible");
+
+  /* force a reflow so the fade-in actually animates */
+  void unlockBanner.offsetWidth;
+
+  unlockBackdrop.classList.add("show");
+
+  unlockBanner.classList.add("show");
+
+
+  /* 2. now the lock screen can quietly disappear behind it */
+  setTimeout(
+    function(){
+      lockScreen.style.display = "none";
+    },
+    250
+  );
+
+
+  playSparkle();
+
+  launchConfetti(150);
+
+
+  /* fireworks behind the greeting */
+  startFireworks(4600,650);
+
+
+  /* 3. hold the greeting, then fade it and reveal the page */
+  setTimeout(
+    function(){
+
+      unlockBanner.classList.remove("show");
+
+      unlockBackdrop.classList.remove("show");
+
+
+      setTimeout(
+        function(){
+
+          unlockBanner.classList.remove("visible");
+
+          unlockBackdrop.classList.remove("visible");
+
+          revealSite();
+
+        },
+        850
+      );
+
+    },
+    4600
+  );
+
+}
+
+
+/* =========================================================
+   BOOM FINALE
+   Fires when the last of the 22 candles goes out.
+========================================================= */
+
+var boomOverlay =
+  document.getElementById("boomOverlay");
+
+var boomLine1 =
+  document.getElementById("boomLine1");
+
+var boomLine2 =
+  document.getElementById("boomLine2");
+
+
+function boomFinale(){
+
+  /* screen shake */
+  var page =
+    document.querySelector(".page");
+
+  /* show ONLY the first line to begin with */
+  boomLine1.classList.add("show");
+
+  boomLine2.classList.remove("show");
+
+  boomOverlay.classList.add("show");
+
+  playBoom();
+
+  page.classList.add("shake");
+
+  setTimeout(
+    function(){
+      page.classList.remove("shake");
+    },
+    650
+  );
+
+
+  /* instant triple burst around the middle of the screen */
+  sizeFireworks();
+
+  fwCanvas.classList.add("show");
+
+  fwStopAt = Date.now() + 9000;
+
+  if(!fwRunning){
+
+    fwRunning = true;
+
+    requestAnimationFrame(fireworksFrame);
+
+  }
+
+  var w = window.innerWidth;
+
+  var h = window.innerHeight;
+
+  burst(w * .5,h * .42,"#ffd94c",90,7.5);
+
+  setTimeout(
+    function(){
+      burst(w * .26,h * .34,"#ff4d6d",70,6.2);
+    },
+    170
+  );
+
+  setTimeout(
+    function(){
+      burst(w * .74,h * .36,"#4dc3ff",70,6.2);
+    },
+    330
+  );
+
+
+  /* then a full rolling show */
+  startFireworks(9000,420);
+
+  launchConfetti(200);
+
+
+  setTimeout(playFanfare,700);
+
+
+  /* =======================================================
+     MESSAGE SEQUENCE — one line at a time, no overlap
+
+       0.0s   "I love you, Michael ❤️"
+       2.6s   swap  →  "You're my Superman 🦸"  (+ a fresh bang)
+       5.4s   both clear
+       6.0s   "Happy 22nd Birthday" card slides in
+  ======================================================= */
+
+  setTimeout(
+    function(){
+
+      boomLine1.classList.remove("show");
+
+      /* brief beat of empty screen between the two lines */
+      setTimeout(
+        function(){
+
+          boomLine2.classList.add("show");
+
+          playBang(.4);
+
+          var w2 = window.innerWidth;
+
+          var h2 = window.innerHeight;
+
+          burst(w2 * .5,h2 * .38,"#ffd94c",80,6.8);
+
+        },
+        260
+      );
+
+    },
+    2600
+  );
+
+
+  setTimeout(
+    function(){
+
+      boomLine2.classList.remove("show");
+
+      boomOverlay.classList.remove("show");
+
+    },
+    5400
+  );
 
 }
 
@@ -3729,124 +5614,127 @@ function launchConfetti(){
 ========================================================= */
 
 document
-  .getElementById(
-    "blowButton"
-  )
-  .addEventListener(
-    "click",
-    startBlowing
-  );
+  .getElementById("blowButton")
+  .addEventListener("click",startBlowing);
 
 
 document
-  .getElementById(
-    "tapButton"
-  )
-  .addEventListener(
+  .getElementById("tapButton")
+  .addEventListener("click",blowOneCandle);
+
+
+buildCandles();
+
+
+if(DEBUG){
+
+  var relight =
+    document.createElement("button");
+
+  relight.className = "birthday-button";
+
+  relight.type = "button";
+
+  relight.textContent = "🔁 Relight candles";
+
+  relight.addEventListener(
     "click",
-    blowOneCandle
+    function(){
+
+      buildCandles();
+
+      celebration.classList.remove("show");
+
+      blowStatus.textContent =
+        "Make a wish first… 🥺❤️";
+
+    }
   );
+
+  document
+    .querySelector(".birthday-controls")
+    .appendChild(relight);
+
+}
 
 
 /* =========================================================
    SCROLL ANIMATION
 ========================================================= */
 
-const revealItems =
+var revealItems =
   document.querySelectorAll(
     ".paper, .photo-page, .note, .reasons, .click-section, .birthday-finale, .next"
   );
 
 
 revealItems.forEach(
-  (item,index)=>{
+  function(item,index){
 
-    item.classList.add(
-      "scroll-reveal"
-    );
+    item.classList.add("scroll-reveal");
 
-
-    if(
-      index % 3 === 1
-    ){
-
-      item.classList.add(
-        "from-left"
-      );
-
+    if(index % 3 === 1){
+      item.classList.add("from-left");
     }
 
-
-    if(
-      index % 3 === 2
-    ){
-
-      item.classList.add(
-        "from-right"
-      );
-
+    if(index % 3 === 2){
+      item.classList.add("from-right");
     }
 
   }
 );
 
 
-const revealObserver =
-  new IntersectionObserver(
-    (entries,observer)=>{
+if("IntersectionObserver" in window){
 
-      entries.forEach(
-        entry=>{
+  var revealObserver =
+    new IntersectionObserver(
+      function(entries,observer){
 
-          if(
-            entry.isIntersecting
-          ){
+        entries.forEach(
+          function(entry){
 
-            entry.target.classList.add(
-              "visible"
-            );
+            if(entry.isIntersecting){
 
+              entry.target.classList.add("visible");
 
-            observer.unobserve(
-              entry.target
-            );
+              observer.unobserve(entry.target);
+
+            }
 
           }
+        );
 
-        }
-      );
+      },
+      {
+        threshold:.14,
 
-    },
-    {
-      threshold:.14,
+        rootMargin:"0px 0px -60px 0px"
+      }
+    );
 
-      rootMargin:
-        "0px 0px -60px 0px"
+
+  revealItems.forEach(
+    function(item){
+      revealObserver.observe(item);
     }
   );
 
+}
 
-document
-  .querySelectorAll(
-    ".scroll-reveal"
-  )
-  .forEach(
-    item=>{
-      revealObserver.observe(
-        item
-      );
+else{
+
+  /* FIX: very old browsers have no IntersectionObserver.
+     Without this fallback the whole page stayed invisible. */
+  revealItems.forEach(
+    function(item){
+      item.classList.add("visible");
     }
   );
 
-
-/* =========================================================
-   KEEP WEBSITE LOCKED AT START
-========================================================= */
-
-document.body.style.overflow =
-  "hidden";
+}
 
 </script>
 
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2aa0c4518856b4e',t:'MTc4NjY0ODUyMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
