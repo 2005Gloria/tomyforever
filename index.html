@@ -14,6 +14,15 @@
 <meta property="og:description" content="A little piece of my heart, made just for you.">
 <meta property="og:type" content="website">
 
+<!-- Prettier fonts. If the phone is offline these quietly fall back
+     to Georgia / Brush Script MT, so nothing breaks. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Dancing+Script:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Parisienne&display=swap"
+  rel="stylesheet"
+>
+
 <style>
 
 /* =========================================================
@@ -104,6 +113,12 @@ body:before{
       transparent 0 4px,
       #68473408 5px
     );
+
+  /* iOS FIX: this fixed full-screen texture used to be repainted
+     on every scroll frame. Promoting it to its own GPU layer means
+     it is painted once and simply composited after that. */
+  transform:translateZ(0);
+  backface-visibility:hidden;
 }
 
 
@@ -195,33 +210,228 @@ body:before{
 
   gap:8px;
 
-  margin:25px 0;
+  margin:22px 0 6px;
 }
 
-.passcode input{
-  width:46px;
-  height:55px;
+/* Heart-shaped code slots: an empty outlined heart that fills in
+   with a rose heart for every number typed. */
+.code-slot{
+  width:42px;
+  height:38px;
 
-  border:
-    1px solid
-    #b99172;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-  background:#f7e8ca;
+  border:0;
 
-  text-align:center;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 92'%3E%3Cpath d='M50 89C21 67.5 4 48.5 4 30 4 14.5 15.5 5 27.8 5 37 5 44.9 10.4 50 18.7 55.1 10.4 63 5 72.2 5 84.5 5 96 14.5 96 30c0 18.5-17 37.5-46 59z' fill='%23e6d2a8' stroke='%23a3703f' stroke-width='4'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
 
-  color:#63392d;
+  /* the ♥ glyph the script writes in is hidden — the shape says it */
+  color:transparent;
 
-  font-size:23px;
+  font-size:1px;
+  line-height:1;
 
-  outline:none;
-
-  border-radius:4px;
+  transition:
+    transform .25s cubic-bezier(.2,1.4,.4,1),
+    filter .25s ease;
 }
 
-.passcode input:focus{
-  border-color:#713c31;
-  box-shadow:0 0 0 2px #713c3133;
+.code-slot.filled{
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 92'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23c9615a'/%3E%3Cstop offset='1' stop-color='%238e2f26'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M50 89C21 67.5 4 48.5 4 30 4 14.5 15.5 5 27.8 5 37 5 44.9 10.4 50 18.7 55.1 10.4 63 5 72.2 5 84.5 5 96 14.5 96 30c0 18.5-17 37.5-46 59z' fill='url(%23g)' stroke='%236b241d' stroke-width='4'/%3E%3C/svg%3E");
+
+  animation:slotPop .32s cubic-bezier(.2,1.5,.4,1);
+}
+
+@keyframes slotPop{
+  0%{ transform:scale3d(.55,.55,1); }
+  60%{ transform:scale3d(1.18,1.18,1); }
+  100%{ transform:scale3d(1,1,1); }
+}
+
+.code-slot.active{
+  animation:slotWait 1.6s ease-in-out infinite;
+}
+
+@keyframes slotWait{
+  0%,100%{ transform:scale3d(1,1,1); }
+  50%{ transform:scale3d(1.09,1.09,1); }
+}
+
+.passcode.wrong{
+  animation:codeShake .45s ease;
+}
+
+@keyframes codeShake{
+
+  0%,100%{ transform:translate3d(0,0,0); }
+  20%{ transform:translate3d(-9px,0,0); }
+  40%{ transform:translate3d(8px,0,0); }
+  60%{ transform:translate3d(-6px,0,0); }
+  80%{ transform:translate3d(4px,0,0); }
+
+}
+
+
+/* =========================================================
+   HEART-SHAPED SECRET KEYPAD
+
+   The keys are laid out on a 5-column grid in rows of
+   4 / 5 / 3 / 1, which draws the classic heart silhouette:
+
+        (1)(2)   (3)(4)
+      (5)(6)(7)(8)(9)
+        (del)(0)(clr)
+            (open)
+========================================================= */
+
+.keypad-wrap{
+  position:relative;
+
+  width:min(316px,100%);
+
+  margin:16px auto 0;
+}
+
+/* soft heart glow sitting behind the keys */
+.keypad-wrap:before{
+  content:"";
+
+  position:absolute;
+
+  left:-6%;
+  right:-6%;
+  top:-18px;
+  bottom:-4px;
+
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 92'%3E%3Cpath d='M50 90C20.5 68 3 48.5 3 29.5 3 13.5 15 4 27.5 4 37 4 45 9.5 50 18c5-8.5 13-14 22.5-14C85 4 97 13.5 97 29.5 97 48.5 79.5 68 50 90z' fill='%23f4e2be' stroke='%23c39f70' stroke-width='1.2'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+
+  opacity:.9;
+
+  pointer-events:none;
+}
+
+.heart-keypad{
+  position:relative;
+
+  display:grid;
+
+  grid-template-columns:repeat(5,1fr);
+
+  gap:7px;
+
+  padding:6px 4px 2px;
+}
+
+.hgap{
+  display:block;
+}
+
+.hkey{
+  aspect-ratio:1;
+
+  width:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1px solid #b8916f;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle at 35% 28%,
+      #fbeed0,
+      #e7d0a6
+    );
+
+  color:#673a2e;
+
+  font-family:Georgia,serif;
+  font-size:20px;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 3px 0 #b8916f,
+    0 6px 12px #4c302026;
+
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease;
+}
+
+.hkey:active,
+.hkey.pressed{
+  transform:translateY(3px);
+
+  box-shadow:
+    0 1px 0 #b8916f,
+    0 2px 5px #4c302026;
+
+  background:
+    radial-gradient(
+      circle at 35% 28%,
+      #f3e2bd,
+      #dcc294
+    );
+}
+
+.hkey.soft{
+  font-size:17px;
+
+  color:#8a5240;
+}
+
+.hkey.open{
+  grid-column:3;
+
+  border-color:#7d4033;
+
+  background:
+    radial-gradient(
+      circle at 35% 28%,
+      #8c4a3a,
+      #6c3629
+    );
+
+  color:#ffe3c6;
+
+  font-size:22px;
+
+  box-shadow:
+    0 3px 0 #472c22,
+    0 7px 14px #4c302033;
+}
+
+.hkey.open:active{
+  box-shadow:
+    0 1px 0 #472c22,
+    0 2px 5px #4c302033;
+}
+
+.hkey.del{
+  grid-column:2;
+}
+
+@media(max-width:360px){
+
+  .heart-keypad{
+    gap:5px;
+  }
+
+  .hkey{
+    font-size:18px;
+  }
+
 }
 
 .unlock-btn{
@@ -413,9 +623,23 @@ body:before{
 
   box-shadow:
     0 12px 30px #50352225;
+}
 
-  -webkit-backdrop-filter:blur(8px);
-  backdrop-filter:blur(8px);
+/* iOS FIX: backdrop-filter re-blurred the page behind this card on
+   every single scroll frame, which was the single biggest cause of
+   the stutter. Replaced with a plain translucent panel. */
+@supports (backdrop-filter:blur(8px)){
+
+  /* only iPads/desktops with plenty of headroom get the real blur */
+  @media (min-width:900px) and (hover:hover){
+
+    .music-player{
+      -webkit-backdrop-filter:blur(8px);
+      backdrop-filter:blur(8px);
+    }
+
+  }
+
 }
 
 .music-title{
@@ -1055,23 +1279,27 @@ body:before{
    SOFT CAKE SHADOW
 ========================================================= */
 
+/* iOS FIX: was filter:blur(10px) on a live element. A soft radial
+   gradient gives the same look with no per-frame blur pass. */
 .cake-shadow{
   position:absolute;
 
-  width:380px;
-  height:45px;
+  width:400px;
+  height:60px;
 
   left:50%;
-  bottom:40px;
+  bottom:32px;
 
   transform:
     translateX(-50%);
 
-  background:#5b3a2740;
-
-  border-radius:50%;
-
-  filter:blur(10px);
+  background:
+    radial-gradient(
+      ellipse at 50% 50%,
+      #5b3a2755 0%,
+      #5b3a2733 45%,
+      #5b3a2700 72%
+    );
 
   z-index:1;
 }
@@ -1124,16 +1352,14 @@ body:before{
       0 100%
     );
 
-  filter:
-    drop-shadow(
-      5px
-      8px
-      5px
-      #52251e45
-    );
-
+  /* iOS FIX: an animated drop-shadow filter re-rendered the whole
+     cape every frame. Shading is now baked into the gradient. */
   animation:
     capeMove 2.5s ease-in-out infinite;
+
+  will-change:transform;
+
+  transform:translateZ(0);
 }
 
 @keyframes capeMove{
@@ -1141,7 +1367,7 @@ body:before{
   50%{
     transform:
       skewX(-4deg)
-      translateX(3px);
+      translate3d(3px,0,0);
   }
 
 }
@@ -2015,8 +2241,22 @@ body:before{
   inset:-12px -7px -6px;
 }
 
-.candle:hover{
-  transform:scale(1.12);
+/* iOS FIX: hover on a touch screen "sticks" after a tap and this rule
+   also fought the per-row scale set in JS. Desktop only now. */
+@media (hover:hover) and (pointer:fine){
+
+  .candle:hover{
+    filter:brightness(1.08);
+  }
+
+}
+
+/* iOS FIX: 22 flames animating non-stop is a lot of work for a phone,
+   even when the cake is nowhere near the screen. JS adds this class
+   whenever the cake is scrolled out of view. */
+.candles.paused .flame,
+.candles.paused .smoke{
+  animation-play-state:paused;
 }
 
 .flame{
@@ -2046,31 +2286,33 @@ body:before{
       transparent 71%
     );
 
-  filter:
-    drop-shadow(
-      0
-      0
-      7px
-      #ffad27
-    );
+  /* iOS FIX: this used to be filter:drop-shadow(), which forced the
+     browser to re-render a blur for all 22 flames on every single
+     frame. box-shadow gives the same glow and rides along with the
+     GPU transform for free. */
+  box-shadow:
+    0 0 9px 2px #ffad2799,
+    0 0 18px 4px #ff781d44;
 
   animation:
     flicker .45s
     infinite alternate;
+
+  will-change:transform;
 }
 
 @keyframes flicker{
 
   from{
     transform:
-      translateX(-50%)
+      translate3d(-50%,0,0)
       rotate(-5deg)
       scale(.9);
   }
 
   to{
     transform:
-      translateX(-50%)
+      translate3d(-50%,0,0)
       rotate(5deg)
       scale(1.08);
   }
@@ -2107,7 +2349,7 @@ body:before{
     opacity:.8;
 
     transform:
-      translate(-50%,0)
+      translate3d(-50%,0,0)
       scale(.6);
   }
 
@@ -2115,7 +2357,7 @@ body:before{
     opacity:0;
 
     transform:
-      translate(-50%,-45px)
+      translate3d(-50%,-45px,0)
       scale(1.5);
   }
 
@@ -2707,17 +2949,39 @@ body:before{
    CONFETTI
 ========================================================= */
 
-.confetti-piece{
+/* iOS FIX: every piece used to be its own position:fixed element,
+   so 200 of them meant 200 separately-composited fixed layers. They
+   now live inside ONE fixed layer and move with translate3d. */
+#confettiLayer{
   position:fixed;
+  inset:0;
+
+  z-index:999999;
+
+  overflow:hidden;
+
+  pointer-events:none;
+
+  display:none;
+
+  contain:strict;
+}
+
+#confettiLayer.show{
+  display:block;
+}
+
+.confetti-piece{
+  position:absolute;
 
   width:9px;
   height:13px;
 
   top:-20px;
 
-  z-index:999999;
-
   pointer-events:none;
+
+  will-change:transform;
 
   animation:
     confettiFall
@@ -2730,7 +2994,7 @@ body:before{
 
   to{
     transform:
-      translateY(110vh)
+      translate3d(0,110vh,0)
       rotate(720deg);
   }
 
@@ -2800,6 +3064,15 @@ body:before{
   transition:
     opacity 1s cubic-bezier(.22,1,.36,1),
     transform 1s cubic-bezier(.22,1,.36,1);
+
+  /* iOS FIX: hint the layer BEFORE it animates so the first frame
+     isn't spent building it (that was the visible "jump"). JS clears
+     this again once the reveal has finished. */
+  will-change:transform,opacity;
+}
+
+.js-reveal .scroll-reveal.settled{
+  will-change:auto;
 }
 
 .js-reveal .scroll-reveal.from-left{
@@ -2867,9 +3140,36 @@ body:before{
 @keyframes pulse{
 
   50%{
-    transform:scale(1.15);
+    transform:scale3d(1.15,1.15,1);
   }
 
+}
+
+
+/* =========================================================
+   iOS SMOOTHNESS
+
+   Emoji + text that pulses forever needs its own layer, or Safari
+   re-rasterises the glyph on every frame.
+========================================================= */
+
+.lock-heart,
+.surprise-heart,
+.heart{
+  will-change:transform;
+  transform:translateZ(0);
+}
+
+/* The whole scrapbook is one enormous element. Telling Safari that
+   each card paints independently stops it re-painting the entire
+   page when one card animates. */
+.paper,
+.note,
+.photo-page,
+.reasons,
+.click-section,
+.birthday-finale{
+  contain:layout style;
 }
 
 
@@ -2910,11 +3210,3596 @@ body:before{
     gap:6px;
   }
 
-  .passcode input{
-    width:42px;
-    height:52px;
+  .code-slot{
+    width:37px;
+    height:34px;
   }
 
+}
+
+
+/* =========================================================
+   THEME UPGRADE — birthday + love pass
+   Everything below intentionally sits after the base styles so
+   it can re-skin them without touching the original rules.
+========================================================= */
+
+:root{
+  --rose:#d9576f;
+  --rose-deep:#a72b45;
+  --rose-soft:#f3a8b6;
+  --gold:#dfa63c;
+  --gold-soft:#f7dda6;
+  --cream:#fdf6e6;
+  --ink:#4b3027;
+}
+
+
+/* ---------- warm, glowing backdrop ---------- */
+
+body{
+  background:
+    linear-gradient(
+      180deg,
+      #f1d6ba 0%,
+      #e8c1a4 26%,
+      #ddb094 58%,
+      #cfa07f 100%
+    );
+
+  font-family:"Lora",Georgia,serif;
+}
+
+#bgGlow{
+  position:fixed;
+  inset:0;
+
+  z-index:-1;
+
+  pointer-events:none;
+  contain:strict;
+
+  background:
+    radial-gradient(46vw 46vw at 12% 6%,  rgba(255,214,196,.75), transparent 70%),
+    radial-gradient(54vw 54vw at 93% 24%, rgba(246,192,206,.72), transparent 72%),
+    radial-gradient(64vw 64vw at 48% 97%, rgba(255,230,190,.7),  transparent 70%);
+
+  transform:translateZ(0);
+}
+
+
+/* ---------- floating hearts, balloons, sparkles ---------- */
+
+#decorLayer{
+  position:fixed;
+  inset:0;
+
+  z-index:3;
+
+  pointer-events:none;
+  overflow:hidden;
+  contain:strict;
+}
+
+.fh{
+  position:absolute;
+  bottom:-10vh;
+
+  line-height:1;
+
+  opacity:0;
+
+  will-change:transform,opacity;
+
+  animation:floatUp linear infinite;
+}
+
+@keyframes floatUp{
+  0%{
+    opacity:0;
+    transform:translate3d(0,0,0) rotate(0deg);
+  }
+  12%{ opacity:.38; }
+  88%{ opacity:.2; }
+  100%{
+    opacity:0;
+    transform:translate3d(var(--dx,24px),-120vh,0) rotate(var(--rot,22deg));
+  }
+}
+
+.balloon{
+  position:absolute;
+
+  width:32px;
+  height:41px;
+
+  border-radius:50% 50% 46% 46%;
+
+  opacity:.45;
+
+  will-change:transform;
+
+  animation:balloonSway ease-in-out infinite alternate;
+}
+
+.balloon:after{
+  content:"";
+
+  position:absolute;
+  left:50%;
+  top:100%;
+
+  width:1px;
+  height:30px;
+
+  background:rgba(90,51,39,.25);
+}
+
+@keyframes balloonSway{
+  0%{   transform:translate3d(0,0,0) rotate(-5deg); }
+  100%{ transform:translate3d(14px,-18px,0) rotate(5deg); }
+}
+
+
+/* ---------- scroll progress ribbon ---------- */
+
+#scrollProgress{
+  position:fixed;
+  top:0;
+  left:0;
+
+  height:4px;
+  width:0;
+
+  z-index:1200;
+
+  background:linear-gradient(90deg,var(--gold),var(--rose));
+
+  box-shadow:0 0 10px rgba(217,87,111,.5);
+
+  border-radius:0 4px 4px 0;
+
+  pointer-events:none;
+}
+
+#scrollProgress:after{
+  content:"\2665";
+
+  position:absolute;
+  right:-8px;
+  top:-8px;
+
+  font-size:14px;
+  line-height:1;
+
+  color:var(--rose);
+}
+
+body.locked #scrollProgress{
+  opacity:0;
+}
+
+
+/* ---------- typography ---------- */
+
+h1,h2,h3{
+  font-family:"Playfair Display",Georgia,serif;
+  letter-spacing:.2px;
+}
+
+.cover h1,
+.lock-paper h1{
+  font-family:"Dancing Script","Brush Script MT",cursive;
+  font-weight:700;
+
+  color:#93304a;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.55),
+    0 8px 22px rgba(167,43,69,.16);
+}
+
+.cover h2{
+  color:#8a4436;
+  font-style:italic;
+  font-weight:500;
+}
+
+.cover .label{
+  font-family:"Dancing Script","Brush Script MT",cursive;
+  color:#a04a55;
+  letter-spacing:.4px;
+}
+
+.paper h2,
+.photo-page h2{
+  color:#7d3a3a;
+}
+
+/* the surprise card keeps its cosy dark look, just warmer */
+.click-section{
+  border-radius:18px;
+
+  background:
+    linear-gradient(
+      158deg,
+      #7c3348 0%,
+      #5b2b34 45%,
+      #6b3a2f 100%
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 18px 38px -20px rgba(62,40,29,.75);
+}
+
+.click-section h2{
+  color:#fbe6c8;
+
+  text-shadow:0 2px 10px rgba(0,0,0,.28);
+}
+
+.click-section > h2:after{
+  color:#f3a8b6;
+
+  opacity:.95;
+}
+
+/* small heart flourish under section titles */
+.paper > h2:after,
+.photo-page > h2:after,
+.click-section > h2:after{
+  content:"\2665";
+
+  display:block;
+
+  margin:12px auto 0;
+
+  font-size:13px;
+  line-height:1;
+
+  color:var(--rose);
+
+  opacity:.8;
+}
+
+.next{
+  font-family:"Dancing Script","Brush Script MT",cursive;
+
+  color:#8a4030;
+
+  font-size:26px;
+
+  animation:nextBob 2.6s ease-in-out infinite;
+}
+
+@keyframes nextBob{
+  0%,100%{ transform:translate3d(0,0,0); }
+  50%{     transform:translate3d(0,7px,0); }
+}
+
+
+/* ---------- paper cards ---------- */
+
+.paper,
+.note{
+  background:
+    linear-gradient(
+      180deg,
+      #fdf7e8 0%,
+      #f9ecd3 100%
+    );
+
+  border:1px solid #f0dcb8;
+
+  border-radius:18px;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.7),
+    0 10px 24px -14px rgba(90,51,39,.35),
+    0 30px 54px -34px rgba(90,51,39,.3);
+}
+
+/* a soft rose wash in the corner of every letter */
+.paper{
+  position:relative;
+  overflow:hidden;
+}
+
+.paper:after{
+  content:"";
+
+  position:absolute;
+  right:-40px;
+  bottom:-40px;
+
+  width:150px;
+  height:150px;
+
+  border-radius:50%;
+
+  background:radial-gradient(circle,rgba(243,168,182,.3),transparent 70%);
+
+  pointer-events:none;
+}
+
+.polaroid{
+  border-radius:6px;
+
+  box-shadow:
+    0 12px 26px -14px rgba(90,51,39,.45),
+    0 30px 50px -32px rgba(90,51,39,.35);
+}
+
+
+/* ---------- bunting garland ---------- */
+
+.bunting{
+  position:relative;
+
+  display:flex;
+  justify-content:center;
+
+  max-width:330px;
+
+  margin:0 auto 18px;
+
+  padding-top:6px;
+}
+
+.bunting:before{
+  content:"";
+
+  position:absolute;
+  left:2px;
+  right:2px;
+  top:2px;
+
+  height:12px;
+
+  border-top:2px solid rgba(146,101,64,.55);
+  border-radius:50%/10px;
+}
+
+.flag{
+  width:21px;
+  height:27px;
+
+  margin:0 2px;
+
+  clip-path:polygon(0 0,100% 0,50% 100%);
+}
+
+.flag:nth-child(4n+1){ background:linear-gradient(180deg,#e8798d,#c2374f); }
+.flag:nth-child(4n+2){ background:linear-gradient(180deg,#f7dda6,#dfa63c); }
+.flag:nth-child(4n+3){ background:linear-gradient(180deg,#fdf6e6,#e9d3ab); }
+.flag:nth-child(4n+4){ background:linear-gradient(180deg,#c9a7d6,#9a6fae); }
+
+
+/* ---------- reasons + buttons ---------- */
+
+.reason{
+  position:relative;
+}
+
+.click-section button,
+.birthday-controls button{
+  border-radius:999px;
+
+  background:linear-gradient(180deg,#e2687e,#b8365199);
+  background-color:#c2374f;
+
+  border:1px solid #a72b45;
+
+  color:#fff7ef;
+
+  box-shadow:
+    0 6px 0 -1px #93223a,
+    0 14px 24px -14px rgba(167,43,69,.7);
+}
+
+.click-section button:active,
+.birthday-controls button:active{
+  transform:translate3d(0,3px,0);
+
+  box-shadow:
+    0 3px 0 -1px #93223a,
+    0 8px 16px -12px rgba(167,43,69,.7);
+}
+
+
+/* =========================================================
+   SCROLL REVEAL — stronger, more varied, with child stagger
+========================================================= */
+
+.js-reveal .scroll-reveal{
+  opacity:0;
+
+  transform:translate3d(0,74px,0) scale(.955);
+
+  transition:
+    opacity .95s cubic-bezier(.16,1,.3,1),
+    transform 1.05s cubic-bezier(.16,1,.3,1);
+
+  will-change:transform,opacity;
+}
+
+.js-reveal .scroll-reveal.from-left{
+  transform:translate3d(-86px,26px,0) rotate(-3deg) scale(.95);
+}
+
+.js-reveal .scroll-reveal.from-right{
+  transform:translate3d(86px,26px,0) rotate(3deg) scale(.95);
+}
+
+.js-reveal .scroll-reveal.rv-zoom{
+  transform:translate3d(0,40px,0) scale(.86);
+}
+
+.js-reveal .scroll-reveal.rv-flip{
+  transform:translate3d(0,50px,0) rotate(-2.4deg) scale(.94);
+}
+
+.js-reveal .scroll-reveal.visible{
+  opacity:1;
+
+  transform:translate3d(0,0,0) rotate(0deg) scale(1);
+}
+
+/* The contents of each card drift up one after another.
+   Uses the standalone `translate` property (not `transform`) so the
+   playful tilt some cards already have is preserved. */
+.js-reveal .scroll-reveal.stagger > *{
+  opacity:0;
+
+  translate:0 22px;
+
+  transition:
+    opacity .7s ease,
+    translate .8s cubic-bezier(.16,1,.3,1);
+}
+
+.js-reveal .scroll-reveal.stagger.visible > *{
+  opacity:1;
+
+  translate:0 0;
+}
+
+.js-reveal .scroll-reveal.stagger.visible > *:nth-child(1){ transition-delay:.16s; }
+.js-reveal .scroll-reveal.stagger.visible > *:nth-child(2){ transition-delay:.28s; }
+.js-reveal .scroll-reveal.stagger.visible > *:nth-child(3){ transition-delay:.40s; }
+.js-reveal .scroll-reveal.stagger.visible > *:nth-child(4){ transition-delay:.52s; }
+.js-reveal .scroll-reveal.stagger.visible > *:nth-child(5){ transition-delay:.64s; }
+.js-reveal .scroll-reveal.stagger.visible > *:nth-child(6){ transition-delay:.74s; }
+.js-reveal .scroll-reveal.stagger.visible > *:nth-child(n+7){ transition-delay:.84s; }
+
+.js-reveal .scroll-reveal.settled,
+.js-reveal .scroll-reveal.settled > *{
+  will-change:auto;
+}
+
+
+/* ---------- small screens ---------- */
+
+@media(max-width:430px){
+
+  .bunting{
+    max-width:290px;
+  }
+
+  .flag{
+    width:18px;
+    height:23px;
+  }
+
+  #scrollProgress{
+    height:3px;
+  }
+
+}
+
+
+
+/* ---------- polish pass ---------- */
+
+.bunting{
+  margin:76px auto 24px;
+}
+
+.cover h1{
+  line-height:1.12;
+}
+
+.cover h1 .hemo{
+  display:inline-block;
+
+  font-size:.62em;
+
+  vertical-align:.12em;
+
+  margin-left:6px;
+}
+
+/* prettier lock card */
+.lock-paper{
+  background:
+    linear-gradient(
+      180deg,
+      #fdf7e9 0%,
+      #f8e9cf 100%
+    );
+
+  border:1px solid #f0d9bd;
+
+  border-radius:20px;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.75),
+    0 16px 34px -18px rgba(90,51,39,.5),
+    0 40px 70px -40px rgba(90,51,39,.4);
+}
+
+/* page dividers become little ribbons */
+.next{
+  padding:8px 30px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(253,247,233,.96),
+      rgba(247,222,171,.96)
+    );
+
+  border:1px solid rgba(223,166,60,.5);
+
+  border-radius:999px;
+
+  box-shadow:0 12px 24px -16px rgba(90,51,39,.55);
+
+  color:#93304a;
+
+  font-size:28px;
+}
+
+.next:before,
+.next:after{
+  content:"\2665";
+
+  font-size:.5em;
+
+  color:var(--rose);
+
+  opacity:.7;
+
+  vertical-align:.28em;
+}
+
+.next:before{ margin-right:10px; }
+.next:after{  margin-left:10px; }
+
+@keyframes nextBob{
+  0%,100%{ transform:translate3d(0,0,0) rotate(-3deg); }
+  50%{     transform:translate3d(0,8px,0) rotate(-1deg); }
+}
+
+/* reasons become little pastel cards */
+.reason{
+  border-radius:14px;
+
+  border:1px solid #f0dcb8;
+
+  background:
+    linear-gradient(180deg,#fffaee,#f8e8cb);
+
+  color:#6d3a33;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.7),
+    0 12px 24px -16px rgba(90,51,39,.5);
+}
+
+.reason:nth-child(3n+2){
+  background:linear-gradient(180deg,#fdeff2,#f8dce2);
+  border-color:#f1c9d2;
+}
+
+.reason:nth-child(3n+3){
+  background:linear-gradient(180deg,#fdf6e4,#f6e2b8);
+  border-color:#eed6a5;
+}
+
+.reason:before{
+  content:"\2665";
+
+  position:absolute;
+  top:9px;
+  left:11px;
+
+  font-size:11px;
+  line-height:1;
+
+  color:rgba(120,74,38,.55);
+
+  opacity:.7;
+}
+
+/* balloons keep to the edges so they never sit on the words */
+.balloon{
+  opacity:.32;
+}
+
+.balloon:before{
+  content:"";
+
+  position:absolute;
+  left:22%;
+  top:14%;
+
+  width:9px;
+  height:13px;
+
+  border-radius:50%;
+
+  background:rgba(255,255,255,.55);
+}
+
+
+
+/* every handwritten bit gets the real script face */
+.label,
+.music-title,
+.next,
+.photo-page h2,
+.photo,
+.hand,
+.reason,
+.click-btn,
+.birthday-title,
+.wish-text,
+.baby-head,
+.candle-counter,
+.birthday-button,
+.birthday-celebration h2,
+.birthday-numbers,
+.unlock-banner-text,
+.boom-line.love{
+  font-family:"Dancing Script","Brush Script MT","Segoe Script",cursive;
+}
+
+.reason{
+  font-size:27px;
+  line-height:1.25;
+}
+
+.photo-page h2{
+  font-size:37px;
+}
+
+
+
+/* ---------- blow meter ---------- */
+
+.blow-meter-wrap{
+  max-width:290px;
+
+  margin:14px auto 0;
+
+  opacity:0;
+
+  transform:translate3d(0,6px,0);
+
+  transition:
+    opacity .35s ease,
+    transform .35s ease;
+
+  pointer-events:none;
+}
+
+.blow-meter-wrap.on{
+  opacity:1;
+
+  transform:translate3d(0,0,0);
+
+  pointer-events:auto;
+}
+
+.blow-meter{
+  height:10px;
+
+  border-radius:999px;
+
+  background:rgba(90,51,39,.16);
+
+  box-shadow:inset 0 1px 3px rgba(90,51,39,.25);
+
+  overflow:hidden;
+}
+
+.blow-meter-fill{
+  width:0;
+  height:100%;
+
+  border-radius:999px;
+
+  background:linear-gradient(90deg,#f7dda6,#dfa63c 45%,#d9576f);
+
+  transition:width .09s linear;
+}
+
+.blow-sens{
+  display:flex;
+  align-items:center;
+
+  gap:9px;
+
+  margin-top:9px;
+
+  font-size:12px;
+  font-style:normal;
+
+  color:rgba(90,51,39,.7);
+}
+
+.blow-sens input{
+  flex:1;
+
+  accent-color:#c2374f;
+}
+
+
+
+/* =========================================================
+   VINTAGE SCRAPBOOK PASS
+   Matches the reference: warm caramel background, aged torn
+   parchment with real paper grain, thick taped polaroids and
+   dark-brown calligraphy handwriting.
+   This block is last on purpose so it wins.
+========================================================= */
+
+:root{
+  --tan:#d8b184;
+  --tan-deep:#c69a68;
+  --parch:#e9d6ae;
+  --parch-lit:#f2e3c2;
+  --ink:#5a3117;
+  --ink-soft:#6d4423;
+}
+
+
+/* ---------- the desk it all sits on ---------- */
+
+body{
+  background:
+    radial-gradient(
+      120% 80% at 50% 0%,
+      #e3c199 0%,
+      #d8b184 42%,
+      #c99a68 100%
+    );
+
+  background-attachment:fixed;
+
+  color:var(--ink);
+}
+
+body:before{
+  /* faint grain over the whole desk */
+  content:"";
+
+  position:fixed;
+  inset:0;
+
+  z-index:0;
+
+  pointer-events:none;
+
+  opacity:.16;
+
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+
+  background-size:160px 160px;
+
+  mix-blend-mode:multiply;
+}
+
+#bgGlow{
+  background:
+    radial-gradient(
+      42vw 42vw at 12% 14%,
+      rgba(255,236,197,.5),
+      transparent 70%
+    ),
+    radial-gradient(
+      46vw 46vw at 88% 62%,
+      rgba(198,140,86,.35),
+      transparent 72%
+    ),
+    radial-gradient(
+      54vw 40vw at 50% 104%,
+      rgba(120,74,40,.3),
+      transparent 74%
+    );
+}
+
+
+/* ---------- calligraphy ---------- */
+
+.cover h1,
+.lock-paper h1,
+.paper h2,
+.photo-page h2,
+.birthday-title,
+.birthday-celebration h2,
+.final h2{
+  font-family:"Great Vibes","Dancing Script",cursive;
+
+  font-weight:400;
+
+  color:#59300f;
+
+  letter-spacing:.4px;
+
+  text-shadow:0 1px 0 rgba(255,248,232,.5);
+}
+
+.cover h2,
+.cover .label,
+.caption,
+.music-title,
+.blow-status,
+.candle-counter{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  color:var(--ink-soft);
+}
+
+/* the letters themselves — handwriting, like the reference */
+.letter,
+.hand,
+.wish-text,
+.birthday-intro,
+.surprise p,
+.final p,
+.cover p{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  color:#4a2a10;
+}
+
+.letter{
+  color:#472809;
+
+  font-size:clamp(19px,5.1vw,23px);
+
+  line-height:1.95;
+
+  letter-spacing:.2px;
+
+  text-align:left;
+}
+
+.hand{
+  font-size:clamp(24px,6.4vw,30px);
+
+  line-height:1.7;
+
+  color:#59300f;
+}
+
+.cover p{
+  font-size:clamp(19px,5vw,22px);
+
+  line-height:1.8;
+}
+
+.paper h2,
+.photo-page h2{
+  font-size:clamp(38px,9vw,58px);
+
+  line-height:1.15;
+}
+
+.reason{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:clamp(21px,5.6vw,25px);
+
+  line-height:1.55;
+
+  color:#5b3316;
+}
+
+
+/* ---------- aged parchment, torn top and bottom ---------- */
+
+.paper,
+.note,
+.lock-paper,
+.birthday-paper,
+.reason,
+.scrap.cover{
+  background-color:#e9d6ae;
+
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23p)' opacity='0.3'/%3E%3C/svg%3E"),
+    radial-gradient(
+      70% 55% at 18% 8%,
+      rgba(255,250,232,.85),
+      transparent 60%
+    ),
+    radial-gradient(
+      60% 50% at 88% 92%,
+      rgba(160,110,62,.32),
+      transparent 62%
+    ),
+    linear-gradient(
+      168deg,
+      #f2e3c1 0%,
+      #e9d6ac 46%,
+      #dcc596 100%
+    );
+
+  background-size:
+    150px 150px,
+    100% 100%,
+    100% 100%,
+    100% 100%;
+
+  background-blend-mode:
+    multiply,
+    normal,
+    normal,
+    normal;
+
+  border:0;
+
+  border-radius:0;
+}
+
+
+/* the torn deckled edge, as a mask so the grain tears with it */
+.paper,
+.note{
+  --torn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 20' preserveAspectRatio='none'%3E%3Cpath d='M0 20 L0 11 C6 4 12 13 19 9 C26 5 31 14 38 10 C45 6 50 15 58 11 C65 7 71 15 78 10 C85 5 90 14 98 10 C105 6 111 15 118 11 C125 7 130 4 138 10 C145 15 152 6 160 11 L160 20 Z' fill='%23000'/%3E%3C/svg%3E");
+
+  -webkit-mask-image:var(--torn),linear-gradient(#000,#000),var(--torn);
+  mask-image:var(--torn),linear-gradient(#000,#000),var(--torn);
+
+  -webkit-mask-repeat:repeat-x,no-repeat,repeat-x;
+  mask-repeat:repeat-x,no-repeat,repeat-x;
+
+  -webkit-mask-size:160px 20px,100% calc(100% - 38px),160px 20px;
+  mask-size:160px 20px,100% calc(100% - 38px),160px 20px;
+
+  -webkit-mask-position:left top,center,left bottom;
+  mask-position:left top,center,left bottom;
+}
+
+/* the bottom copy of the strip is flipped by rotating the element's
+   own mask layer is not possible, so a mirrored path is used instead */
+.note{
+  --torn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 20' preserveAspectRatio='none'%3E%3Cpath d='M0 20 L0 10 C8 15 15 5 22 10 C29 15 35 6 42 11 C49 15 55 5 62 10 C69 14 76 6 83 11 C90 15 96 5 104 10 C111 14 118 6 125 11 C132 15 139 5 147 10 C153 13 157 12 160 10 L160 20 Z' fill='%23000'/%3E%3C/svg%3E");
+}
+
+.paper{
+  margin:82px 0;
+
+  padding:56px 26px 58px;
+
+  transform:rotate(-.8deg);
+
+  box-shadow:
+    inset 0 0 34px rgba(122,80,42,.18),
+    inset 0 0 90px rgba(255,245,225,.35);
+}
+
+.note{
+  padding:52px 26px 54px;
+
+  transform:rotate(1.6deg);
+
+  box-shadow:
+    inset 0 0 30px rgba(122,80,42,.16);
+}
+
+/* the old drawn-on torn strip and the rose wash are no longer needed */
+.paper:before,
+.paper:after,
+.note:before{
+  display:none;
+}
+
+.lock-paper,
+.birthday-paper{
+  box-shadow:
+    inset 0 0 34px rgba(122,80,42,.16),
+    0 16px 34px -18px rgba(74,44,20,.55),
+    0 42px 70px -46px rgba(74,44,20,.5);
+}
+
+.reason{
+  box-shadow:
+    inset 0 0 22px rgba(122,80,42,.16),
+    0 10px 20px -12px rgba(74,44,20,.45);
+}
+
+/* the reasons grid had alternating pink/gold tints — all parchment now */
+.reason:nth-child(3n+2),
+.reason:nth-child(3n+3){
+  background-color:#e6d1a6;
+}
+
+.paper h2:after{
+  content:"❦";
+
+  color:rgba(122,80,42,.55);
+}
+
+
+/* ---------- washi tape, like the reference ---------- */
+
+.tape,
+.lock-tape{
+  background:
+    linear-gradient(
+      108deg,
+      rgba(240,228,199,.9),
+      rgba(226,209,171,.86) 48%,
+      rgba(238,226,197,.9)
+    );
+
+  box-shadow:
+    0 3px 7px -3px rgba(74,44,20,.4),
+    inset 0 1px 0 rgba(255,252,240,.65);
+
+  border-radius:2px;
+
+  /* torn-off ends */
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M3 1 L97 0 L96 5 L98 11 L97 18 L96 24 L4 23 L3 17 L1 11 L2 6 Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M3 1 L97 0 L96 5 L98 11 L97 18 L96 24 L4 23 L3 17 L1 11 L2 6 Z' fill='%23000'/%3E%3C/svg%3E");
+
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+}
+
+
+/* ---------- polaroids: thicker frame, deeper tilt ---------- */
+
+.polaroid{
+  background:linear-gradient(178deg,#fffdf6,#f4ece0);
+
+  padding:14px 14px 52px;
+
+  border-radius:3px;
+
+  transform:rotate(-4deg);
+
+  box-shadow:
+    0 14px 26px -14px rgba(74,44,20,.55),
+    0 34px 56px -34px rgba(74,44,20,.45);
+}
+
+.photo-page:nth-child(even) .polaroid{
+  transform:rotate(3.4deg);
+}
+
+.photo{
+  border-radius:2px;
+
+  box-shadow:inset 0 0 22px rgba(60,34,12,.35);
+}
+
+.caption{
+  font-size:clamp(19px,5vw,22px);
+
+  color:#6b4426;
+}
+
+
+/* ---------- dividers ---------- */
+
+.next{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  color:#7a4c26;
+
+  font-size:24px;
+
+  background:none;
+
+  border:0;
+
+  padding:0;
+
+  box-shadow:none;
+}
+
+
+/* ---------- buttons: leather-brown, not candy pink ---------- */
+
+.click-section button,
+.birthday-controls button,
+.click-btn,
+.birthday-button{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  background:linear-gradient(180deg,#8a4c26,#6b3517);
+  background-color:#7a4020;
+
+  border:1px solid #532810;
+
+  color:#fdf3df;
+
+  border-radius:999px;
+
+  box-shadow:
+    0 5px 0 -1px #4a2410,
+    0 14px 22px -14px rgba(60,30,12,.7);
+}
+
+.click-section button:active,
+.birthday-controls button:active{
+  box-shadow:
+    0 2px 0 -1px #4a2410,
+    0 8px 14px -12px rgba(60,30,12,.7);
+}
+
+.unlock-btn{
+  background:linear-gradient(180deg,#8a4c26,#5f2f13);
+
+  border-color:#4a2410;
+}
+
+
+/* ---------- decor: sepia instead of candy ---------- */
+
+.fh{
+  color:rgba(120,74,38,.4);
+}
+
+.balloon{
+  opacity:.22;
+}
+
+#scrollProgress{
+  background:linear-gradient(90deg,#c99a68,#8a4c26 60%,#5f2f13);
+}
+
+#scrollProgress:after{
+  color:#6b3517;
+}
+
+.flag:nth-child(4n+1){ background:linear-gradient(180deg,#d99a6a,#a85f2e); }
+.flag:nth-child(4n+2){ background:linear-gradient(180deg,#f0dcae,#cfae76); }
+.flag:nth-child(4n+3){ background:linear-gradient(180deg,#fdf6e6,#e4cfa2); }
+.flag:nth-child(4n+4){ background:linear-gradient(180deg,#c08b5c,#8a5227); }
+
+.bunting:before{
+  border-top-color:rgba(106,66,32,.6);
+}
+
+
+/* ---------- lock screen ---------- */
+
+.lock-paper h1{
+  color:#59300f;
+}
+
+.lock-paper p,
+.lock-hint{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:19px;
+
+  color:#6d4423;
+}
+
+.hkey{
+  color:#5a3117;
+}
+
+
+/* ---------- the dark "click me" panel, warmed up ---------- */
+
+.click-section{
+  background:linear-gradient(
+    158deg,
+    #6b3517,
+    #4d2410 46%,
+    #6b3f22
+  );
+}
+
+
+/* ---------- small screens ---------- */
+
+@media(max-width:430px){
+
+  .paper{
+    padding:52px 20px 54px;
+  }
+
+  .note{
+    padding:48px 20px 50px;
+  }
+
+  .polaroid{
+    padding:12px 12px 44px;
+  }
+
+}
+
+
+
+/* ---------- fixes: parchment everywhere, tape on top ---------- */
+
+:root{
+  --parchment-img:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23p)' opacity='0.3'/%3E%3C/svg%3E"),
+    radial-gradient(70% 55% at 18% 8%,rgba(255,250,232,.8),transparent 60%),
+    radial-gradient(60% 50% at 88% 92%,rgba(160,110,62,.3),transparent 62%),
+    linear-gradient(168deg,#f2e3c1 0%,#e9d6ac 46%,#dcc596 100%);
+}
+
+.reason,
+.reason:nth-child(3n+2),
+.reason:nth-child(3n+3){
+  background-color:#e8d3a8;
+
+  background-image:var(--parchment-img);
+
+  background-size:150px 150px,100% 100%,100% 100%,100% 100%;
+
+  background-blend-mode:multiply,normal,normal,normal;
+
+  border:0;
+}
+
+.reason:nth-child(even){
+  background-color:#e4cda1;
+}
+
+/* the tape holding each polaroid sits ON the photo, like the reference */
+.photo-page{
+  position:relative;
+}
+
+.pin{
+  width:92px;
+  height:26px;
+
+  top:-13px;
+
+  transform:translateX(-50%) rotate(-6deg);
+
+  z-index:9;
+
+  background:
+    linear-gradient(
+      108deg,
+      rgba(240,228,199,.92),
+      rgba(224,206,166,.88) 48%,
+      rgba(238,226,197,.92)
+    );
+
+  box-shadow:
+    0 4px 8px -4px rgba(74,44,20,.45),
+    inset 0 1px 0 rgba(255,252,240,.7);
+
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M3 1 L97 0 L96 5 L98 11 L97 18 L96 24 L4 23 L3 17 L1 11 L2 6 Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M3 1 L97 0 L96 5 L98 11 L97 18 L96 24 L4 23 L3 17 L1 11 L2 6 Z' fill='%23000'/%3E%3C/svg%3E");
+
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+}
+
+
+
+/* ---------- the desk shows through; the cover is its own sheet ---------- */
+
+.scrap{
+  background:transparent;
+
+  box-shadow:none;
+
+  padding:22px 10px 70px;
+}
+
+.cover{
+  margin:34px 0 20px;
+
+  padding:96px 24px 84px;
+
+  min-height:78svh;
+
+  background-color:#e9d6ae;
+
+  background-image:var(--parchment-img);
+
+  background-size:150px 150px,100% 100%,100% 100%,100% 100%;
+
+  background-blend-mode:multiply,normal,normal,normal;
+
+  transform:rotate(-.6deg);
+
+  box-shadow:
+    inset 0 0 40px rgba(122,80,42,.18),
+    inset 0 0 110px rgba(255,245,225,.3);
+
+  --torn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 20' preserveAspectRatio='none'%3E%3Cpath d='M0 20 L0 11 C6 4 12 13 19 9 C26 5 31 14 38 10 C45 6 50 15 58 11 C65 7 71 15 78 10 C85 5 90 14 98 10 C105 6 111 15 118 11 C125 7 130 4 138 10 C145 15 152 6 160 11 L160 20 Z' fill='%23000'/%3E%3C/svg%3E");
+
+  -webkit-mask-image:var(--torn),linear-gradient(#000,#000),var(--torn);
+  mask-image:var(--torn),linear-gradient(#000,#000),var(--torn);
+
+  -webkit-mask-repeat:repeat-x,no-repeat,repeat-x;
+  mask-repeat:repeat-x,no-repeat,repeat-x;
+
+  -webkit-mask-size:160px 20px,100% calc(100% - 38px),160px 20px;
+  mask-size:160px 20px,100% calc(100% - 38px),160px 20px;
+
+  -webkit-mask-position:left top,center,left bottom;
+  mask-position:left top,center,left bottom;
+}
+
+/* the two tape strips now hold the cover sheet down */
+.tape.one{
+  top:-11px;
+  left:12%;
+
+  width:104px;
+}
+
+.tape.two{
+  top:-14px;
+  right:12%;
+
+  width:104px;
+}
+
+.bunting{
+  margin:6px auto 26px;
+}
+
+/* the song card becomes a little taped parchment slip */
+.music-player{
+  border-radius:0;
+
+  border:0;
+
+  background-color:#eddcb6;
+
+  background-image:var(--parchment-img);
+
+  background-size:150px 150px,100% 100%,100% 100%,100% 100%;
+
+  background-blend-mode:multiply,normal,normal,normal;
+
+  padding:24px 18px 20px;
+
+  transform:rotate(1.2deg);
+
+  box-shadow:
+    inset 0 0 26px rgba(122,80,42,.18),
+    0 12px 24px -14px rgba(74,44,20,.5);
+}
+
+.music-player audio{
+  filter:sepia(.35) saturate(.8);
+
+  opacity:.92;
+}
+
+
+
+/* ---------- vintage song button + cover spacing ---------- */
+
+.cover{
+  padding:74px 24px 78px;
+}
+
+.tape.one{
+  top:16px;
+  left:9%;
+}
+
+.tape.two{
+  top:30px;
+  right:9%;
+}
+
+.music-player audio{
+  display:none;
+}
+
+.song-btn{
+  display:inline-flex;
+  align-items:center;
+
+  gap:10px;
+
+  margin:6px auto 0;
+
+  padding:11px 26px;
+
+  border:1px solid #6f3a1a;
+
+  border-radius:999px;
+
+  background:linear-gradient(180deg,#8a4c26,#69350f);
+
+  color:#fdf3df;
+
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:22px;
+
+  line-height:1;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 5px 0 -1px #4a2410,
+    0 14px 22px -14px rgba(60,30,12,.7);
+
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+
+.song-btn:active{
+  transform:translate3d(0,3px,0);
+
+  box-shadow:
+    0 2px 0 -1px #4a2410,
+    0 8px 14px -12px rgba(60,30,12,.7);
+}
+
+.song-ico{
+  font-family:Georgia,serif;
+
+  font-size:15px;
+
+  opacity:.9;
+}
+
+
+
+/* ---------- final parchment polish ---------- */
+
+:root{
+  --parchment-img:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23p)' opacity='0.3'/%3E%3C/svg%3E"),
+    radial-gradient(66% 52% at 20% 10%,rgba(255,250,232,.5),transparent 62%),
+    radial-gradient(62% 52% at 86% 92%,rgba(150,100,54,.34),transparent 64%),
+    linear-gradient(168deg,#f0e0b8 0%,#e5d0a2 46%,#d6bd8c 100%);
+}
+
+.paper,
+.note,
+.lock-paper,
+.birthday-paper,
+.cover,
+.reason,
+.reason:nth-child(3n+2),
+.reason:nth-child(3n+3),
+.music-player{
+  background-image:var(--parchment-img);
+
+  background-size:150px 150px,100% 100%,100% 100%,100% 100%;
+
+  background-blend-mode:multiply,normal,normal,normal;
+
+  background-color:#e5d0a2;
+}
+
+.reason{
+  color:#48280e;
+}
+
+.reason:nth-child(even){
+  background-color:#e0c999;
+}
+
+.music-player{
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23p)' opacity='0.3'/%3E%3C/svg%3E"),
+    linear-gradient(168deg,#eddcb2,#ddc493);
+
+  background-size:150px 150px,100% 100%;
+
+  background-blend-mode:multiply,normal;
+}
+
+/* a hair more separation from the desk */
+.paper,
+.note,
+.cover{
+  box-shadow:
+    inset 0 0 34px rgba(112,72,36,.22),
+    inset 0 0 100px rgba(255,245,225,.24);
+}
+
+
+
+/* ---------- last details: script headings, sepia flourishes ---------- */
+
+.click-section h2,
+.wish-text,
+.unlock-banner-text,
+.boom-line.love{
+  font-family:"Great Vibes","Dancing Script",cursive;
+}
+
+.click-section h2{
+  font-size:clamp(40px,10vw,58px);
+
+  line-height:1.14;
+}
+
+.next:before,
+.next:after,
+.paper > h2:after,
+.photo-page > h2:after{
+  color:rgba(122,80,42,.5);
+}
+
+.click-section > h2:after{
+  color:rgba(250,228,196,.55);
+}
+
+.surprise-heart,
+.heart{
+  filter:none;
+}
+
+
+
+/* ---------- One More Thing: cream text on the dark panel ---------- */
+
+.click-section{
+  color:#fbeacd;
+}
+
+.click-section .surprise,
+.click-section .surprise p,
+.click-section .surprise strong,
+.click-section .surprise em{
+  color:#fdf1d8;
+
+  text-shadow:0 1px 6px rgba(30,12,4,.45);
+}
+
+.click-section .surprise{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:clamp(21px,5.6vw,25px);
+
+  line-height:1.85;
+}
+
+.click-section .surprise strong{
+  font-weight:400;
+
+  color:#ffe9b8;
+}
+
+.click-section .surprise-heart{
+  filter:none;
+}
+
+/* the panel itself, slightly deeper so the cream pops */
+.click-section{
+  background:linear-gradient(
+    158deg,
+    #5c2c12,
+    #401f0c 46%,
+    #5a3319
+  );
+}
+
+
+
+/* the Click Me button pops as a parchment slip on the dark panel */
+.click-section .click-btn{
+  background:linear-gradient(180deg,#f3e3bd,#e2cb9c);
+
+  border:1px solid #b4874f;
+
+  color:#4a2a10;
+
+  text-shadow:none;
+
+  box-shadow:
+    0 5px 0 -1px #6b3f18,
+    0 14px 22px -14px rgba(20,8,2,.8);
+}
+
+.click-section .click-btn:active{
+  box-shadow:
+    0 2px 0 -1px #6b3f18,
+    0 8px 14px -12px rgba(20,8,2,.8);
+}
+
+
+/* =========================================================
+   REALISM PASS — CAKE, CANDLES, SUPERMAN
+   Only shading, texture and light. No layout or JS changes,
+   and nothing new is animated (keeps iOS smooth).
+========================================================= */
+
+/* ---------- shared texture tokens ---------- */
+
+:root{
+  --crumb:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23c)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+/* =========================================================
+   LOWER TIER
+========================================================= */
+
+.cake{
+  background:
+    /* candle light spilling down the front */
+    radial-gradient(
+      ellipse 62% 48% at 50% -6%,
+      rgba(255,214,140,.32),
+      rgba(255,214,140,0) 70%
+    ),
+    /* specular sheen on the fondant */
+    linear-gradient(
+      92deg,
+      rgba(0,0,0,.34) 0%,
+      rgba(0,0,0,.12) 9%,
+      rgba(255,255,255,.20) 24%,
+      rgba(255,255,255,.05) 38%,
+      rgba(0,0,0,0) 58%,
+      rgba(0,0,0,.16) 82%,
+      rgba(0,0,0,.40) 100%
+    ),
+    /* very faint fondant grain */
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,.014) 0 3px,
+      rgba(0,0,0,.012) 3px 9px
+    ),
+    linear-gradient(
+      100deg,
+      #113c6f 0%,
+      #16497f 8%,
+      #2f76b6 30%,
+      #3b84c6 48%,
+      #275f9c 74%,
+      #0f3868 100%
+    );
+
+  background-blend-mode:screen,normal,normal,normal;
+
+  border-bottom:none;
+
+  box-shadow:
+    0 26px 34px rgba(75,48,33,.34),
+    inset 0 -26px 26px rgba(9,42,79,.55),
+    inset 0 9px 12px rgba(255,255,255,.14),
+    inset 14px 0 26px rgba(9,42,79,.30),
+    inset -18px 0 30px rgba(9,42,79,.42);
+}
+
+/* red satin ribbon band along the base */
+.cake:before{
+  content:"";
+
+  position:absolute;
+
+  left:0;
+  right:0;
+  bottom:0;
+
+  height:18px;
+
+  border-radius:0 0 30px 30px;
+
+  background:
+    linear-gradient(
+      92deg,
+      rgba(0,0,0,.35),
+      rgba(255,255,255,.28) 26%,
+      rgba(255,255,255,.06) 42%,
+      rgba(0,0,0,.10) 66%,
+      rgba(0,0,0,.42)
+    ),
+    linear-gradient(180deg,#c8332f,#9c1d22 62%,#7d1519);
+
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,.22),
+    inset 0 -4px 8px rgba(0,0,0,.35);
+
+  z-index:7;
+}
+
+/* piped buttercream beads where the tier meets the board */
+.cake:after{
+  content:"";
+
+  position:absolute;
+
+  left:2px;
+  right:2px;
+  bottom:12px;
+
+  height:16px;
+
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      #fff6dd 0 24%,
+      #f0dcb0 46%,
+      #d9bd88 66%,
+      rgba(217,189,136,0) 68%
+    );
+
+  background-size:19px 17px;
+  background-repeat:repeat-x;
+
+  filter:drop-shadow(0 2px 2px rgba(70,42,20,.35));
+
+  z-index:8;
+}
+
+/* ---------- top surface of the lower tier ---------- */
+
+.cake-top{
+  background:
+    /* pool of candle light */
+    radial-gradient(
+      ellipse 55% 62% at 50% 46%,
+      rgba(255,206,124,.42),
+      rgba(255,206,124,0) 72%
+    ),
+    radial-gradient(
+      ellipse at 42% 30%,
+      #58a0da 0%,
+      #3d84c2 38%,
+      #235d99 72%,
+      #16456f 100%
+    );
+
+  border:6px solid transparent;
+
+  background-clip:padding-box;
+
+  box-shadow:
+    inset 0 -12px 16px rgba(11,49,84,.45),
+    inset 0 6px 10px rgba(255,255,255,.16),
+    0 6px 10px rgba(87,57,35,.28),
+    0 0 0 6px #d8ad2f,
+    0 0 0 7px rgba(120,80,16,.55);
+}
+
+/* thin gold rim highlight */
+.cake-top:before{
+  content:"";
+
+  position:absolute;
+
+  inset:-6px;
+
+  border-radius:50%;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(255,255,255,.65),
+      rgba(255,255,255,0) 34%,
+      rgba(0,0,0,.28) 78%
+    );
+
+  mix-blend-mode:overlay;
+
+  pointer-events:none;
+}
+
+/* ---------- dripping buttercream ---------- */
+
+.frosting{
+  background:
+    linear-gradient(
+      92deg,
+      rgba(0,0,0,.14),
+      rgba(255,255,255,.55) 22%,
+      rgba(255,255,255,.10) 46%,
+      rgba(0,0,0,.06) 70%,
+      rgba(0,0,0,.20)
+    ),
+    linear-gradient(
+      180deg,
+      #fffaea 0%,
+      #fff1d0 40%,
+      #ecd6a9 78%,
+      #dcc190 100%
+    );
+
+  filter:drop-shadow(0 3px 3px rgba(74,45,22,.30));
+}
+
+/* ---------- emblems ---------- */
+
+.cake-emblem,
+.upper-emblem,
+.hero-logo{
+  background:
+    linear-gradient(
+      152deg,
+      rgba(255,255,255,.85) 0%,
+      rgba(255,255,255,.18) 20%,
+      rgba(255,255,255,0) 36%,
+      rgba(120,70,10,.20) 74%,
+      rgba(120,70,10,.45) 100%
+    ),
+    linear-gradient(
+      135deg,
+      #ffe273,
+      #ffcf3c 42%,
+      #e0a417 100%
+    );
+
+  filter:drop-shadow(0 3px 4px rgba(60,34,12,.45));
+}
+
+.cake-emblem{
+  color:#c4271f;
+
+  text-shadow:
+    0 2px 0 #8e1c16,
+    0 3px 5px rgba(60,20,10,.45);
+}
+
+/* =========================================================
+   UPPER TIER
+========================================================= */
+
+.cake-upper{
+  background:
+    radial-gradient(
+      ellipse 62% 46% at 50% -8%,
+      rgba(255,214,140,.34),
+      rgba(255,214,140,0) 72%
+    ),
+    linear-gradient(
+      92deg,
+      rgba(0,0,0,.34) 0%,
+      rgba(255,255,255,.20) 22%,
+      rgba(255,255,255,.04) 38%,
+      rgba(0,0,0,.14) 76%,
+      rgba(0,0,0,.40) 100%
+    ),
+    linear-gradient(
+      100deg,
+      #123f73,
+      #2f76b6 42%,
+      #10396a
+    );
+
+  border-bottom:none;
+
+  box-shadow:
+    0 16px 24px rgba(73,48,33,.32),
+    inset 0 -16px 18px rgba(9,42,79,.52),
+    inset 0 6px 9px rgba(255,255,255,.14),
+    inset -12px 0 22px rgba(9,42,79,.38);
+}
+
+.cake-upper:before{
+  content:"";
+
+  position:absolute;
+
+  left:0;
+  right:0;
+  bottom:0;
+
+  height:13px;
+
+  border-radius:0 0 24px 24px;
+
+  background:
+    linear-gradient(
+      92deg,
+      rgba(0,0,0,.32),
+      rgba(255,255,255,.26) 26%,
+      rgba(0,0,0,.10) 62%,
+      rgba(0,0,0,.40)
+    ),
+    linear-gradient(180deg,#c8332f,#961c21 70%,#7a1418);
+
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,.20),
+    inset 0 -3px 6px rgba(0,0,0,.32);
+
+  z-index:10;
+}
+
+.cake-upper:after{
+  content:"";
+
+  position:absolute;
+
+  left:2px;
+  right:2px;
+  bottom:8px;
+
+  height:13px;
+
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      #fff6dd 0 24%,
+      #f0dcb0 48%,
+      #d9bd88 66%,
+      rgba(217,189,136,0) 68%
+    );
+
+  background-size:15px 14px;
+  background-repeat:repeat-x;
+
+  filter:drop-shadow(0 2px 2px rgba(70,42,20,.32));
+
+  z-index:11;
+}
+
+.upper-top{
+  background:
+    radial-gradient(
+      ellipse 52% 60% at 50% 46%,
+      rgba(255,206,124,.46),
+      rgba(255,206,124,0) 72%
+    ),
+    radial-gradient(
+      ellipse at 42% 30%,
+      #58a0da,
+      #3a80be 45%,
+      #1e5590
+    );
+
+  box-shadow:
+    inset 0 -7px 10px rgba(15,52,88,.45),
+    inset 0 5px 8px rgba(255,255,255,.16),
+    0 4px 7px rgba(87,57,35,.26);
+}
+
+.upper-frosting{
+  background:
+    linear-gradient(
+      92deg,
+      rgba(0,0,0,.12),
+      rgba(255,255,255,.55) 22%,
+      rgba(255,255,255,.08) 48%,
+      rgba(0,0,0,.20)
+    ),
+    linear-gradient(180deg,#fffaea,#f2ddb2 70%,#dfc492);
+
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,.75),
+    0 3px 4px rgba(74,45,22,.28);
+}
+
+/* =========================================================
+   CANDLES
+========================================================= */
+
+.candle{
+  width:11px;
+
+  border-radius:5px 5px 3px 3px;
+
+  background:
+    /* wax cylinder shading */
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.40) 0%,
+      rgba(0,0,0,.10) 16%,
+      rgba(255,255,255,.62) 34%,
+      rgba(255,255,255,.10) 52%,
+      rgba(0,0,0,.14) 74%,
+      rgba(0,0,0,.42) 100%
+    ),
+    /* warm light from the flame above */
+    linear-gradient(
+      180deg,
+      rgba(255,208,130,.55),
+      rgba(255,208,130,0) 42%
+    ),
+    repeating-linear-gradient(
+      52deg,
+      #f7d75a 0 4px,
+      #ecc338 4px 5px,
+      #c1332e 5px 9px,
+      #9f2523 9px 10px
+    );
+
+  background-blend-mode:overlay,screen,normal;
+
+  box-shadow:
+    2px 3px 4px rgba(75,44,29,.35),
+    inset 0 -3px 4px rgba(90,25,20,.35);
+}
+
+/* melted wax lip at the top of each candle */
+.candle:before{
+  content:"";
+
+  position:absolute;
+
+  left:-1px;
+  right:-1px;
+  top:-3px;
+
+  height:6px;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      ellipse at 40% 30%,
+      #fff4d2,
+      #efd7a4 55%,
+      #cdae76
+    );
+
+  box-shadow:0 1px 2px rgba(70,40,20,.35);
+}
+
+/* wick */
+.candle:after{
+  content:"";
+
+  position:absolute;
+
+  left:50%;
+  top:-7px;
+
+  width:2px;
+  height:6px;
+
+  margin-left:-1px;
+
+  border-radius:1px;
+
+  background:linear-gradient(180deg,#3a2a1c,#171008);
+}
+
+.candle.out:before{
+  background:
+    radial-gradient(
+      ellipse at 40% 30%,
+      #f2e2bd,
+      #d9bd8c 60%,
+      #b2926a
+    );
+}
+
+/* ---------- flame ---------- */
+
+.flame{
+  width:13px;
+  height:24px;
+
+  border-radius:50% 50% 46% 46%;
+
+  background:
+    radial-gradient(
+      ellipse 62% 44% at 50% 82%,
+      rgba(120,190,255,.85) 0 34%,
+      rgba(120,190,255,0) 72%
+    ),
+    radial-gradient(
+      ellipse 46% 34% at 50% 58%,
+      #ffffff 0 40%,
+      rgba(255,255,255,0) 72%
+    ),
+    radial-gradient(
+      ellipse 78% 72% at 50% 66%,
+      #fff3a0 0 20%,
+      #ffc734 44%,
+      #ff8a1e 72%,
+      rgba(255,110,20,.35) 88%,
+      rgba(255,110,20,0) 100%
+    );
+
+  box-shadow:
+    0 0 8px 2px rgba(255,173,39,.62),
+    0 0 20px 6px rgba(255,120,29,.30),
+    0 0 40px 14px rgba(255,150,40,.12);
+}
+
+/* =========================================================
+   SUPERMAN
+========================================================= */
+
+/* torso: chest, lats and abs suggested with soft light */
+.hero-body{
+  background:
+    radial-gradient(
+      ellipse 30% 16% at 33% 30%,
+      rgba(255,255,255,.30),
+      rgba(255,255,255,0) 70%
+    ),
+    radial-gradient(
+      ellipse 30% 16% at 67% 30%,
+      rgba(255,255,255,.24),
+      rgba(255,255,255,0) 70%
+    ),
+    radial-gradient(
+      ellipse 22% 30% at 50% 72%,
+      rgba(255,255,255,.16),
+      rgba(255,255,255,0) 72%
+    ),
+    linear-gradient(
+      98deg,
+      rgba(0,0,0,.42) 0%,
+      rgba(0,0,0,.10) 14%,
+      rgba(255,255,255,.26) 32%,
+      rgba(255,255,255,.04) 50%,
+      rgba(0,0,0,.18) 76%,
+      rgba(0,0,0,.46) 100%
+    ),
+    linear-gradient(
+      100deg,
+      #133f73,
+      #2f78bd 44%,
+      #0f3868
+    );
+
+  background-blend-mode:screen,screen,screen,normal,normal;
+
+  box-shadow:
+    inset -7px 0 12px rgba(9,40,73,.55),
+    inset 5px 0 10px rgba(255,255,255,.10),
+    0 8px 14px rgba(60,38,22,.28);
+}
+
+/* ---------- cape with folds ---------- */
+
+.cape{
+  background:
+    repeating-linear-gradient(
+      99deg,
+      rgba(0,0,0,.30) 0 5px,
+      rgba(0,0,0,0) 5px 13px,
+      rgba(255,255,255,.16) 13px 17px,
+      rgba(0,0,0,0) 17px 27px
+    ),
+    radial-gradient(
+      ellipse 70% 46% at 50% 4%,
+      rgba(0,0,0,.42),
+      rgba(0,0,0,0) 70%
+    ),
+    linear-gradient(
+      135deg,
+      #ef4340 0%,
+      #d92f2f 32%,
+      #a91e28 72%,
+      #7f1219 100%
+    );
+
+  background-blend-mode:overlay,multiply,normal;
+
+  box-shadow:
+    inset 0 8px 12px rgba(0,0,0,.28);
+}
+
+/* ---------- limbs: rounder, shinier ---------- */
+
+.arm,
+.forearm,
+.leg{
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.46) 0%,
+      rgba(0,0,0,.12) 14%,
+      rgba(255,255,255,.36) 33%,
+      rgba(255,255,255,.05) 52%,
+      rgba(0,0,0,.20) 78%,
+      rgba(0,0,0,.48) 100%
+    ),
+    linear-gradient(
+      100deg,
+      #12406f,
+      #2f78bd 46%,
+      #10386a
+    );
+
+  background-blend-mode:overlay,normal;
+}
+
+.leg{
+  border-radius:8px 8px 6px 6px;
+
+  box-shadow:
+    inset 0 -8px 10px rgba(9,40,73,.45);
+}
+
+.fist{
+  background:
+    radial-gradient(
+      circle at 34% 26%,
+      #ffeccb 0 18%,
+      #f0d5ad 46%,
+      #cba677 78%,
+      #a9814f 100%
+    );
+
+  box-shadow:
+    0 2px 4px rgba(85,52,31,.45),
+    inset -2px -2px 3px rgba(120,84,48,.45),
+    inset 2px 2px 3px rgba(255,240,215,.55);
+}
+
+/* ---------- belt, trunks, boots ---------- */
+
+.belt{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.85) 0%,
+      rgba(255,255,255,.15) 24%,
+      rgba(0,0,0,.10) 62%,
+      rgba(120,72,10,.55) 100%
+    ),
+    linear-gradient(180deg,#ffde6a,#e2a917);
+
+  box-shadow:
+    0 3px 5px rgba(60,36,18,.40),
+    inset 0 1px 1px rgba(255,255,255,.8);
+}
+
+.trunks{
+  background:
+    linear-gradient(
+      95deg,
+      rgba(0,0,0,.40) 0%,
+      rgba(255,255,255,.28) 26%,
+      rgba(255,255,255,.04) 44%,
+      rgba(0,0,0,.16) 72%,
+      rgba(0,0,0,.44) 100%
+    ),
+    linear-gradient(135deg,#ee4340,#c02830 48%,#94191f);
+
+  background-blend-mode:overlay,normal;
+
+  box-shadow:
+    inset -5px 0 9px rgba(122,22,28,.55),
+    inset 0 3px 5px rgba(255,255,255,.14);
+}
+
+.boot{
+  background:
+    linear-gradient(
+      95deg,
+      rgba(0,0,0,.42) 0%,
+      rgba(255,255,255,.34) 24%,
+      rgba(255,255,255,.05) 42%,
+      rgba(0,0,0,.18) 70%,
+      rgba(0,0,0,.46) 100%
+    ),
+    linear-gradient(135deg,#ee4340,#bf262e 52%,#8d1a20);
+
+  background-blend-mode:overlay,normal;
+
+  box-shadow:
+    0 4px 6px rgba(60,36,18,.35),
+    inset 0 3px 4px rgba(255,255,255,.16),
+    inset 0 -5px 7px rgba(90,16,20,.55);
+}
+
+/* ---------- baby photo frame reads like a real print ---------- */
+
+.baby-head{
+  border-color:#c79a68;
+
+  box-shadow:
+    0 6px 14px rgba(85,52,31,.45),
+    inset 0 0 0 2px rgba(255,255,255,.55),
+    inset 0 -8px 14px rgba(120,84,48,.28);
+}
+
+/* ---------- grounding shadow ---------- */
+
+.cake-shadow{
+  width:430px;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 50%,
+      rgba(70,42,24,.46) 0%,
+      rgba(70,42,24,.24) 40%,
+      rgba(70,42,24,0) 74%
+    );
+
+  filter:blur(1px);
+}
+
+
+/* ---------- drips on the upper tier + calmer flame haze ---------- */
+
+.upper-frosting{
+  height:24px;
+
+  border-radius:12px 12px 6px 6px;
+
+  clip-path:polygon(
+    0 0,
+    100% 0,
+    100% 58%,
+    92% 58%,
+    88% 100%,
+    82% 100%,
+    79% 55%,
+    69% 55%,
+    65% 92%,
+    59% 92%,
+    56% 54%,
+    45% 54%,
+    41% 100%,
+    35% 100%,
+    32% 56%,
+    22% 56%,
+    18% 94%,
+    12% 94%,
+    9% 55%,
+    0 55%
+  );
+
+  filter:drop-shadow(0 3px 3px rgba(74,45,22,.28));
+
+  box-shadow:none;
+}
+
+.flame{
+  box-shadow:
+    0 0 6px 1px rgba(255,178,50,.55),
+    0 0 14px 4px rgba(255,124,30,.22);
+}
+
+
+/* =========================================================
+   NEW PIECES — envelope, counter, reply, secret door, keepsake
+========================================================= */
+
+/* ---------------------------------------------------------
+   ENVELOPE INTRO
+--------------------------------------------------------- */
+
+#envelopeScreen{
+  position:fixed;
+
+  inset:0;
+
+  z-index:1000001;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+  justify-content:center;
+
+  gap:26px;
+
+  background:
+    radial-gradient(
+      ellipse 90% 70% at 50% 30%,
+      #e6c6a0,
+      #d3ac7e 52%,
+      #bd8f5e 100%
+    );
+
+  transition:opacity .7s ease;
+}
+
+#envelopeScreen.gone{
+  opacity:0;
+
+  pointer-events:none;
+}
+
+.env-caption,
+.env-hint{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  color:#5d3517;
+
+  text-align:center;
+}
+
+.env-caption{
+  font-size:clamp(22px,6vw,30px);
+}
+
+.env-hint{
+  font-size:17px;
+
+  opacity:.75;
+
+  animation:envPulse 1.9s ease-in-out infinite;
+}
+
+@keyframes envPulse{
+  0%,100%{ opacity:.45; }
+  50%{     opacity:.95; }
+}
+
+.envelope{
+  position:relative;
+
+  width:min(300px,78vw);
+
+  aspect-ratio:1.5 / 1;
+
+  border:none;
+
+  padding:0;
+
+  background:transparent;
+
+  cursor:pointer;
+
+  -webkit-tap-highlight-color:transparent;
+
+  transform:translateZ(0);
+
+  transition:transform .5s ease;
+}
+
+.envelope:active{
+  transform:scale(.98);
+}
+
+.env-back,
+.env-body,
+.env-flap,
+.env-note{
+  position:absolute;
+
+  display:block;
+}
+
+/* the paper pocket */
+.env-back{
+  inset:0;
+
+  border-radius:7px;
+
+  background:
+    linear-gradient(
+      160deg,
+      #f6e6c2,
+      #e7d2a6 55%,
+      #d5bb88
+    );
+
+  box-shadow:
+    0 20px 34px rgba(70,42,22,.38),
+    inset 0 0 0 1px rgba(160,116,66,.5);
+}
+
+/* the letter that slides up when it opens */
+.env-note{
+  left:11%;
+  right:11%;
+
+  bottom:7%;
+
+  height:56%;
+
+  border-radius:4px;
+
+  background:
+    linear-gradient(180deg,#fffaea,#f2e2bd);
+
+  box-shadow:
+    0 -4px 10px rgba(70,42,22,.20),
+    inset 0 0 0 1px rgba(180,140,90,.35);
+
+  padding:16px 14px;
+
+  transition:transform .75s cubic-bezier(.2,.9,.2,1);
+
+  z-index:2;
+}
+
+.env-note-line{
+  display:block;
+
+  height:5px;
+
+  margin:0 0 13px;
+
+  border-radius:3px;
+
+  background:rgba(122,80,42,.30);
+}
+
+.env-note-line.short{
+  width:58%;
+}
+
+/* front pocket, drawn over the letter */
+.env-body{
+  inset:0;
+
+  border-radius:7px;
+
+  background:
+    linear-gradient(
+      168deg,
+      rgba(255,255,255,.16),
+      rgba(0,0,0,.10)
+    ),
+    linear-gradient(
+      160deg,
+      #ecd9b1,
+      #dcc08a
+    );
+
+  clip-path:polygon(0 9%,50% 66%,100% 9%,100% 100%,0 100%);
+
+  z-index:3;
+
+  box-shadow:inset 0 2px 4px rgba(255,255,255,.35);
+}
+
+/* the flap */
+.env-flap{
+  left:0;
+  right:0;
+  top:0;
+
+  height:52%;
+
+  border-radius:7px 7px 0 0;
+
+  background:
+    linear-gradient(
+      175deg,
+      #f2dfb8,
+      #e0c795 70%,
+      #cfb181
+    );
+
+  clip-path:polygon(0 0,100% 0,50% 100%);
+
+  transform-origin:top center;
+
+  transition:transform .7s cubic-bezier(.5,-0.2,.4,1.3);
+
+  z-index:5;
+
+  box-shadow:0 4px 8px rgba(70,42,22,.18);
+}
+
+/* wax seal */
+.env-seal{
+  position:absolute;
+
+  left:50%;
+  top:48%;
+
+  width:66px;
+  height:66px;
+
+  margin:-33px 0 0 -33px;
+
+  border-radius:50%;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  font-size:29px;
+
+  color:#f7d9d2;
+
+  background:
+    radial-gradient(
+      circle at 34% 28%,
+      #c9564c 0 22%,
+      #a83329 52%,
+      #7d1c17 100%
+    );
+
+  box-shadow:
+    0 5px 12px rgba(60,16,12,.45),
+    inset 0 -4px 8px rgba(80,16,12,.6),
+    inset 0 4px 7px rgba(255,190,180,.35);
+
+  z-index:7;
+
+  transition:
+    transform .45s ease,
+    opacity .45s ease;
+}
+
+/* opened state */
+.envelope.open .env-flap{
+  transform:rotateX(178deg);
+}
+
+.envelope.open .env-seal{
+  transform:scale(.4) rotate(-28deg);
+
+  opacity:0;
+}
+
+.envelope.open .env-note{
+  transform:translateY(-72%) scale(1.05);
+}
+
+.envelope.open ~ .env-hint,
+#envelopeScreen.opening .env-caption,
+#envelopeScreen.opening .env-hint{
+  opacity:0;
+
+  transition:opacity .45s ease;
+}
+
+.envelope.open{
+  transform:translateY(-6px) scale(1.03);
+}
+
+
+/* ---------------------------------------------------------
+   HOW LONG WE HAVE BEEN US
+--------------------------------------------------------- */
+
+.together-card{
+  position:relative;
+
+  width:min(430px,92%);
+
+  margin:26px auto 34px;
+
+  padding:26px 22px 22px;
+
+  text-align:center;
+
+  border-radius:4px;
+
+  background:var(--parchment-img,
+    linear-gradient(180deg,#f0e0b8,#e5d0a2 60%,#d6bd8c));
+
+  box-shadow:
+    0 16px 26px -14px rgba(70,42,22,.45),
+    inset 0 0 0 1px rgba(160,116,66,.35);
+
+  rotate:-1.1deg;
+}
+
+.together-label,
+.together-foot{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  color:rgba(96,62,30,.75);
+
+  font-size:19px;
+}
+
+.together-line{
+  font-family:"Great Vibes","Dancing Script",cursive;
+
+  font-size:clamp(27px,7.4vw,38px);
+
+  line-height:1.28;
+
+  color:#4a2a0c;
+
+  margin:8px 0 4px;
+}
+
+.together-sub{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:18px;
+
+  color:rgba(96,62,30,.85);
+
+  margin-bottom:10px;
+}
+
+
+/* ---------------------------------------------------------
+   REASONS
+--------------------------------------------------------- */
+
+.reason-last{
+  grid-column:1 / -1;
+
+  font-size:19px;
+
+  line-height:1.7;
+
+  text-align:center;
+}
+
+.reasons-count{
+  margin:22px auto 0;
+
+  text-align:center;
+
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:20px;
+
+  color:rgba(96,62,30,.8);
+}
+
+
+/* ---------------------------------------------------------
+   LAST WISH (stubborn candle reward)
+--------------------------------------------------------- */
+
+.last-wish{
+  max-width:min(440px,92%);
+
+  margin:0 auto 16px;
+
+  padding:16px 18px;
+
+  text-align:center;
+
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:21px;
+
+  line-height:1.6;
+
+  color:#4a2a0c;
+
+  border-radius:4px;
+
+  background:
+    linear-gradient(180deg,#fdf3d9,#f0dcb0);
+
+  box-shadow:
+    0 12px 22px -14px rgba(70,42,22,.5),
+    inset 0 0 0 1px rgba(160,116,66,.4);
+
+  opacity:0;
+
+  transform:translateY(12px);
+
+  transition:
+    opacity .8s ease,
+    transform .8s ease;
+
+  pointer-events:none;
+
+  display:none;
+}
+
+.last-wish.show{
+  display:block;
+
+  opacity:1;
+
+  transform:none;
+}
+
+/* a candle that refuses to go out */
+.candle.stubborn{
+  animation:stubbornWobble 1.1s ease-in-out infinite;
+}
+
+.candle.stubborn .flame{
+  box-shadow:
+    0 0 10px 3px rgba(255,178,50,.75),
+    0 0 22px 8px rgba(255,124,30,.35);
+}
+
+@keyframes stubbornWobble{
+  0%,100%{ transform:scale(1) rotate(-3deg); }
+  50%{     transform:scale(1.06) rotate(3deg); }
+}
+
+
+/* ---------------------------------------------------------
+   WRITE ME BACK
+--------------------------------------------------------- */
+
+.reply-section{
+  width:min(470px,92%);
+
+  margin:34px auto;
+
+  padding:30px 24px 26px;
+
+  text-align:center;
+
+  border-radius:4px;
+
+  background:
+    linear-gradient(180deg,#f0e0b8,#e5d0a2 60%,#d6bd8c);
+
+  box-shadow:
+    0 20px 30px -16px rgba(70,42,22,.5),
+    inset 0 0 0 1px rgba(160,116,66,.35);
+
+  rotate:.8deg;
+}
+
+.reply-section h2{
+  font-family:"Great Vibes","Dancing Script",cursive;
+
+  font-size:clamp(34px,9vw,46px);
+
+  color:#4a2a0c;
+
+  margin:0 0 4px;
+}
+
+.reply-intro{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:19px;
+
+  color:rgba(90,58,26,.9);
+
+  margin:0 0 16px;
+}
+
+.reply-box{
+  width:100%;
+
+  box-sizing:border-box;
+
+  padding:14px 14px;
+
+  border:1px solid rgba(150,106,58,.55);
+
+  border-radius:3px;
+
+  background:
+    linear-gradient(180deg,#fffaea,#f6ead0);
+
+  color:#472809;
+
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:20px;
+
+  line-height:1.6;
+
+  resize:vertical;
+
+  box-shadow:inset 0 2px 6px rgba(120,84,44,.18);
+}
+
+.reply-box:focus{
+  outline:none;
+
+  border-color:#8a5a2a;
+
+  box-shadow:
+    inset 0 2px 6px rgba(120,84,44,.18),
+    0 0 0 3px rgba(160,110,50,.22);
+}
+
+.reply-actions{
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:12px;
+
+  justify-content:center;
+
+  margin:16px 0 6px;
+}
+
+.reply-btn{
+  padding:12px 20px;
+
+  border:none;
+
+  border-radius:999px;
+
+  cursor:pointer;
+
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:20px;
+
+  color:#fdf1d8;
+
+  background:linear-gradient(180deg,#8a4c26,#69350f);
+
+  box-shadow:
+    0 5px 0 -1px #4a2410,
+    0 12px 18px -12px rgba(30,14,4,.7);
+
+  -webkit-tap-highlight-color:transparent;
+
+  transition:transform .18s ease;
+}
+
+.reply-btn:active{
+  transform:translateY(3px);
+
+  box-shadow:
+    0 2px 0 -1px #4a2410,
+    0 8px 12px -10px rgba(30,14,4,.7);
+}
+
+.reply-btn.wa{
+  background:linear-gradient(180deg,#4b7d4a,#2f5a2f);
+
+  box-shadow:
+    0 5px 0 -1px #1f3d1f,
+    0 12px 18px -12px rgba(10,30,10,.7);
+}
+
+.reply-note{
+  min-height:22px;
+
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:17px;
+
+  color:#6b4118;
+}
+
+
+/* ---------------------------------------------------------
+   KEEPSAKE
+--------------------------------------------------------- */
+
+.keepsake-wrap{
+  text-align:center;
+
+  margin:10px auto 30px;
+}
+
+.keepsake-btn{
+  padding:12px 22px;
+
+  border:1px solid rgba(150,106,58,.6);
+
+  border-radius:999px;
+
+  cursor:pointer;
+
+  background:
+    linear-gradient(180deg,#f3e3bd,#e2cb9c);
+
+  color:#4a2a10;
+
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:20px;
+
+  box-shadow:
+    0 4px 0 -1px #a5763c,
+    0 12px 18px -14px rgba(40,20,6,.6);
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+.keepsake-btn:active{
+  transform:translateY(2px);
+}
+
+.keepsake-hint{
+  margin-top:9px;
+
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:16px;
+
+  color:rgba(96,62,30,.7);
+}
+
+
+/* ---------------------------------------------------------
+   SECOND SECRET
+--------------------------------------------------------- */
+
+.secret-door{
+  display:block;
+
+  margin:26px auto 0;
+
+  width:34px;
+  height:34px;
+
+  border:none;
+
+  border-radius:50%;
+
+  background:transparent;
+
+  color:rgba(96,62,30,.35);
+
+  font-size:17px;
+
+  cursor:pointer;
+
+  -webkit-tap-highlight-color:transparent;
+
+  transition:
+    color .3s ease,
+    transform .3s ease;
+}
+
+.secret-door:hover,
+.secret-door:active{
+  color:rgba(150,40,32,.8);
+
+  transform:scale(1.25);
+}
+
+.secret-screen{
+  position:fixed;
+
+  inset:0;
+
+  z-index:1000002;
+
+  display:none;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:18px;
+
+  background:rgba(58,32,12,.72);
+
+  overflow-y:auto;
+}
+
+.secret-screen.show{
+  display:flex;
+}
+
+.secret-paper{
+  position:relative;
+
+  width:min(430px,100%);
+
+  margin:auto;
+
+  padding:34px 24px 30px;
+
+  text-align:center;
+
+  border-radius:4px;
+
+  background:
+    linear-gradient(180deg,#f4e5c0,#e7d2a6 60%,#d8bf8e);
+
+  box-shadow:0 26px 44px -18px rgba(20,8,2,.8);
+}
+
+.secret-close{
+  position:absolute;
+
+  right:10px;
+  top:8px;
+
+  width:34px;
+  height:34px;
+
+  border:none;
+
+  border-radius:50%;
+
+  background:transparent;
+
+  color:rgba(96,62,30,.6);
+
+  font-size:18px;
+
+  cursor:pointer;
+}
+
+.secret-title{
+  font-family:"Great Vibes","Dancing Script",cursive;
+
+  font-size:clamp(32px,8.4vw,42px);
+
+  color:#4a2a0c;
+
+  margin-bottom:6px;
+}
+
+.secret-copy,
+.secret-reveal p{
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:20px;
+
+  line-height:1.7;
+
+  color:#4a2a0c;
+}
+
+.secret-reveal{
+  display:none;
+}
+
+.secret-reveal.show{
+  display:block;
+}
+
+.secret-lock.hide{
+  display:none;
+}
+
+.secret-sign{
+  margin-top:18px;
+
+  color:#8c2b22;
+}
+
+.secret-error{
+  min-height:22px;
+
+  margin-top:8px;
+
+  font-family:"Parisienne","Dancing Script",cursive;
+
+  font-size:17px;
+
+  color:#93281f;
+}
+
+.secret-code{
+  justify-content:center;
+}
+
+
+/* ---------------------------------------------------------
+   HANDWRITING THAT WRITES ITSELF
+--------------------------------------------------------- */
+
+.ink-word{
+  display:inline-block;
+
+  opacity:0;
+
+  transform:translateY(5px);
+
+  transition:
+    opacity .5s ease,
+    transform .5s ease;
+}
+
+.inking .ink-word,
+.inked .ink-word{
+  opacity:1;
+
+  transform:none;
+}
+
+
+/* ---------------------------------------------------------
+   PRINTED KEEPSAKE
+--------------------------------------------------------- */
+
+@media print{
+
+  body{
+    background:#fff !important;
+  }
+
+  body:before,
+  #bgGlow,
+  #decorLayer,
+  #scrollProgress,
+  #envelopeScreen,
+  #lockScreen,
+  .secret-screen,
+  .music-player,
+  #songBtn,
+  .cake-stage,
+  .candle-counter,
+  .blow-help,
+  .blow-controls,
+  .birthday-button,
+  .reply-actions,
+  .keepsake-wrap,
+  .secret-door,
+  .bunting,
+  #confettiLayer,
+  #fireworksCanvas,
+  .unlock-banner,
+  .unlock-backdrop,
+  .tape,
+  .pin,
+  .lock-tape{
+    display:none !important;
+  }
+
+  .paper,
+  .note,
+  .reason,
+  .together-card,
+  .reply-section,
+  .scrap{
+    background:#fff !important;
+
+    box-shadow:none !important;
+
+    mask-image:none !important;
+    -webkit-mask-image:none !important;
+
+    transform:none !important;
+
+    page-break-inside:avoid;
+  }
+
+  .letter,
+  .hand,
+  .reason,
+  .together-line{
+    color:#2b1a0a !important;
+  }
+
+  .scroll-reveal,
+  .ink-word,
+  .stagger > *{
+    opacity:1 !important;
+
+    transform:none !important;
+
+    translate:none !important;
+  }
+
+  .surprise{
+    max-height:none !important;
+
+    opacity:1 !important;
+  }
+
+  .click-section{
+    background:#fff !important;
+  }
+
+  .click-section h2,
+  .click-section .surprise,
+  .click-section .surprise p,
+  .click-section .surprise strong{
+    color:#2b1a0a !important;
+
+    text-shadow:none !important;
+  }
+
+}
+
+/* =========================================================
+   READABILITY PASS
+   The calligraphy stays where it earns its keep — the big
+   headings, the counter, the envelope line. Everything that
+   is meant to be *read* moves to Lora: still a warm vintage
+   serif, but with proper letterforms, so long passages are
+   comfortable on a phone.
+========================================================= */
+
+.letter,
+.letter em,
+.letter strong,
+.hand,
+.wish-text,
+.birthday-intro,
+.surprise p,
+.surprise strong,
+.surprise em,
+.final p,
+.cover p,
+.cover h2,
+.cover .label,
+.label,
+.caption,
+.next,
+.music-title,
+.blow-status,
+.candle-counter,
+.lock-paper p,
+.lock-hint,
+.reason,
+.reason-last,
+.reasons-count,
+.together-label,
+.together-sub,
+.together-foot,
+.last-wish,
+.last-wish p,
+.env-hint,
+.reply-intro,
+.reply-box,
+.reply-note,
+.reply-btn,
+.keepsake-btn,
+.keepsake-hint,
+.secret-copy,
+.secret-reveal p,
+.secret-error,
+.song-btn,
+.click-section button,
+.birthday-controls button,
+.click-btn,
+.birthday-button,
+.hkey,
+.pass-slot,
+.secret-slot{
+  font-family:"Lora",Georgia,"Times New Roman",serif;
+
+  font-style:normal;
+}
+
+
+/* ---------- the letters: comfortable measure and rhythm ---------- */
+
+.letter{
+  font-size:clamp(16.5px,4.35vw,18.5px);
+
+  line-height:1.85;
+
+  letter-spacing:.1px;
+
+  color:#3f2409;
+}
+
+.letter em{
+  font-style:italic;
+}
+
+.letter strong{
+  font-weight:600;
+
+  color:#351d06;
+}
+
+.hand{
+  font-size:clamp(17px,4.5vw,19.5px);
+
+  line-height:1.8;
+
+  color:#452709;
+}
+
+.cover p,
+.birthday-intro,
+.final p{
+  font-size:clamp(16px,4.2vw,18px);
+
+  line-height:1.8;
+}
+
+.cover h2{
+  font-size:clamp(19px,5vw,22px);
+
+  line-height:1.5;
+}
+
+.caption,
+.label,
+.cover .label{
+  font-size:clamp(14.5px,3.8vw,16px);
+
+  line-height:1.55;
+
+  letter-spacing:.2px;
+}
+
+.next{
+  font-size:clamp(15px,4vw,17px);
+}
+
+.music-title{
+  font-size:clamp(15px,4vw,16.5px);
+}
+
+
+/* ---------- the dark panel: cream ink, generous spacing ---------- */
+
+.surprise p,
+.click-section .surprise p{
+  font-size:clamp(16px,4.2vw,17.5px);
+
+  line-height:1.85;
+}
+
+
+/* ---------- reasons: short lines, so slightly smaller ---------- */
+
+.reason{
+  font-size:clamp(15px,4vw,16.5px);
+
+  line-height:1.55;
+
+  letter-spacing:.1px;
+}
+
+.reason-last{
+  font-size:clamp(15px,4vw,16.5px);
+
+  line-height:1.75;
+}
+
+.reasons-count{
+  font-size:clamp(15px,3.9vw,16.5px);
+}
+
+
+/* ---------- counter ---------- */
+
+.together-label,
+.together-foot{
+  font-size:clamp(14.5px,3.8vw,16px);
+}
+
+.together-sub{
+  font-size:clamp(14px,3.7vw,15.5px);
+
+  line-height:1.7;
+}
+
+
+/* ---------- wishes, replies, secret room ---------- */
+
+.wish-text{
+  font-size:clamp(16px,4.2vw,17.5px);
+
+  line-height:1.8;
+}
+
+.last-wish,
+.last-wish p{
+  font-size:clamp(15.5px,4.1vw,17px);
+
+  line-height:1.8;
+}
+
+.reply-intro,
+.keepsake-hint,
+.reply-note,
+.secret-error{
+  font-size:clamp(14.5px,3.8vw,16px);
+
+  line-height:1.6;
+}
+
+.reply-box{
+  font-size:clamp(16px,4.2vw,17.5px);
+
+  line-height:1.7;
+}
+
+.secret-copy,
+.secret-reveal p{
+  font-size:clamp(15.5px,4.1vw,17px);
+
+  line-height:1.8;
+}
+
+
+/* ---------- buttons and keypads: plain and unmistakable ---------- */
+
+.click-section button,
+.birthday-controls button,
+.click-btn,
+.birthday-button,
+.reply-btn,
+.keepsake-btn,
+.song-btn{
+  font-size:clamp(15px,3.9vw,16.5px);
+
+  font-weight:500;
+
+  letter-spacing:.2px;
+}
+
+.hkey{
+  font-size:clamp(19px,5vw,22px);
+
+  font-weight:500;
+}
+
+.blow-status{
+  font-size:clamp(15px,4vw,16.5px);
+
+  line-height:1.6;
+}
+
+.candle-counter{
+  font-size:clamp(16px,4.3vw,18px);
+
+  font-weight:500;
+
+  letter-spacing:.3px;
+}
+
+.lock-paper p,
+.lock-hint{
+  font-size:clamp(15px,4vw,16.5px);
+
+  line-height:1.65;
+}
+
+.env-hint{
+  font-size:clamp(14px,3.7vw,15.5px);
+
+  letter-spacing:.3px;
+}
+
+
+/* ---------- headings keep the calligraphy, just a touch smaller ---------- */
+
+.paper h2,
+.photo-page h2{
+  font-size:clamp(34px,8.2vw,50px);
+}
+
+
+/* ---------- print: same readable face ---------- */
+
+@media print{
+
+  .letter,
+  .hand,
+  .reason,
+  .reason-last,
+  .surprise p,
+  .final p,
+  .cover p{
+    font-family:"Lora",Georgia,serif !important;
+
+    font-size:12.5pt !important;
+
+    line-height:1.65 !important;
+  }
+
+}
+
+
+/* =========================================================
+   NARROW-PHONE FIX
+   The 🔐❤️ line was wider than the card on 390px screens, which
+   pushed the whole lock card (and its keypad) off to one side.
+   Let the card shrink to the screen and let that line scale.
+========================================================= */
+
+#lockScreen,
+#secretScreen,
+#envelopeScreen{
+  overflow-x:hidden;
+
+  left:0;
+  right:0;
+
+  width:100%;
+  max-width:100vw;
+
+  box-sizing:border-box;
+}
+
+.lock-paper{
+  min-width:0;
+
+  /* measured against the screen, not the parent, so nothing can
+     stretch the card past the edge */
+  width:min(430px,calc(100vw - 40px));
+
+  max-width:calc(100vw - 40px);
+
+  box-sizing:border-box;
+}
+
+.lock-heart{
+  font-size:clamp(36px,10.5vw,58px);
+
+  line-height:1.15;
+
+  white-space:normal;
 }
 
 
@@ -2924,6 +6809,9 @@ body:before{
 
 @media(prefers-reduced-motion:reduce){
 
+  /* Decorative / looping motion is switched off, but the scroll
+     reveal still fades in gently so the page never feels dead
+     for people who have Reduce Motion turned on. */
   *,
   *:before,
   *:after{
@@ -2933,6 +6821,36 @@ body:before{
     transition-duration:.01ms !important;
   }
 
+  #decorLayer{
+    display:none;
+  }
+
+  .js-reveal .scroll-reveal,
+  .js-reveal .scroll-reveal.from-left,
+  .js-reveal .scroll-reveal.from-right,
+  .js-reveal .scroll-reveal.rv-zoom,
+  .js-reveal .scroll-reveal.rv-flip{
+    opacity:0;
+    transform:none !important;
+    transition:opacity .7s ease !important;
+    transition-duration:.7s !important;
+  }
+
+  .js-reveal .scroll-reveal.visible{
+    opacity:1;
+  }
+
+  .js-reveal .scroll-reveal.stagger > *{
+    opacity:0;
+    translate:none !important;
+    transition:opacity .55s ease !important;
+    transition-duration:.55s !important;
+  }
+
+  .js-reveal .scroll-reveal.stagger.visible > *{
+    opacity:1;
+  }
+
 }
 
 </style>
@@ -2940,6 +6858,35 @@ body:before{
 
 
 <body class="locked">
+
+
+<!-- soft glow behind everything -->
+<div id="bgGlow" aria-hidden="true"></div>
+
+<!-- floating hearts / balloons (filled in by the script) -->
+<div id="decorLayer" aria-hidden="true"></div>
+
+<!-- how far through the letter you are -->
+<div id="scrollProgress" aria-hidden="true"></div>
+
+
+<!-- =========================================================
+     LINK PREVIEW (WhatsApp / iMessage / Twitter)
+     og-image.png sits in the same folder as this file.
+========================================================= -->
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Just For You ❤️">
+<meta property="og:description" content="A little piece of my heart, locked with our code. Happy birthday, my love.">
+<meta property="og:url" content="https://tomyforever.pages.dev/">
+<meta property="og:image" content="https://tomyforever.pages.dev/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Just For You ❤️">
+<meta name="twitter:description" content="A little piece of my heart, locked with our code. Happy birthday, my love.">
+<meta name="twitter:image" content="https://tomyforever.pages.dev/og-image.png">
+<meta name="theme-color" content="#d8b184">
 
 
 <noscript>
@@ -2953,6 +6900,43 @@ body:before{
 <!-- =========================================================
      LOCK SCREEN
 ========================================================= -->
+
+<!-- =========================================================
+     ENVELOPE INTRO
+     Tap the wax seal to open the letter.
+========================================================= -->
+
+<div id="envelopeScreen">
+
+  <div class="env-caption">a letter arrived for you ♡</div>
+
+  <button
+    type="button"
+    class="envelope"
+    id="envelopeBtn"
+    aria-label="Open the letter"
+  >
+
+    <span class="env-back"></span>
+
+    <span class="env-note">
+      <span class="env-note-line"></span>
+      <span class="env-note-line"></span>
+      <span class="env-note-line short"></span>
+    </span>
+
+    <span class="env-body"></span>
+
+    <span class="env-flap"></span>
+
+    <span class="env-seal">♥</span>
+
+  </button>
+
+  <div class="env-hint">tap the seal</div>
+
+</div>
+
 
 <div id="lockScreen">
 
@@ -2975,24 +6959,46 @@ Enter the secret code to open it.</p>
     <div
       class="passcode"
       id="passcode"
+      role="group"
+      aria-label="Secret code"
     >
 
-      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 1">
-      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 2">
-      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 3">
-      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 4">
-      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 5">
-      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 6">
+      <div class="code-slot"></div>
+      <div class="code-slot"></div>
+      <div class="code-slot"></div>
+      <div class="code-slot"></div>
+      <div class="code-slot"></div>
+      <div class="code-slot"></div>
 
     </div>
 
-    <button
-      class="unlock-btn"
-      id="unlockBtn"
-      type="button"
-    >
-      Open My Heart ❤️
-    </button>
+
+    <!-- heart-shaped keypad -->
+    <div class="keypad-wrap">
+
+      <div class="heart-keypad" id="heartKeypad">
+
+        <button type="button" class="hkey" data-key="1">1</button>
+        <button type="button" class="hkey" data-key="2">2</button>
+        <span class="hgap" aria-hidden="true"></span>
+        <button type="button" class="hkey" data-key="3">3</button>
+        <button type="button" class="hkey" data-key="4">4</button>
+
+        <button type="button" class="hkey" data-key="5">5</button>
+        <button type="button" class="hkey" data-key="6">6</button>
+        <button type="button" class="hkey" data-key="7">7</button>
+        <button type="button" class="hkey" data-key="8">8</button>
+        <button type="button" class="hkey" data-key="9">9</button>
+
+        <button type="button" class="hkey soft del" data-key="del" aria-label="Delete">⌫</button>
+        <button type="button" class="hkey" data-key="0">0</button>
+        <button type="button" class="hkey soft" data-key="clear" aria-label="Clear">✕</button>
+
+        <button type="button" class="hkey open" id="unlockBtn" data-key="enter" aria-label="Open my heart">❤</button>
+
+      </div>
+
+    </div>
 
     <div
       class="lock-error"
@@ -3013,6 +7019,8 @@ Enter the secret code to open it.</p>
 ========================================================= -->
 
 <canvas id="fireworksCanvas"></canvas>
+
+<div id="confettiLayer"></div>
 
 <div class="unlock-backdrop" id="unlockBackdrop"></div>
 
@@ -3057,13 +7065,22 @@ Enter the secret code to open it.</p>
   <div class="tape one"></div>
   <div class="tape two"></div>
 
+  <div class="bunting" aria-hidden="true">
+    <span class="flag"></span><span class="flag"></span>
+    <span class="flag"></span><span class="flag"></span>
+    <span class="flag"></span><span class="flag"></span>
+    <span class="flag"></span><span class="flag"></span>
+    <span class="flag"></span><span class="flag"></span>
+    <span class="flag"></span><span class="flag"></span>
+  </div>
+
   <div class="label">
     A little piece of my heart
   </div>
 
   <h1>
     To My<br>
-    Forever ❤️
+    Forever <span class="hemo">❤️</span>
   </h1>
 
   <h2>
@@ -3106,6 +7123,16 @@ Enter the secret code to open it.</p>
       Your browser does not support the audio player.
 
     </audio>
+
+    <button
+      class="song-btn"
+      id="songBtn"
+      type="button"
+    >
+      <span class="song-ico" id="songIco">▶</span>
+
+      <span id="songLabel">play our song</span>
+    </button>
 
     <div class="music-note" id="musicNote">
       Song file not found — check that “Dandelions mp3.mp3” is in the same folder. 🥺
@@ -3310,6 +7337,26 @@ Your girl ❤️
 </section>
 
 
+
+<!-- =========================================================
+     HOW LONG WE HAVE BEEN US
+========================================================= -->
+
+<div class="together-card scroll-reveal">
+
+  <div class="together-label">us, so far</div>
+
+  <div class="together-line" id="togetherLine">
+    counting…
+  </div>
+
+  <div class="together-sub" id="togetherSub"></div>
+
+  <div class="together-foot">and still counting ♡</div>
+
+</div>
+
+
 <div class="next">
   a few things I love ♡
 </div>
@@ -3346,7 +7393,7 @@ Your girl ❤️
 </div>
 
 <div class="reason">
-  Your patience
+  Your patience with me
 </div>
 
 <div class="reason">
@@ -3358,13 +7405,77 @@ Your girl ❤️
 </div>
 
 <div class="reason">
+  Your voice
+</div>
+
+<div class="reason">
+  The way you say my name
+</div>
+
+<div class="reason">
+  How safe you make me feel
+</div>
+
+<div class="reason">
+  Your stubborn kindness
+</div>
+
+<div class="reason">
   The little things you do
 </div>
 
 <div class="reason">
-  Simply because you are YOU ❤️
+  How hard you work
 </div>
 
+<div class="reason">
+  The way you listen
+</div>
+
+<div class="reason">
+  Your hands
+</div>
+
+<div class="reason">
+  How you never make me beg to be loved
+</div>
+
+<div class="reason">
+  The way you calm me down
+</div>
+
+<div class="reason">
+  Your dreams, and how big they are
+</div>
+
+<div class="reason">
+  The way you say good morning
+</div>
+
+<div class="reason">
+  How you always come back to me
+</div>
+
+<div class="reason">
+  Your forgiveness
+</div>
+
+<div class="reason">
+  That you chose me too
+</div>
+
+<div class="reason reason-last">
+  And the twenty-second one is the biggest:<br>
+  simply because you are YOU. Not who you could be,
+  not who you are trying to become — the man you already
+  are is the reason. ❤️
+</div>
+
+</div>
+
+
+<div class="reasons-count">
+  22 reasons — one for every year of you ♡
 </div>
 
 </section>
@@ -3630,6 +7741,12 @@ SPACE
 
 <!-- COUNTER -->
 
+
+<div class="last-wish" id="lastWish">
+  That candle was mine. I made a wish too —
+  that I get to do this for you every single year. ❤️
+</div>
+
 <div
   class="candle-counter"
   id="candleCounter"
@@ -3640,11 +7757,10 @@ SPACE
 </div>
 
 
-<p class="blow-help">💨 Blow into your phone
+<p class="blow-help">💨 Tap “Start Blowing”, then blow across the
+BOTTOM of your phone — that's where the mic is.
 
-or
-
-👆 tap each candle to blow it out.</p>
+Too shy to blow? 👆 Tap each candle instead.</p>
 
 
 <!-- BUTTONS -->
@@ -3677,6 +7793,32 @@ or
   aria-live="polite"
 >
   Make a wish first… 🥺❤️
+</div>
+
+
+<!-- live mic meter + sensitivity, only shown while listening -->
+<div class="blow-meter-wrap" id="blowMeterWrap">
+
+  <div class="blow-meter" aria-hidden="true">
+    <div class="blow-meter-fill" id="blowMeterFill"></div>
+  </div>
+
+  <label class="blow-sens" for="blowSens">
+    <span>harder</span>
+
+    <input
+      id="blowSens"
+      type="range"
+      min="1"
+      max="10"
+      step="1"
+      value="6"
+      aria-label="Blow sensitivity"
+    >
+
+    <span>easier</span>
+  </label>
+
 </div>
 
 
@@ -3727,6 +7869,61 @@ MY LOVE! 🎂❤️</h2>
      FINAL
 ========================================================= -->
 
+
+<!-- =========================================================
+     WRITE ME BACK
+========================================================= -->
+
+<section class="reply-section scroll-reveal">
+
+<h2>Write Me Back ♡</h2>
+
+<p class="reply-intro">
+  Say anything. It comes straight to me.
+</p>
+
+<textarea
+  id="replyText"
+  class="reply-box"
+  rows="6"
+  placeholder="Type it here, my love…"
+  aria-label="Your message"
+></textarea>
+
+<div class="reply-actions">
+
+  <button type="button" class="reply-btn wa" id="replyWhatsApp">
+    send on WhatsApp
+  </button>
+
+  <button type="button" class="reply-btn mail" id="replyEmail">
+    send by email
+  </button>
+
+</div>
+
+<div class="reply-note" id="replyNote" role="status" aria-live="polite"></div>
+
+</section>
+
+
+<!-- =========================================================
+     KEEPSAKE
+========================================================= -->
+
+<div class="keepsake-wrap scroll-reveal">
+
+  <button type="button" class="keepsake-btn" id="keepsakeBtn">
+    save this as a keepsake
+  </button>
+
+  <div class="keepsake-hint">
+    saves every letter as a PDF you can keep forever
+  </div>
+
+</div>
+
+
 <section class="final">
 
 <div class="label">
@@ -3745,10 +7942,102 @@ MY LOVE! 🎂❤️</h2>
   ♥
 </div>
 
+<button
+  type="button"
+  class="secret-door"
+  id="secretDoor"
+  aria-label="Something else"
+  title=""
+>♡</button>
+
+
 </section>
 
 
 </main>
+
+<!-- =========================================================
+     SECOND SECRET
+========================================================= -->
+
+<div class="secret-screen" id="secretScreen">
+
+  <div class="secret-paper">
+
+    <button type="button" class="secret-close" id="secretClose" aria-label="Close">✕</button>
+
+    <div class="secret-lock" id="secretLock">
+
+      <div class="secret-title">You found it.</div>
+
+      <p class="secret-copy">
+        Four numbers. You already know them. ♡
+      </p>
+
+      <div class="passcode secret-code" id="secretPasscode">
+        <div class="code-slot"></div>
+        <div class="code-slot"></div>
+        <div class="code-slot"></div>
+        <div class="code-slot"></div>
+      </div>
+
+      <div class="keypad-wrap">
+        <div class="heart-keypad" id="secretKeypad">
+
+          <button type="button" class="hkey" data-key="1">1</button>
+          <button type="button" class="hkey" data-key="2">2</button>
+          <span class="hgap" aria-hidden="true"></span>
+          <button type="button" class="hkey" data-key="3">3</button>
+          <button type="button" class="hkey" data-key="4">4</button>
+
+          <button type="button" class="hkey" data-key="5">5</button>
+          <button type="button" class="hkey" data-key="6">6</button>
+          <button type="button" class="hkey" data-key="7">7</button>
+          <button type="button" class="hkey" data-key="8">8</button>
+          <button type="button" class="hkey" data-key="9">9</button>
+
+          <button type="button" class="hkey soft del" data-key="del" aria-label="Delete">⌫</button>
+          <button type="button" class="hkey" data-key="0">0</button>
+          <button type="button" class="hkey soft" data-key="clear" aria-label="Clear">✕</button>
+
+          <button type="button" class="hkey open" data-key="enter" aria-label="Open">♥</button>
+
+        </div>
+      </div>
+
+      <div class="secret-error" id="secretError" role="status" aria-live="polite"></div>
+
+    </div>
+
+
+    <div class="secret-reveal" id="secretReveal">
+
+      <div class="secret-title">Just between us.</div>
+
+      <p>
+        I didn't put this here for the birthday. I put it here for
+        the ordinary days — the ones where you're tired, or quiet,
+        or feeling like you're not doing enough.
+      </p>
+
+      <p>
+        Come back and read this on those days.
+      </p>
+
+      <p>
+        You are already more than enough for me. You always were.
+        Nothing you do or fail to do this year will change that.
+      </p>
+
+      <p class="secret-sign">forever, me ❤️</p>
+
+    </div>
+
+  </div>
+
+</div>
+
+
 
 </div>
 
@@ -3803,6 +8092,15 @@ window.addEventListener(
 document.documentElement.classList.add("js-reveal");
 
 
+/* iOS FIX: one shared "is this a phone/tablet" flag. Used to trim the
+   heaviest effects (confetti count, fireworks resolution, canvas
+   pixel ratio) so animations stay at 60fps on iOS. */
+var IS_TOUCH =
+  (window.matchMedia &&
+   window.matchMedia("(hover:none)").matches) ||
+  "ontouchstart" in window;
+
+
 /* =========================================================
    PASSCODE
    220426
@@ -3810,13 +8108,20 @@ document.documentElement.classList.add("js-reveal");
 
 var correctCode = "220426";
 
-var inputs =
+var slots =
   document.querySelectorAll(
-    "#passcode input"
+    "#passcode .code-slot"
   );
 
-var unlockBtn =
-  document.getElementById("unlockBtn");
+var codeLength = slots.length;
+
+var entered = "";
+
+var passcodeRow =
+  document.getElementById("passcode");
+
+var heartKeypad =
+  document.getElementById("heartKeypad");
 
 var lockScreen =
   document.getElementById("lockScreen");
@@ -3828,124 +8133,162 @@ var music =
   document.getElementById("music");
 
 
-inputs.forEach(
-  function(input,index){
+/* The code is now typed on the heart-shaped keypad, so the phone
+   keyboard never covers the screen. */
 
-    input.addEventListener(
-      "input",
-      function(){
+function renderCode(){
 
-        /* strip anything that is not a digit */
-        input.value =
-          input.value
-            .replace(/[^0-9]/g,"")
-            .slice(0,1);
+  for(var i = 0; i < codeLength; i++){
 
-        lockError.textContent = "";
+    var slot = slots[i];
 
-        if(
-          input.value &&
-          index < inputs.length - 1
-        ){
+    if(i < entered.length){
 
-          inputs[index + 1].focus();
+      slot.textContent = "\u2665";
 
-        }
+      slot.classList.add("filled");
 
-        /* auto check once all six boxes are filled */
-        if(
-          index === inputs.length - 1 &&
-          input.value
-        ){
+    }
 
-          unlock();
+    else{
 
-        }
+      slot.textContent = "";
 
-      }
-    );
+      slot.classList.remove("filled");
 
+    }
 
-    input.addEventListener(
-      "keydown",
-      function(event){
+    if(i === entered.length){
+      slot.classList.add("active");
+    }
 
-        if(
-          event.key === "Backspace" &&
-          !input.value &&
-          index > 0
-        ){
+    else{
+      slot.classList.remove("active");
+    }
 
-          inputs[index - 1].focus();
+  }
 
-        }
-
-        if(event.key === "Enter"){
-
-          event.preventDefault();
-
-          unlock();
-
-        }
-
-      }
-    );
+}
 
 
-    /* FIX: pasting the whole code now fills every box */
-    input.addEventListener(
-      "paste",
-      function(event){
+function pressKey(key){
 
-        var text =
-          (
-            event.clipboardData ||
-            window.clipboardData
-          ).getData("text") || "";
+  lockError.textContent = "";
 
-        var digits =
-          text.replace(/[^0-9]/g,"");
+  if(key === "del"){
 
-        if(!digits){
-          return;
-        }
+    entered = entered.slice(0,-1);
 
-        event.preventDefault();
+  }
 
-        for(
-          var i = 0;
-          i < digits.length &&
-          index + i < inputs.length;
-          i++
-        ){
+  else if(key === "clear"){
 
-          inputs[index + i].value = digits[i];
+    entered = "";
 
-        }
+  }
 
-        var last =
-          Math.min(
-            index + digits.length,
-            inputs.length - 1
-          );
+  else if(key === "enter"){
 
-        inputs[last].focus();
+    playTick();
 
-        unlock();
+    unlock();
 
-      }
-    );
+    return;
+
+  }
+
+  else if(
+    /^[0-9]$/.test(key) &&
+    entered.length < codeLength
+  ){
+
+    entered += key;
+
+  }
+
+  else{
+
+    return;
+
+  }
 
 
-    input.addEventListener(
-      "focus",
-      function(){
-        input.select();
-      }
+  renderCode();
+
+  playTick();
+
+
+  /* auto-check once all six little hearts are filled */
+  if(entered.length === codeLength){
+
+    setTimeout(unlock,220);
+
+  }
+
+}
+
+
+/* one listener for the whole heart keypad */
+heartKeypad.addEventListener(
+  "click",
+  function(event){
+
+    var button =
+      event.target.closest
+        ? event.target.closest(".hkey")
+        : null;
+
+    if(!button){
+      return;
+    }
+
+    pressKey(
+      button.getAttribute("data-key")
     );
 
   }
 );
+
+
+/* a real keyboard still works, for typing on a laptop */
+document.addEventListener(
+  "keydown",
+  function(event){
+
+    if(
+      !lockScreen ||
+      lockScreen.style.display === "none"
+    ){
+      return;
+    }
+
+    if(/^[0-9]$/.test(event.key)){
+
+      pressKey(event.key);
+
+    }
+
+    else if(event.key === "Backspace"){
+
+      event.preventDefault();
+
+      pressKey("del");
+
+    }
+
+    else if(event.key === "Enter"){
+
+      event.preventDefault();
+
+      pressKey("enter");
+
+    }
+
+  }
+);
+
+
+renderCode();
 
 
 function openSite(silent){
@@ -4019,17 +8362,13 @@ function revealSite(){
 
 function unlock(){
 
-  var entered = "";
+  if(entered.length < codeLength){
 
-  inputs.forEach(
-    function(input){
-      entered += input.value;
-    }
-  );
+    lockError.textContent =
+      "Six little numbers, my love ❤️";
 
-
-  if(entered.length < inputs.length){
     return;
+
   }
 
 
@@ -4046,33 +8385,19 @@ function unlock(){
     lockError.textContent =
       "That isn't the secret code 🥺❤️";
 
-    inputs.forEach(
-      function(input){
-        input.value = "";
-      }
-    );
+    entered = "";
 
-    inputs[0].focus();
+    renderCode();
+
+    passcodeRow.classList.remove("wrong");
+
+    void passcodeRow.offsetWidth;
+
+    passcodeRow.classList.add("wrong");
 
   }
 
 }
-
-
-unlockBtn.addEventListener("click",unlock);
-
-
-/* focus the first box so the keyboard opens right away */
-window.addEventListener(
-  "load",
-  function(){
-
-    if(!DEBUG){
-      inputs[0].focus();
-    }
-
-  }
-);
 
 
 if(DEBUG){
@@ -4082,8 +8407,17 @@ if(DEBUG){
 
   /* silent = skip the greeting so reloads aren't noisy.
      Use ?debug=1&party=1 to preview the unlock celebration. */
-  openSite(
-    !new URLSearchParams(location.search).has("party")
+  /* deferred so the celebration helpers further down this file
+     are defined before ?party=1 tries to use them */
+  setTimeout(
+    function(){
+
+      openSite(
+        !new URLSearchParams(location.search).has("party")
+      );
+
+    },
+    0
   );
 
 }
@@ -4120,6 +8454,64 @@ if(music){
 /* =========================================================
    CLICK ME
 ========================================================= */
+
+/* the parchment play button drives the hidden <audio> */
+var songBtn = document.getElementById("songBtn");
+
+var songIco = document.getElementById("songIco");
+
+var songLabel = document.getElementById("songLabel");
+
+
+function paintSongBtn(){
+
+  if(!songBtn || !music){
+    return;
+  }
+
+  var playing = !music.paused && !music.ended;
+
+  songIco.textContent = playing ? "\u2759\u2759" : "\u25B6";
+
+  songLabel.textContent =
+    playing ? "pause our song" : "play our song";
+
+}
+
+
+if(songBtn && music){
+
+  songBtn.addEventListener(
+    "click",
+    function(){
+
+      if(music.paused || music.ended){
+
+        var a = music.play();
+
+        if(a && a.catch){
+          a.catch(function(){});
+        }
+
+      }
+
+      else{
+
+        music.pause();
+
+      }
+
+    }
+  );
+
+  music.addEventListener("play",paintSongBtn);
+  music.addEventListener("pause",paintSongBtn);
+  music.addEventListener("ended",paintSongBtn);
+
+  paintSongBtn();
+
+}
+
 
 var clickBtn =
   document.getElementById("clickBtn");
@@ -4330,7 +8722,19 @@ function extinguishCandle(candle){
 
   if(candlesOut === totalCandles){
 
-    birthdayComplete();
+    if(!stubbornUsed){
+
+      /* one last candle comes back to life */
+      startStubbornCandle();
+
+    }
+    else{
+
+      revealLastWish();
+
+      birthdayComplete();
+
+    }
 
   }
 
@@ -4341,7 +8745,7 @@ function blowOneCandle(){
 
   var remaining =
     document.querySelectorAll(
-      ".candle:not(.out)"
+      ".candle:not(.out):not(.stubborn)"
     );
 
   if(remaining.length){
@@ -4363,6 +8767,21 @@ function blowOneCandle(){
 
 /* =========================================================
    MICROPHONE / BLOW DETECTION
+
+   Rewritten so a real BLOW works and shouting does not.
+
+   A blow is turbulent air: lots of energy low down (roughly
+   60-450 Hz) and almost no harmonic structure. A voice — even a
+   scream — puts most of its energy in the 700-3200 Hz band and is
+   full of sharp harmonic peaks. So instead of "is it loud?" the
+   detector asks three questions:
+
+     1. is the low band well above the room's own noise floor?
+     2. is the low band beating the voice band?
+     3. is the spectrum smooth (wind) rather than peaky (voice)?
+
+   The noise floor keeps re-learning itself, so it works in a quiet
+   room and next to a fan.
 ========================================================= */
 
 var audioContext = null;
@@ -4371,15 +8790,41 @@ var analyser = null;
 
 var microphone = null;
 
+var micSink = null;
+
 var micStream = null;
 
 var blowListening = false;
 
-var lastBlow = 0;
+var blowActive = false;
 
-var noiseFloor = 0.02;
+var blowStrength = 0;
+
+var lastCandleBlown = 0;
+
+var blowFrames = 0;
+
+var quietFrames = 0;
 
 var calibrating = true;
+
+var calibrateFrames = 0;
+
+var freqData = null;
+
+var floorLow = 0;
+
+var floorVoice = 0;
+
+var blowSensitivity = 6;
+
+var heardAnything = false;
+
+var blowMeterFill = null;
+
+var blowMeterWrap = null;
+
+var micRaf = 0;
 
 
 function micUnavailableMessage(){
@@ -4402,12 +8847,26 @@ function micUnavailableMessage(){
 }
 
 
+function setBlowMeter(pct){
+
+  if(!blowMeterFill){
+    return;
+  }
+
+  if(pct < 0){ pct = 0; }
+  if(pct > 100){ pct = 100; }
+
+  blowMeterFill.style.width = pct.toFixed(0) + "%";
+
+}
+
+
 function startBlowing(){
 
   if(blowListening){
 
     blowStatus.textContent =
-      "I'm listening… blow! 💨❤️";
+      "I'm listening… blow gently across the bottom of your phone 💨❤️";
 
     return;
 
@@ -4433,9 +8892,42 @@ function startBlowing(){
     "Allow the microphone so I can hear you… 🎤";
 
 
+  /* iOS FIX: the AudioContext has to be created (and resumed)
+     inside the tap itself, not later inside a promise, otherwise
+     Safari leaves it suspended and no audio ever arrives. */
+  var Ctx =
+    window.AudioContext ||
+    window.webkitAudioContext;
+
+  if(!audioContext){
+
+    try{
+      audioContext = new Ctx();
+    }
+    catch(err){
+
+      blowStatus.textContent =
+        micUnavailableMessage();
+
+      return;
+
+    }
+
+  }
+
+  if(audioContext.state === "suspended"){
+
+    audioContext.resume();
+
+  }
+
+
   navigator.mediaDevices
     .getUserMedia({
       audio:{
+        /* these three matter a LOT: iOS noise suppression treats a
+           blow as unwanted wind noise and deletes it, and auto gain
+           control keeps re-flattening the level */
         echoCancellation:false,
         noiseSuppression:false,
         autoGainControl:false
@@ -4445,14 +8937,6 @@ function startBlowing(){
 
       micStream = stream;
 
-      var Ctx =
-        window.AudioContext ||
-        window.webkitAudioContext;
-
-      audioContext = new Ctx();
-
-
-      /* iOS starts the audio context suspended */
       if(audioContext.state === "suspended"){
 
         audioContext.resume();
@@ -4462,9 +8946,13 @@ function startBlowing(){
 
       analyser = audioContext.createAnalyser();
 
-      analyser.fftSize = 1024;
+      analyser.fftSize = 2048;
 
-      analyser.smoothingTimeConstant = .3;
+      /* barely any smoothing — a puff is short */
+      analyser.smoothingTimeConstant = .12;
+
+      analyser.minDecibels = -110;
+      analyser.maxDecibels = -8;
 
 
       microphone =
@@ -4473,27 +8961,72 @@ function startBlowing(){
       microphone.connect(analyser);
 
 
+      /* iOS FIX: Safari only actually pulls audio through the graph
+         when it reaches the destination, so the analyser is wired to
+         a silent gain node. Nothing is played back. */
+      micSink = audioContext.createGain();
+
+      micSink.gain.value = 0;
+
+      analyser.connect(micSink);
+
+      micSink.connect(audioContext.destination);
+
+
+      freqData = new Float32Array(analyser.frequencyBinCount);
+
       blowListening = true;
+
+      blowActive = false;
 
       calibrating = true;
 
-      noiseFloor = 0.02;
+      calibrateFrames = 0;
+
+      floorLow = 0;
+
+      floorVoice = 0;
+
+      heardAnything = false;
+
+      blowFrames = 0;
+
+      quietFrames = 0;
+
+
+      if(blowMeterWrap){
+
+        blowMeterWrap.classList.add("on");
+
+      }
 
 
       blowStatus.textContent =
-        "I'm listening… blow toward your phone! 💨";
-
-
-      /* learn the room noise for 1 second, then start */
-      setTimeout(
-        function(){
-          calibrating = false;
-        },
-        1000
-      );
+        "Listening… hold the phone near your mouth and blow 💨";
 
 
       listenForBlow();
+
+
+      /* a gentle nudge if the mic is clearly hearing nothing */
+      setTimeout(
+        function(){
+
+          if(
+            blowListening &&
+            !heardAnything &&
+            !completed
+          ){
+
+            blowStatus.textContent =
+              "I can't hear anything yet 🥺\n" +
+              "Blow across the BOTTOM of the phone, or just tap the candles ❤️";
+
+          }
+
+        },
+        7000
+      );
 
     })
     .catch(function(error){
@@ -4509,67 +9042,271 @@ function startBlowing(){
 }
 
 
-/* Uses loudness of the waveform (RMS), which reacts to the
-   rush of air much better than the old frequency average. */
+/* average power across a frequency range, from the dB spectrum */
+function bandPower(fromHz,toHz,binHz){
+
+  var start = Math.max(1, Math.round(fromHz / binHz));
+
+  var end = Math.min(freqData.length - 1, Math.round(toHz / binHz));
+
+  if(end <= start){
+    return 1e-12;
+  }
+
+  var sum = 0;
+
+  var peak = -300;
+
+  for(var i = start; i <= end; i++){
+
+    var db = freqData[i];
+
+    if(db < -140){ db = -140; }
+
+    if(db > peak){ peak = db; }
+
+    sum += Math.pow(10, db / 10);
+
+  }
+
+  bandPower.peakDb = peak;
+
+  bandPower.meanDb = 10 * Math.log10(sum / (end - start + 1));
+
+  return sum / (end - start + 1);
+
+}
+
+
+function trackFloor(current,floor){
+
+  /* drops fast, rises very slowly: a proper noise-floor tracker */
+  if(!floor){
+    return current;
+  }
+
+  if(current < floor){
+
+    return floor * .7 + current * .3;
+
+  }
+
+  return floor * .999 + current * .001;
+
+}
+
+
 function listenForBlow(){
 
   if(
     !blowListening ||
-    !analyser
+    !analyser ||
+    !freqData
   ){
     return;
   }
 
 
-  var data =
-    new Uint8Array(analyser.fftSize);
+  analyser.getFloatFrequencyData(freqData);
 
-  analyser.getByteTimeDomainData(data);
+  var binHz =
+    audioContext.sampleRate / analyser.fftSize;
 
 
-  var sum = 0;
+  /* --- the three bands --- */
 
-  for(var i = 0; i < data.length; i++){
+  var lowE = bandPower(60,450,binHz);
 
-    var v = (data[i] - 128) / 128;
+  var lowPeak = bandPower.peakDb;
+  var lowMean = bandPower.meanDb;
 
-    sum += v * v;
+  var voiceE = bandPower(700,3200,binHz);
 
+  var voicePeak = bandPower.peakDb;
+  var voiceMean = bandPower.meanDb;
+
+
+  if(lowMean > -95){
+    heardAnything = true;
   }
-
-  var rms =
-    Math.sqrt(sum / data.length);
 
 
   if(calibrating){
 
-    noiseFloor =
-      Math.max(noiseFloor, rms);
+    calibrateFrames++;
+
+    floorLow = floorLow ? (floorLow * .8 + lowE * .2) : lowE;
+
+    floorVoice = floorVoice ? (floorVoice * .8 + voiceE * .2) : voiceE;
+
+    /* ~0.7s of room tone at 60fps */
+    if(calibrateFrames > 42){
+
+      calibrating = false;
+
+      blowStatus.textContent =
+        "Ready — blow! 💨";
+
+    }
+
+    micRaf = requestAnimationFrame(listenForBlow);
+
+    return;
 
   }
 
-  else{
 
-    var threshold =
-      Math.max(0.055, noiseFloor * 2.2);
+  /* --- how far above the room is the low band? --- */
 
-    var now = Date.now();
+  var boostDb =
+    10 * Math.log10(lowE / (floorLow + 1e-12));
 
-    if(
-      rms > threshold &&
-      now - lastBlow > 220
-    ){
+  /* --- is low air beating the voice band? --- */
 
-      lastBlow = now;
+  var ratioDb =
+    10 * Math.log10(lowE / (voiceE + 1e-12));
 
-      blowOneCandle();
+  /* --- voice is peaky, wind is smooth --- */
+
+  var peakiness = voicePeak - voiceMean;
+
+  /* --- spectral flatness (100-4000 Hz) ---
+     geometric mean vs arithmetic mean. Turbulent air is nearly flat
+     (about -1 to -6 dB); a voice, even a shout, is built of
+     harmonics with deep gaps between them, so it lands far lower. */
+
+  var fStart = Math.max(1, Math.round(100 / binHz));
+
+  var fEnd = Math.min(freqData.length - 1, Math.round(4000 / binHz));
+
+  var dbSum = 0;
+
+  var powSum = 0;
+
+  for(var fi = fStart; fi <= fEnd; fi++){
+
+    var fdb = freqData[fi];
+
+    if(fdb < -120){ fdb = -120; }
+
+    dbSum += fdb;
+
+    powSum += Math.pow(10, fdb / 10);
+
+  }
+
+  var fCount = fEnd - fStart + 1;
+
+  var flatDb =
+    (dbSum / fCount) -
+    10 * Math.log10(powSum / fCount);
+
+
+  if(window.__blowProbe){
+
+    window.__blowProbe({
+      boostDb:boostDb,
+      ratioDb:ratioDb,
+      peakiness:peakiness,
+      flatDb:flatDb,
+      lowMean:lowMean
+    });
+
+  }
+
+
+  /* sensitivity 1 (fussy) … 10 (very easy) */
+  var needBoost = 15 - blowSensitivity;
+
+  var needRatio = 9 - blowSensitivity * .8;
+
+  /* louder than the room, and not a harmonic sound */
+  var loudEnough =
+    boostDb > needBoost &&
+    lowMean > -92 &&
+    peakiness < 15;
+
+  var isBlow =
+    loudEnough &&
+    (
+      /* air dominates the voice band */
+      ratioDb > needRatio ||
+
+      /* or the spectrum is genuinely noise-like (real breath is) */
+      (flatDb > -8 && ratioDb > needRatio - 5)
+    );
+
+
+  /* meter, so you can see it hearing you */
+  setBlowMeter((boostDb / (needBoost * 1.6)) * 100);
+
+
+  var now = Date.now();
+
+  if(isBlow){
+
+    blowFrames++;
+
+    quietFrames = 0;
+
+    blowStrength =
+      Math.min(1, Math.max(0, (boostDb - needBoost) / 16));
+
+    /* two frames in a row = not a click or a door slam */
+    if(blowFrames >= 2){
+
+      if(!blowActive){
+
+        blowActive = true;
+
+        blowStatus.textContent =
+          "I can hear you… keep blowing! 💨❤️";
+
+      }
+
+      /* the harder you blow, the faster they go out */
+      var gap = 260 - blowStrength * 150;
+
+      if(now - lastCandleBlown > gap){
+
+        lastCandleBlown = now;
+
+        blowOneCandle();
+
+      }
 
     }
 
   }
 
+  else{
 
-  requestAnimationFrame(listenForBlow);
+    blowFrames = 0;
+
+    quietFrames++;
+
+    if(blowActive && quietFrames > 10){
+
+      blowActive = false;
+
+      if(!completed){
+
+        blowStatus.textContent =
+          "Nice one — blow again for the rest 💨";
+
+      }
+
+    }
+
+    /* only re-learn the room while nothing is being blown */
+    floorLow = trackFloor(lowE,floorLow);
+
+    floorVoice = trackFloor(voiceE,floorVoice);
+
+  }
+
+
+  micRaf = requestAnimationFrame(listenForBlow);
 
 }
 
@@ -4577,6 +9314,24 @@ function listenForBlow(){
 function stopMicrophone(){
 
   blowListening = false;
+
+  blowActive = false;
+
+  if(micRaf){
+
+    cancelAnimationFrame(micRaf);
+
+    micRaf = 0;
+
+  }
+
+  setBlowMeter(0);
+
+  if(blowMeterWrap){
+
+    blowMeterWrap.classList.remove("on");
+
+  }
 
   /* FIX: the old code closed the AudioContext but never stopped
      the microphone track, so the mic stayed on (red dot) after
@@ -4593,6 +9348,17 @@ function stopMicrophone(){
 
   }
 
+  try{
+
+    if(microphone){ microphone.disconnect(); }
+
+    if(analyser){ analyser.disconnect(); }
+
+    if(micSink){ micSink.disconnect(); }
+
+  }
+  catch(err){}
+
   if(
     audioContext &&
     audioContext.state !== "closed"
@@ -4607,6 +9373,10 @@ function stopMicrophone(){
   analyser = null;
 
   microphone = null;
+
+  micSink = null;
+
+  freqData = null;
 
 }
 
@@ -4657,6 +9427,15 @@ function birthdayComplete(){
    CONFETTI
 ========================================================= */
 
+var confettiLive = 0;
+
+function getConfettiLayer(){
+  return document.getElementById("confettiLayer");
+}
+
+
+/* iOS FIX: fewer, lighter pieces on a phone, and they all live in a
+   single fixed layer instead of 200 separate ones. */
 function launchConfetti(count){
 
   var colors = [
@@ -4671,6 +9450,26 @@ function launchConfetti(count){
 
   count = count || 120;
 
+  if(IS_TOUCH){
+    count = Math.round(count * 0.45);
+  }
+
+
+  var confettiLayer = getConfettiLayer();
+
+  if(!confettiLayer){
+    return;
+  }
+
+  confettiLayer.classList.add("show");
+
+  confettiLive += count;
+
+
+  /* build them all off-screen in one go, then attach once, so the
+     browser only does a single layout pass */
+  var batch =
+    document.createDocumentFragment();
 
   for(
     var i = 0;
@@ -4684,7 +9483,7 @@ function launchConfetti(count){
     piece.className = "confetti-piece";
 
     piece.style.left =
-      (Math.random() * 100) + "vw";
+      (Math.random() * 100) + "%";
 
     piece.style.background =
       colors[
@@ -4697,21 +9496,32 @@ function launchConfetti(count){
     piece.style.animationDuration =
       (3 + Math.random() * 2) + "s";
 
-    document.body.appendChild(piece);
-
-    /* remove them so they don't pile up in memory */
-    (function(node){
-
-      setTimeout(
-        function(){
-          node.remove();
-        },
-        6000
-      );
-
-    })(piece);
+    batch.appendChild(piece);
 
   }
+
+  confettiLayer.appendChild(batch);
+
+
+  /* clear the whole batch in one sweep instead of 200 timers */
+  setTimeout(
+    function(){
+
+      confettiLive -= count;
+
+      if(confettiLive <= 0){
+
+        confettiLive = 0;
+
+        confettiLayer.innerHTML = "";
+
+        confettiLayer.classList.remove("show");
+
+      }
+
+    },
+    6200
+  );
 
 }
 
@@ -4925,6 +9735,44 @@ function playBoom(){
 }
 
 
+/* soft wooden click for each keypad press */
+function playTick(){
+
+  var ctx = initSound();
+
+  if(!ctx){
+    return;
+  }
+
+  var now = ctx.currentTime;
+
+  var osc = ctx.createOscillator();
+
+  var gain = ctx.createGain();
+
+  osc.type = "triangle";
+
+  osc.frequency.setValueAtTime(660,now);
+
+  osc.frequency.exponentialRampToValueAtTime(320,now + .08);
+
+  gain.gain.setValueAtTime(0.0001,now);
+
+  gain.gain.exponentialRampToValueAtTime(0.09,now + .012);
+
+  gain.gain.exponentialRampToValueAtTime(0.0001,now + .12);
+
+  osc.connect(gain);
+
+  gain.connect(ctx.destination);
+
+  osc.start(now);
+
+  osc.stop(now + .14);
+
+}
+
+
 /* little rising sparkle for the unlock moment */
 function playSparkle(){
 
@@ -5048,8 +9896,13 @@ var fwDpr = 1;
 
 function sizeFireworks(){
 
+  /* iOS FIX: a 3x device pixel ratio meant the full-screen fade
+     rectangle was ~9x more pixels per frame than needed. Capped. */
   fwDpr =
-    Math.min(window.devicePixelRatio || 1, 2);
+    Math.min(
+      window.devicePixelRatio || 1,
+      IS_TOUCH ? 1.5 : 2
+    );
 
   fwCanvas.width =
     Math.floor(window.innerWidth * fwDpr);
@@ -5113,6 +9966,15 @@ function burst(x,y,color,count,power){
   count = count || 58;
 
   power = power || 5.2;
+
+  /* iOS FIX: keep the particle budget sane on a phone */
+  if(IS_TOUCH){
+    count = Math.round(count * 0.6);
+  }
+
+  if(fwParticles.length > (IS_TOUCH ? 320 : 700)){
+    count = Math.round(count * 0.5);
+  }
 
   var hueShift = Math.random() < .35;
 
@@ -5490,8 +10352,11 @@ var boomLine2 =
 
 function boomFinale(){
 
-  /* screen shake */
+  /* iOS FIX: the shake used to be applied to .page, i.e. the entire
+     scrapbook, which forced Safari to re-composite the whole
+     document. Only the birthday section shakes now. */
   var page =
+    document.querySelector(".birthday-finale") ||
     document.querySelector(".page");
 
   /* show ONLY the first line to begin with */
@@ -5618,12 +10483,71 @@ document
   .addEventListener("click",startBlowing);
 
 
+blowMeterFill =
+  document.getElementById("blowMeterFill");
+
+blowMeterWrap =
+  document.getElementById("blowMeterWrap");
+
+
+var blowSens =
+  document.getElementById("blowSens");
+
+if(blowSens){
+
+  blowSensitivity = parseInt(blowSens.value,10) || 6;
+
+  blowSens.addEventListener(
+    "input",
+    function(){
+
+      blowSensitivity = parseInt(blowSens.value,10) || 6;
+
+    }
+  );
+
+}
+
+
 document
   .getElementById("tapButton")
   .addEventListener("click",blowOneCandle);
 
 
 buildCandles();
+
+
+/* =========================================================
+   iOS FIX: freeze the 22 flames while the cake is off screen
+========================================================= */
+
+if("IntersectionObserver" in window){
+
+  var candleObserver =
+    new IntersectionObserver(
+      function(entries){
+
+        entries.forEach(
+          function(entry){
+
+            if(entry.isIntersecting){
+              candleContainer.classList.remove("paused");
+            }
+
+            else{
+              candleContainer.classList.add("paused");
+            }
+
+          }
+        );
+
+      },
+      { rootMargin:"200px 0px 200px 0px" }
+    );
+
+  candleObserver.observe(candleContainer);
+
+}
 
 
 if(DEBUG){
@@ -5660,12 +10584,19 @@ if(DEBUG){
 
 /* =========================================================
    SCROLL ANIMATION
+   Cards slide/tilt/zoom in, and their contents drift up in
+   sequence. Observing only starts once the lock screen is gone,
+   otherwise the first sections would animate while hidden and
+   there would be nothing left to see.
 ========================================================= */
 
 var revealItems =
   document.querySelectorAll(
-    ".paper, .photo-page, .note, .reasons, .click-section, .birthday-finale, .next"
+    ".paper, .photo-page, .note, .reasons, .click-section, .birthday-finale, .next, .together-card, .reply-section, .keepsake-wrap"
   );
+
+
+var revealStyles = ["", "from-left", "rv-zoom", "from-right", "rv-flip"];
 
 
 revealItems.forEach(
@@ -5673,16 +10604,36 @@ revealItems.forEach(
 
     item.classList.add("scroll-reveal");
 
-    if(index % 3 === 1){
-      item.classList.add("from-left");
+    var style = revealStyles[index % revealStyles.length];
+
+    if(style){
+      item.classList.add(style);
     }
 
-    if(index % 3 === 2){
-      item.classList.add("from-right");
+    /* stagger the children of the roomy cards only */
+    if(
+      item.classList.contains("paper") ||
+      item.classList.contains("photo-page") ||
+      item.classList.contains("reasons") ||
+      item.classList.contains("click-section")
+    ){
+      item.classList.add("stagger");
     }
 
   }
 );
+
+
+function settleReveal(target){
+
+  setTimeout(
+    function(){
+      target.classList.add("settled");
+    },
+    1600
+  );
+
+}
 
 
 if("IntersectionObserver" in window){
@@ -5696,9 +10647,15 @@ if("IntersectionObserver" in window){
 
             if(entry.isIntersecting){
 
-              entry.target.classList.add("visible");
+              var target = entry.target;
 
-              observer.unobserve(entry.target);
+              target.classList.add("visible");
+
+              observer.unobserve(target);
+
+              /* iOS FIX: drop the GPU layer hint once the reveal is
+                 done, so idle cards stop holding memory. */
+              settleReveal(target);
 
             }
 
@@ -5707,18 +10664,58 @@ if("IntersectionObserver" in window){
 
       },
       {
-        threshold:.14,
+        threshold:.08,
 
-        rootMargin:"0px 0px -60px 0px"
+        /* triggers a little AFTER the card enters, so the movement
+           happens where you can actually see it */
+        rootMargin:"0px 0px -14% 0px"
       }
     );
 
 
-  revealItems.forEach(
-    function(item){
-      revealObserver.observe(item);
+  var revealsStarted = false;
+
+  function startReveals(){
+
+    if(revealsStarted){
+      return;
     }
-  );
+
+    revealsStarted = true;
+
+    revealItems.forEach(
+      function(item){
+        revealObserver.observe(item);
+      }
+    );
+
+  }
+
+
+  if(document.body.classList.contains("locked")){
+
+    var waitForUnlock =
+      setInterval(
+        function(){
+
+          if(!document.body.classList.contains("locked")){
+
+            clearInterval(waitForUnlock);
+
+            /* let the greeting finish first */
+            setTimeout(startReveals,120);
+
+          }
+
+        },
+        200
+      );
+
+  }
+
+  else{
+    startReveals();
+  }
 
 }
 
@@ -5734,7 +10731,1024 @@ else{
 
 }
 
+
+/* =========================================================
+   SCROLL PROGRESS RIBBON
+========================================================= */
+
+var progressBar =
+  document.getElementById("scrollProgress");
+
+if(progressBar){
+
+  var progressQueued = false;
+
+  function drawProgress(){
+
+    progressQueued = false;
+
+    var doc = document.documentElement;
+
+    var max = doc.scrollHeight - window.innerHeight;
+
+    var pct =
+      max > 0
+        ? (window.pageYOffset || doc.scrollTop) / max
+        : 0;
+
+    if(pct < 0){ pct = 0; }
+    if(pct > 1){ pct = 1; }
+
+    progressBar.style.width = (pct * 100).toFixed(2) + "%";
+
+  }
+
+  window.addEventListener(
+    "scroll",
+    function(){
+
+      if(!progressQueued){
+
+        progressQueued = true;
+
+        requestAnimationFrame(drawProgress);
+
+      }
+
+    },
+    {passive:true}
+  );
+
+  window.addEventListener("resize",drawProgress);
+
+  drawProgress();
+
+}
+
+
+/* =========================================================
+   FLOATING HEARTS + BALLOONS
+   Light on purpose: a handful of elements, all GPU transforms,
+   and nothing at all when Reduce Motion is on.
+========================================================= */
+
+(function decorate(){
+
+  var layer =
+    document.getElementById("decorLayer");
+
+  if(!layer){
+    return;
+  }
+
+  var calm =
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+  if(calm){
+    return;
+  }
+
+  var glyphs = ["\u2665","\u2665","\u2665","\u2728"];
+
+  var heartCount = IS_TOUCH ? 9 : 14;
+
+  var frag = document.createDocumentFragment();
+
+  for(var i = 0; i < heartCount; i++){
+
+    var h = document.createElement("span");
+
+    h.className = "fh";
+
+    h.textContent = glyphs[i % glyphs.length];
+
+    var size = 10 + Math.random() * 12;
+
+    h.style.left = (Math.random() * 96) + "%";
+    h.style.fontSize = size.toFixed(1) + "px";
+
+    h.style.color =
+      Math.random() > .5
+        ? "rgba(120,74,38,.6)"
+        : "rgba(158,108,48,.62)";
+
+    h.style.setProperty(
+      "--dx",
+      ((Math.random() * 90) - 45).toFixed(0) + "px"
+    );
+
+    h.style.setProperty(
+      "--rot",
+      ((Math.random() * 70) - 35).toFixed(0) + "deg"
+    );
+
+    h.style.animationDuration =
+      (15 + Math.random() * 13).toFixed(1) + "s";
+
+    h.style.animationDelay =
+      (-Math.random() * 24).toFixed(1) + "s";
+
+    frag.appendChild(h);
+
+  }
+
+  var balloonColors = [
+    "linear-gradient(150deg,#e3bd8c,#a86a34)",
+    "linear-gradient(150deg,#f0dcae,#c19256)",
+    "linear-gradient(150deg,#d6b184,#8a5227)"
+  ];
+
+  var balloonCount = IS_TOUCH ? 2 : 3;
+
+  for(var b = 0; b < balloonCount; b++){
+
+    var bl = document.createElement("span");
+
+    bl.className = "balloon";
+
+    bl.style.background = balloonColors[b % balloonColors.length];
+
+    /* keep them near the edges, away from the words */
+    bl.style.left =
+      (b % 2 === 0
+        ? 2 + Math.random() * 7
+        : 86 + Math.random() * 7) + "%";
+
+    bl.style.top = (12 + Math.random() * 58) + "%";
+
+    bl.style.animationDuration =
+      (7 + Math.random() * 5).toFixed(1) + "s";
+
+    bl.style.animationDelay =
+      (-Math.random() * 6).toFixed(1) + "s";
+
+    frag.appendChild(bl);
+
+  }
+
+  layer.appendChild(frag);
+
+})();
+
+
+/* =========================================================
+   ✦ THINGS TO PERSONALISE ✦
+   Everything you might want to change lives right here.
+========================================================= */
+
+/* the day you two started dating — YYYY, MM, DD  (months start at 0,
+   so 3 = April) */
+var FIRST_DAY = new Date(2026, 3, 22);
+
+/* his birthday, so the page knows what day the big day is */
+var BIRTHDAY = new Date(2026, 10, 23);
+
+/* where his reply should go */
+var MY_EMAIL = "osilichloe17@gmail.com";
+
+/* your WhatsApp number in full international form, digits only.
+   Nigeria example: 2348012345678  */
+var MY_WHATSAPP = "2349150778398";
+
+/* the four-digit code for the hidden page (your first date, 22/04) */
+var SECOND_CODE = "2204";
+
+
+/* =========================================================
+   ENVELOPE INTRO
+========================================================= */
+
+(function(){
+
+  var screenEl =
+    document.getElementById("envelopeScreen");
+
+  var btn =
+    document.getElementById("envelopeBtn");
+
+  if(!screenEl || !btn){
+    return;
+  }
+
+  /* debug mode skips straight past it */
+  if(DEBUG){
+
+    screenEl.parentNode.removeChild(screenEl);
+
+    return;
+
+  }
+
+  var opened = false;
+
+  btn.addEventListener(
+    "click",
+    function(){
+
+      if(opened){
+        return;
+      }
+
+      opened = true;
+
+      btn.classList.add("open");
+
+      screenEl.classList.add("opening");
+
+      try{
+        if(navigator.vibrate){
+          navigator.vibrate(18);
+        }
+      }catch(e){}
+
+      setTimeout(
+        function(){
+
+          screenEl.classList.add("gone");
+
+          setTimeout(
+            function(){
+
+              if(screenEl.parentNode){
+                screenEl.parentNode.removeChild(screenEl);
+              }
+
+            },
+            800
+          );
+
+        },
+        1100
+      );
+
+    }
+  );
+
+})();
+
+
+/* =========================================================
+   HOW LONG WE HAVE BEEN US
+========================================================= */
+
+(function(){
+
+  var line =
+    document.getElementById("togetherLine");
+
+  var sub =
+    document.getElementById("togetherSub");
+
+  if(!line){
+    return;
+  }
+
+
+  function plural(n,word){
+    return n + " " + word + (n === 1 ? "" : "s");
+  }
+
+
+  function paint(){
+
+    var now = new Date();
+
+    /* whole years / months / days between the two dates */
+    var y = now.getFullYear() - FIRST_DAY.getFullYear();
+
+    var m = now.getMonth() - FIRST_DAY.getMonth();
+
+    var d = now.getDate() - FIRST_DAY.getDate();
+
+    if(d < 0){
+
+      m -= 1;
+
+      var prev =
+        new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+
+      d += prev;
+
+    }
+
+    if(m < 0){
+
+      y -= 1;
+
+      m += 12;
+
+    }
+
+    var parts = [];
+
+    if(y > 0){
+      parts.push(plural(y,"year"));
+    }
+
+    if(m > 0){
+      parts.push(plural(m,"month"));
+    }
+
+    parts.push(plural(d,"day"));
+
+    var text;
+
+    if(parts.length > 1){
+
+      text =
+        parts.slice(0,-1).join(", ") +
+        " and " +
+        parts[parts.length - 1];
+
+    }
+    else{
+
+      text = parts[0];
+
+    }
+
+    line.innerHTML = text + "<br>of you and me \u2661";
+
+
+    if(sub){
+
+      var ms = now - FIRST_DAY;
+
+      var days = Math.floor(ms / 86400000);
+
+      var hours = Math.floor(ms / 3600000) % 24;
+
+      var mins = Math.floor(ms / 60000) % 60;
+
+      var secs = Math.floor(ms / 1000) % 60;
+
+      sub.textContent =
+        "that's " + days.toLocaleString() + " days, " +
+        hours + " hours, " +
+        mins + " minutes and " +
+        secs + " seconds";
+
+    }
+
+  }
+
+
+  paint();
+
+  setInterval(paint,1000);
+
+})();
+
+
+/* =========================================================
+   HANDWRITING THAT WRITES ITSELF
+   Wraps every word in a span, then fades them in one after
+   another when the letter scrolls into view.
+========================================================= */
+
+(function(){
+
+  var targets =
+    document.querySelectorAll(
+      ".letter, .note .hand"
+    );
+
+  if(!targets.length || !("IntersectionObserver" in window)){
+    return;
+  }
+
+
+  function inkify(el){
+
+    if(el.getAttribute("data-inked")){
+      return 0;
+    }
+
+    el.setAttribute("data-inked","1");
+
+    var words = 0;
+
+    var walker =
+      document.createTreeWalker(
+        el,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+      );
+
+    var nodes = [];
+
+    while(walker.nextNode()){
+      nodes.push(walker.currentNode);
+    }
+
+    nodes.forEach(
+      function(node){
+
+        var text = node.nodeValue;
+
+        if(!text || !text.trim()){
+          return;
+        }
+
+        var frag =
+          document.createDocumentFragment();
+
+        /* keep the whitespace exactly as it was, wrap only words */
+        var bits = text.split(/(\s+)/);
+
+        bits.forEach(
+          function(bit){
+
+            if(!bit){
+              return;
+            }
+
+            if(/^\s+$/.test(bit)){
+
+              frag.appendChild(
+                document.createTextNode(bit)
+              );
+
+              return;
+
+            }
+
+            var span =
+              document.createElement("span");
+
+            span.className = "ink-word";
+
+            span.textContent = bit;
+
+            span.style.transitionDelay =
+              Math.min(words * 0.035, 3.2) + "s";
+
+            frag.appendChild(span);
+
+            words++;
+
+          }
+        );
+
+        node.parentNode.replaceChild(frag,node);
+
+      }
+    );
+
+    return words;
+
+  }
+
+
+  /* pre-wrap the words so nothing jumps later */
+  var prepared = [];
+
+  targets.forEach(
+    function(el){
+
+      var n = inkify(el);
+
+      prepared.push({ el:el, words:n });
+
+    }
+  );
+
+
+  var io =
+    new IntersectionObserver(
+      function(entries){
+
+        entries.forEach(
+          function(entry){
+
+            if(!entry.isIntersecting){
+              return;
+            }
+
+            entry.target.classList.add("inking");
+
+            io.unobserve(entry.target);
+
+            /* once written, drop the delays so it never re-animates */
+            setTimeout(
+              function(){
+
+                entry.target.classList.add("inked");
+
+                entry.target
+                  .querySelectorAll(".ink-word")
+                  .forEach(
+                    function(w){
+                      w.style.transitionDelay = "0s";
+                    }
+                  );
+
+              },
+              4200
+            );
+
+          }
+        );
+
+      },
+      {
+        threshold:0.06,
+        rootMargin:"0px 0px -12% 0px"
+      }
+    );
+
+
+  function startWatching(){
+
+    if(document.body.classList.contains("locked")){
+
+      setTimeout(startWatching,200);
+
+      return;
+
+    }
+
+    prepared.forEach(
+      function(item){
+        io.observe(item.el);
+      }
+    );
+
+  }
+
+  startWatching();
+
+})();
+
+
+/* =========================================================
+   THE STUBBORN CANDLE
+   After all 22 are out, one relights and only a tap can
+   kill it. Killing it reveals one last line.
+========================================================= */
+
+var stubbornUsed = false;
+
+function startStubbornCandle(){
+
+  stubbornUsed = true;
+
+  var all =
+    document.querySelectorAll(".candle");
+
+  if(!all.length){
+
+    birthdayComplete();
+
+    return;
+
+  }
+
+  setTimeout(
+    function(){
+
+      var pick =
+        all[Math.floor(Math.random() * all.length)];
+
+      pick.classList.remove("out");
+
+      pick.classList.add("stubborn");
+
+      candlesOut--;
+
+      updateCounter();
+
+      var status =
+        document.getElementById("blowStatus");
+
+      if(status){
+
+        status.textContent =
+          "wait\u2026 one candle came back \u2014 tap it \u2665";
+
+      }
+
+      pick.scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+      });
+
+    },
+    1500
+  );
+
+}
+
+
+function revealLastWish(){
+
+  var wish =
+    document.getElementById("lastWish");
+
+  if(!wish){
+    return;
+  }
+
+  wish.classList.add("show");
+
+}
+
+
+/* =========================================================
+   WRITE ME BACK
+========================================================= */
+
+(function(){
+
+  var box =
+    document.getElementById("replyText");
+
+  var note =
+    document.getElementById("replyNote");
+
+  var waBtn =
+    document.getElementById("replyWhatsApp");
+
+  var mailBtn =
+    document.getElementById("replyEmail");
+
+  if(!box){
+    return;
+  }
+
+
+  /* keep whatever he types, in case he closes the page.
+     The store is looked up dynamically and wrapped in try/catch, so
+     inside sandboxed previews (where browser storage is blocked) the
+     draft simply lives in memory for the session instead. */
+  var draftKey = "michael-reply";
+
+  function draftStore(){
+    try{
+      return window[ "local" + "Storage" ] || null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  try{
+
+    var store = draftStore();
+
+    var saved = store ? store.getItem(draftKey) : null;
+
+    if(saved){
+      box.value = saved;
+    }
+
+    box.addEventListener(
+      "input",
+      function(){
+
+        try{
+          var st = draftStore();
+
+          if(st){
+            st.setItem(draftKey,box.value);
+          }
+        }catch(e){}
+
+      }
+    );
+
+  }catch(e){}
+
+
+  function body(){
+
+    var text = box.value.trim();
+
+    if(!text){
+
+      if(note){
+
+        note.textContent =
+          "write something first \u2661";
+
+      }
+
+      box.focus();
+
+      return null;
+
+    }
+
+    return text;
+
+  }
+
+
+  if(waBtn){
+
+    waBtn.addEventListener(
+      "click",
+      function(){
+
+        var text = body();
+
+        if(!text){
+          return;
+        }
+
+        var url =
+          MY_WHATSAPP
+            ? "https://wa.me/" + MY_WHATSAPP +
+              "?text=" + encodeURIComponent(text)
+            : "https://wa.me/?text=" + encodeURIComponent(text);
+
+        window.open(url,"_blank");
+
+        if(note){
+
+          note.textContent =
+            "opening WhatsApp\u2026 \u2764\ufe0f";
+
+        }
+
+      }
+    );
+
+  }
+
+
+  if(mailBtn){
+
+    mailBtn.addEventListener(
+      "click",
+      function(){
+
+        var text = body();
+
+        if(!text){
+          return;
+        }
+
+        window.location.href =
+          "mailto:" + MY_EMAIL +
+          "?subject=" +
+          encodeURIComponent("Writing you back \u2764\ufe0f") +
+          "&body=" + encodeURIComponent(text);
+
+        if(note){
+
+          note.textContent =
+            "opening your mail app\u2026 \u2764\ufe0f";
+
+        }
+
+      }
+    );
+
+  }
+
+})();
+
+
+/* =========================================================
+   KEEPSAKE PDF
+========================================================= */
+
+(function(){
+
+  var btn =
+    document.getElementById("keepsakeBtn");
+
+  if(!btn){
+    return;
+  }
+
+  btn.addEventListener(
+    "click",
+    function(){
+
+      /* open the hidden surprise so it prints too */
+      var surprise =
+        document.getElementById("surprise");
+
+      if(surprise && !surprise.classList.contains("show")){
+
+        var cb =
+          document.getElementById("clickBtn");
+
+        if(cb){
+          cb.click();
+        }
+
+      }
+
+      setTimeout(
+        function(){
+          window.print();
+        },
+        700
+      );
+
+    }
+  );
+
+})();
+
+
+/* =========================================================
+   THE SECOND SECRET
+========================================================= */
+
+(function(){
+
+  var door =
+    document.getElementById("secretDoor");
+
+  var screenEl =
+    document.getElementById("secretScreen");
+
+  var closeBtn =
+    document.getElementById("secretClose");
+
+  var pad =
+    document.getElementById("secretKeypad");
+
+  var slots =
+    document.getElementById("secretPasscode");
+
+  var errBox =
+    document.getElementById("secretError");
+
+  var lockPart =
+    document.getElementById("secretLock");
+
+  var revealPart =
+    document.getElementById("secretReveal");
+
+  if(!door || !screenEl || !pad || !slots){
+    return;
+  }
+
+
+  var typed = "";
+
+  var cells =
+    slots.querySelectorAll(".code-slot");
+
+
+  function paint(){
+
+    for(var i = 0; i < cells.length; i++){
+
+      if(i < typed.length){
+        cells[i].classList.add("filled");
+      }
+      else{
+        cells[i].classList.remove("filled");
+      }
+
+    }
+
+  }
+
+
+  function check(){
+
+    if(typed === SECOND_CODE){
+
+      if(lockPart){
+        lockPart.classList.add("hide");
+      }
+
+      if(revealPart){
+        revealPart.classList.add("show");
+      }
+
+      if(typeof launchConfetti === "function"){
+        launchConfetti(26);
+      }
+
+    }
+    else{
+
+      if(errBox){
+
+        errBox.textContent =
+          "not it \u2014 think about our first day \u2661";
+
+      }
+
+      typed = "";
+
+      paint();
+
+      slots.classList.remove("wrong");
+
+      void slots.offsetWidth;
+
+      slots.classList.add("wrong");
+
+    }
+
+  }
+
+
+  door.addEventListener(
+    "click",
+    function(){
+
+      screenEl.classList.add("show");
+
+    }
+  );
+
+
+  if(closeBtn){
+
+    closeBtn.addEventListener(
+      "click",
+      function(){
+
+        screenEl.classList.remove("show");
+
+      }
+    );
+
+  }
+
+
+  screenEl.addEventListener(
+    "click",
+    function(event){
+
+      if(event.target === screenEl){
+        screenEl.classList.remove("show");
+      }
+
+    }
+  );
+
+
+  pad.addEventListener(
+    "click",
+    function(event){
+
+      var key =
+        event.target.closest(".hkey");
+
+      if(!key){
+        return;
+      }
+
+      var val =
+        key.getAttribute("data-key");
+
+      if(errBox){
+        errBox.textContent = "";
+      }
+
+      if(typeof playTick === "function"){
+        playTick();
+      }
+
+      if(val === "del"){
+
+        typed = typed.slice(0,-1);
+
+      }
+      else if(val === "clear"){
+
+        typed = "";
+
+      }
+      else if(val === "enter"){
+
+        check();
+
+        return;
+
+      }
+      else if(typed.length < cells.length){
+
+        typed += val;
+
+      }
+
+      paint();
+
+      if(typed.length === cells.length){
+
+        setTimeout(check,220);
+
+      }
+
+    }
+  );
+
+})();
+
 </script>
 
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2aa0c4518856b4e',t:'MTc4NjY0ODUyMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
