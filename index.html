@@ -9,10 +9,19 @@
 <meta name="description" content="A little piece of my heart, made just for you.">
 <meta name="theme-color" content="#b99472">
 
-<!-- Nice preview when you send the link on WhatsApp -->
-<meta property="og:title" content="To My Forever ❤️">
-<meta property="og:description" content="A little piece of my heart, made just for you.">
+<!-- Nice preview when you send the link on WhatsApp / iMessage.
+     og-image.png sits in the same folder as this file. -->
 <meta property="og:type" content="website">
+<meta property="og:title" content="Just For You ❤️">
+<meta property="og:description" content="A little piece of my heart, locked with our code. Happy birthday, my love.">
+<meta property="og:url" content="https://tomyforever.pages.dev/">
+<meta property="og:image" content="https://tomyforever.pages.dev/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Just For You ❤️">
+<meta name="twitter:description" content="A little piece of my heart, locked with our code. Happy birthday, my love.">
+<meta name="twitter:image" content="https://tomyforever.pages.dev/og-image.png">
 
 <!-- Prettier fonts. If the phone is offline these quietly fall back
      to Georgia / Brush Script MT, so nothing breaks. -->
@@ -6853,6 +6862,41 @@ body:before{
 
 }
 
+
+/* ---------- real photos + videos in the polaroids ---------- */
+.photo.has-media{
+  aspect-ratio:4/5;
+  position:relative;
+  padding:0;
+  white-space:normal;
+  background:#2a1a10;
+}
+.photo.has-media img,
+.photo.has-media video{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  border-radius:inherit;
+}
+.photo.is-video{ cursor:pointer; }
+.sound-btn{
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  z-index:3;
+  padding:8px 13px;
+  border:0;
+  border-radius:999px;
+  background:rgba(40,24,12,.75);
+  color:#fbeede;
+  font:600 13px/1 system-ui,-apple-system,sans-serif;
+  letter-spacing:.02em;
+  -webkit-backdrop-filter:blur(4px);
+  backdrop-filter:blur(4px);
+  cursor:pointer;
+}
+.sound-btn.on{ background:rgba(122,52,40,.88); }
 </style>
 </head>
 
@@ -6870,23 +6914,6 @@ body:before{
 <div id="scrollProgress" aria-hidden="true"></div>
 
 
-<!-- =========================================================
-     LINK PREVIEW (WhatsApp / iMessage / Twitter)
-     og-image.png sits in the same folder as this file.
-========================================================= -->
-
-<meta property="og:type" content="website">
-<meta property="og:title" content="Just For You ❤️">
-<meta property="og:description" content="A little piece of my heart, locked with our code. Happy birthday, my love.">
-<meta property="og:url" content="https://tomyforever.pages.dev/">
-<meta property="og:image" content="https://tomyforever.pages.dev/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Just For You ❤️">
-<meta name="twitter:description" content="A little piece of my heart, locked with our code. Happy birthday, my love.">
-<meta name="twitter:image" content="https://tomyforever.pages.dev/og-image.png">
-<meta name="theme-color" content="#d8b184">
 
 
 <noscript>
@@ -7185,12 +7212,7 @@ I pray you achieve everything you've worked for and everything you aim to achiev
 
   <div class="pin"></div>
 
-  <div class="photo">
-    <!-- To add the real photo, delete the two text lines below
-         and paste:  <img src="photo1.jpg" alt="Us"> -->
-PHOTO SPACE
-❤️
-  </div>
+  <div class="photo has-media"><img src="photo1.jpg" alt="Us at the beach" style="object-position:50% 72%" decoding="async"></div>
 
   <div class="caption">
     Our first pic together ❤️
@@ -7231,21 +7253,14 @@ But the truth was… I was crying because I was secretly building this website f
 
 <section class="photo-page">
 
-<h2>
-  That Little Moment ❤️
-</h2>
-
 <div class="polaroid">
 
   <div class="pin"></div>
 
-  <div class="photo">
-PHOTO SPACE
-♡
-  </div>
+  <div class="photo has-media is-video" data-anim="video1.webp" data-sound="video1-sound.m4a"><img src="video1-poster.jpg" alt="A little video of us" decoding="async"><button class="sound-btn" type="button" aria-label="Turn the sound on">♪ tap for sound</button></div>
 
   <div class="caption">
-    A moment that means more than you know
+    I love you so much Michael
   </div>
 
 </div>
@@ -7285,21 +7300,33 @@ Happy birthday again, my forever. ❤️
 
 <section class="photo-page">
 
-<h2>
-  Another Little Piece Of Us
-</h2>
+<div class="polaroid">
+
+  <div class="pin"></div>
+
+  <div class="photo has-media"><img src="photo3.jpg" alt="You, fast asleep" style="object-position:50% 30%" decoding="async"></div>
+
+  <div class="caption">
+    I still can’t decide if you love me more than sleep 😂
+  </div>
+
+</div>
+
+</section>
+
+
+<!-- VIDEO -->
+
+<section class="photo-page">
 
 <div class="polaroid">
 
   <div class="pin"></div>
 
-  <div class="photo">
-PHOTO SPACE
-♥
-  </div>
+  <div class="photo has-media is-video" data-anim="video2.webp"><img src="video2-poster.jpg" alt="A quiet night with you" decoding="async"></div>
 
   <div class="caption">
-    One of my favorite memories
+    My favourite place is right next to you
   </div>
 
 </div>
@@ -11748,6 +11775,156 @@ function revealLastWish(){
 
 })();
 
+</script>
+
+<script>
+/* ---------- moving polaroids ----------
+   The clips are shown as moving pictures (not a video player), so
+   the phone can NEVER open them full screen, and nothing appears
+   until he actually scrolls to them.
+   - they start by themselves when he scrolls to them
+   - the clip's sound plays with it, and the song drops quieter
+     while it plays, then comes back up
+   - tapping the picture mutes / unmutes the clip */
+(function(){
+  var boxes=[].slice.call(document.querySelectorAll('.photo.is-video[data-anim]'));
+  if(!boxes.length) return;
+  var music=document.getElementById('music');
+  var FULL=1, LOW=0.2;
+
+  /* ---- song volume (iPhones ignore audio.volume, so use Web Audio there) ---- */
+  var nativeVolume=true, ctx=null, gain=null, routed=false;
+  if(music){ try{ music.volume=0.5; nativeVolume=Math.abs(music.volume-0.5)<0.01; music.volume=FULL; }catch(e){ nativeVolume=false; } }
+  function routeMusic(){
+    if(routed) return true;
+    if(!ctx || ctx.state!=='running' || !music) return false;
+    try{
+      var src=ctx.createMediaElementSource(music);
+      gain=ctx.createGain(); gain.gain.value=FULL;
+      src.connect(gain); gain.connect(ctx.destination);
+      routed=true;
+    }catch(e){ routed=false; }
+    return routed;
+  }
+  var fadeTimer=null;
+  function setSongVolume(target){
+    if(!music) return;
+    if(nativeVolume){
+      clearInterval(fadeTimer);
+      fadeTimer=setInterval(function(){
+        var v=music.volume, d=target-v;
+        if(Math.abs(d)<0.04){ music.volume=target; clearInterval(fadeTimer); return; }
+        music.volume=v+d*0.25;
+      },40);
+    }else if(routeMusic()){
+      gain.gain.setTargetAtTime(target, ctx.currentTime, 0.18);
+    }else if(target<FULL){
+      if(!music.paused){ music.pause(); music._pausedForClip=true; }
+    }
+    if(target===FULL && music._pausedForClip){ music._pausedForClip=false; music.play().catch(function(){}); }
+  }
+
+  /* ---- set up each clip ---- */
+  var clips=boxes.map(function(box){
+    var img=box.querySelector('img');
+    var c={box:box, img:img, poster:img.getAttribute('src'), anim:box.getAttribute('data-anim'),
+           blob:null, url:null, sound:null, inView:false, userMuted:false, playing:false};
+    var s=box.getAttribute('data-sound');
+    if(s){ c.sound=new Audio(); c.sound.preload='auto'; c.sound.src=s; }
+    /* fetch the moving picture ahead of time so it starts instantly */
+    fetch(c.anim).then(function(r){ return r.blob(); }).then(function(b){ c.blob=b; if(c.inView) restart(c); }).catch(function(){});
+    return c;
+  });
+
+  /* The first tap on the page (the seal) quietly "unlocks" sound on
+     iPhone. Nothing plays and nothing is shown here. */
+  var unlocked=false;
+  function unlock(){
+    if(unlocked) return; unlocked=true;
+    clips.forEach(function(c){ if(c.sound){ try{ c.sound.load(); }catch(e){} } });
+    if(!nativeVolume){
+      var AC=window.AudioContext||window.webkitAudioContext;
+      if(AC){ try{ ctx=new AC(); if(ctx.resume) ctx.resume(); }catch(e){ ctx=null; } }
+    }
+  }
+  ['touchend','click','keydown'].forEach(function(t){ document.addEventListener(t,unlock,{capture:true,passive:true}); });
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){ clips.forEach(stop); }
+    else if(ctx && ctx.state!=='running'){ ctx.resume().catch(function(){}); }
+  });
+
+  function label(c){
+    var btn=c.box.querySelector('.sound-btn');
+    if(!btn) return;
+    var on=c.sound && c.playing && !c.sound.paused && !c.sound.muted;
+    btn.classList.toggle('on',!!on);
+    btn.textContent=on?'\u266A sound on':'\u266A tap for sound';
+    btn.setAttribute('aria-label',on?'Mute the clip':'Turn the sound on');
+  }
+  function loud(){ return clips.some(function(c){ return c.playing && c.sound && !c.sound.paused && !c.sound.muted; }); }
+  function refreshSong(){ setSongVolume(loud()?LOW:FULL); }
+
+  function showAnim(c){
+    if(!c.blob){ return; }
+    if(c.url) URL.revokeObjectURL(c.url);
+    c.url=URL.createObjectURL(c.blob);   /* a fresh address restarts it from the first frame */
+    c.img.src=c.url;
+  }
+  function playSound(c){
+    if(!c.sound || c.userMuted) { label(c); refreshSong(); return; }
+    c.sound.muted=false;
+    try{ c.sound.currentTime=0; }catch(e){}
+    var p=c.sound.play();
+    if(p && p.then){ p.then(function(){ label(c); refreshSong(); }).catch(function(){ label(c); refreshSong(); }); }
+    else{ label(c); refreshSong(); }
+  }
+  function restart(c){
+    if(!c.inView) return;
+    c.playing=true;
+    showAnim(c);
+    playSound(c);
+  }
+  function stop(c){
+    c.playing=false;
+    if(c.sound){ c.sound.pause(); }
+    if(c.img.getAttribute('src')!==c.poster){ c.img.src=c.poster; }
+    if(c.url){ URL.revokeObjectURL(c.url); c.url=null; }
+    label(c); refreshSong();
+  }
+
+  clips.forEach(function(c){
+    if(c.sound){
+      /* keep picture and sound together: when the sound ends, start both again */
+      c.sound.addEventListener('ended',function(){ if(c.inView) restart(c); });
+    }
+    c.box.addEventListener('click',function(){
+      if(!c.sound) return;
+      if(c.userMuted || c.sound.paused){
+        c.userMuted=false;
+        c.inView=true;
+        restart(c);          /* inside a tap, so sound is always allowed */
+      }else{
+        c.userMuted=true;
+        c.sound.pause();
+        label(c); refreshSong();
+      }
+    });
+  });
+
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        var c=clips.filter(function(x){ return x.box===en.target; })[0];
+        if(!c) return;
+        if(en.isIntersecting && !c.inView){ c.inView=true; restart(c); }
+        else if(!en.isIntersecting && c.inView){ c.inView=false; stop(c); }
+      });
+    },{threshold:.55});
+    clips.forEach(function(c){ io.observe(c.box); });
+  }else{
+    clips.forEach(function(c){ c.inView=true; restart(c); });
+  }
+})();
 </script>
 
 </body>
