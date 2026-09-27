@@ -6897,6 +6897,31 @@ body:before{
   cursor:pointer;
 }
 .sound-btn.on{ background:rgba(122,52,40,.88); }
+
+/* voice note inside secret */
+.vn-wrap{margin-top:26px;text-align:center}
+.vn-lead{font-style:italic;color:#8c2b22;margin-bottom:12px}
+.vn-btn{width:64px;height:64px;border-radius:50%;border:none;cursor:pointer;background:#d9576f;color:#fff;font-size:22px;box-shadow:0 6px 18px rgba(167,43,69,.35);transition:transform .2s}
+.vn-btn:active{transform:scale(.94)}
+.vn-btn.playing{animation:vnBeat 1.2s ease-in-out infinite}
+@keyframes vnBeat{0%,100%{transform:scale(1)}15%{transform:scale(1.1)}30%{transform:scale(1)}45%{transform:scale(1.07)}}
+.vn-bar{width:70%;max-width:240px;height:4px;margin:14px auto 0;background:rgba(140,43,34,.18);border-radius:4px;overflow:hidden}
+.vn-fill{height:100%;width:0;background:#d9576f}
+
+.decoy-heart{cursor:pointer;display:inline-block;position:relative;z-index:5;-webkit-text-fill-color:initial;-webkit-tap-highlight-color:transparent}
+div.decoy-heart{display:block;width:max-content;margin-left:auto;margin-right:auto}
+.decoy-heart.wiggle{animation:dWig .5s ease}
+@keyframes dWig{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}50%{transform:rotate(12deg)}75%{transform:rotate(-6deg)}}
+.oops-toast{position:fixed;left:50%;bottom:32px;transform:translate(-50%,20px);background:#fdf6e6;color:#a72b45;padding:12px 22px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:16px;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;z-index:99999;white-space:nowrap}
+.oops-toast.show{opacity:1;transform:translate(-50%,0)}
+
+
+/* candle glow at the ending */
+.candle-glow{position:fixed;inset:0;pointer-events:none;z-index:1150;opacity:0;transition:opacity .25s linear;
+background:radial-gradient(ellipse 75% 60% at 50% 55%,rgba(255,190,110,.22) 0%,rgba(255,170,90,.08) 40%,rgba(60,28,10,.55) 80%,rgba(35,15,5,.8) 100%)}
+.candle-glow::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 50% 40% at 50% 55%,rgba(255,200,120,.18),transparent 70%);animation:cgFlicker 3.2s ease-in-out infinite}
+@keyframes cgFlicker{0%,100%{opacity:.7}20%{opacity:1}35%{opacity:.8}60%{opacity:.95}80%{opacity:.75}}
+
 </style>
 </head>
 
@@ -7958,14 +7983,14 @@ MY LOVE! 🎂❤️</h2>
 </div>
 
 <h2>
-  Forever Yours ❤️
+  Forever Yours <span class="decoy-heart" role="button" tabindex="0" aria-label="heart">❤️</span>
 </h2>
 
 <p>
   Made with all my heart, just for you.
 </p>
 
-<div class="heart">
+<div class="heart decoy-heart" role="button" tabindex="0" aria-label="heart">
   ♥
 </div>
 
@@ -8057,6 +8082,15 @@ MY LOVE! 🎂❤️</h2>
       </p>
 
       <p class="secret-sign">forever, me ❤️</p>
+
+      <div class="vn-wrap">
+        <p class="vn-lead">and one more thing… press play ♡</p>
+        <button type="button" class="vn-btn" id="vnBtn" aria-label="Play my voice note">
+          <span class="vn-icon" id="vnIcon">▶</span>
+        </button>
+        <div class="vn-bar"><div class="vn-fill" id="vnFill"></div></div>
+        <audio id="voiceNote" preload="none" src="voice-note.m4a"></audio>
+      </div>
 
     </div>
 
@@ -11927,5 +11961,45 @@ function revealLastWish(){
 })();
 </script>
 
+<script>
+(function(){
+  var a=document.getElementById('voiceNote'),b=document.getElementById('vnBtn'),ic=document.getElementById('vnIcon'),f=document.getElementById('vnFill');
+  if(!a||!b)return;
+  var bg=null;
+  b.addEventListener('click',function(){
+    if(a.paused){
+      document.querySelectorAll('audio').forEach(function(x){ if(x!==a&&!x.paused){x.pause();bg=x;} });
+      a.play(); b.classList.add('playing'); ic.textContent='❚❚';
+    } else { a.pause(); }
+  });
+  a.addEventListener('pause',function(){ b.classList.remove('playing'); ic.textContent='▶'; });
+  a.addEventListener('ended',function(){ f.style.width='100%'; if(bg){bg.play().catch(function(){});bg=null;} });
+  a.addEventListener('timeupdate',function(){ if(a.duration) f.style.width=(a.currentTime/a.duration*100)+'%'; });
+  var c=document.getElementById('secretClose'); if(c) c.addEventListener('click',function(){ a.pause(); });
+})();
+</script>
+<script>
+(function(){
+  var t=document.createElement('div');t.className='oops-toast';t.textContent='oops, wrong one 🙈 keep looking ♡';document.body.appendChild(t);
+  var tm;
+  document.querySelectorAll('.decoy-heart').forEach(function(h){
+    function go(e){ if(e.type==='keydown'&&e.key!=='Enter'&&e.key!==' ')return;
+      if(h.animate){h.animate([{transform:'rotate(0) scale(1)'},{transform:'rotate(-18deg) scale(1.2)'},{transform:'rotate(16deg) scale(1.2)'},{transform:'rotate(-12deg) scale(1.15)'},{transform:'rotate(8deg) scale(1.1)'},{transform:'rotate(0) scale(1)'}],{duration:700,easing:'ease-in-out'});}
+      t.classList.add('show');clearTimeout(tm);tm=setTimeout(function(){t.classList.remove('show')},1800);}
+    h.addEventListener('click',go);h.addEventListener('keydown',go);
+  });
+})();
+</script>
+<script>
+(function(){
+  var g=document.createElement('div');g.className='candle-glow';g.setAttribute('aria-hidden','true');document.body.appendChild(g);
+  var tick=false;
+  function upd(){tick=false;var d=document.documentElement,h=window.innerHeight,
+    left=d.scrollHeight-(window.scrollY||d.scrollTop)-h;
+    var p=1-left/(h*1.6);p=Math.max(0,Math.min(1,p));g.style.opacity=p.toFixed(3);}
+  window.addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(upd);}},{passive:true});
+  window.addEventListener('resize',upd);upd();
+})();
+</script>
 </body>
 </html>
