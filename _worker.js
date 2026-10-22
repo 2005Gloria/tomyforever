@@ -3,7 +3,7 @@ export default {
   async fetch(request, env) {
     const response = await env.ASSETS.fetch(request);
     if (!response.headers.get('content-type')?.includes('text/html')) return response;
-    return new HTMLRewriter().on('#babyPhotoSpace', {
+    return new HTMLRewriter().on('#scrollProgress', {element(el) {el.remove();}}).on('#babyPhotoSpace', {
       element(el) {
         el.setAttribute('style', 'width:82px;height:100px;top:-23px;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;border-radius:46% 46% 48% 48%;overflow:hidden;padding:0;');
         el.setInnerContent('<img src="' + face + '" alt="Michael as a little boy" width="82" height="100" style="display:block;width:100%;height:100%;object-fit:fill;border:0;outline:0;box-shadow:none;">', {html:true});
